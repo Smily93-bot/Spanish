@@ -91,15 +91,17 @@ class SpanishContent(
     // ---------------------------------------------------------------- Quantum Cloze
 
     fun clozeQuestion(language: HelperLanguage, level: CefrLevel?, random: Random = Random): ClozeQuestion {
-        val candidates = clozeReady.filter { level == null || it.level == level.code }.ifEmpty { clozeReady }
+        // The frequency list stops at C1, so C2 players get the hardest (C1) sentences.
+        val band = if (level == CefrLevel.C2) CefrLevel.C1 else level
+        val candidates = clozeReady.filter { band == null || it.level == band.code }.ifEmpty { clozeReady }
         val word = candidates.random(random)
         val gapRegex = wordRegex(word.shortSpanish)
         val match = gapRegex.find(word.exampleEs)!!
         val answer = match.value
         val gapped = word.exampleEs.replaceRange(match.range, "_____")
-        val samePart = clozeReady.filter { it.partOfSpeech == word.partOfSpeech && it.shortSpanish != word.shortSpanish }
-        val distractors = (samePart.ifEmpty { clozeReady }).asSequence()
-            .shuffled(random)
+        // Prefer distractors with the same part of speech; top up from the whole list if there are too few.
+        val samePart = clozeReady.filter { it.partOfSpeech == word.partOfSpeech }.shuffled(random)
+        val distractors = (samePart.asSequence() + clozeReady.asSequence().shuffled(random))
             .map { matchCase(it.shortSpanish, answer) }
             .filter { normalizeAnswer(it) != normalizeAnswer(answer) }
             .distinct()
@@ -132,9 +134,14 @@ class SpanishContent(
     companion object {
         private val SKIPPED_PARTS = setOf("article", "punctuation", "number", "contraction")
 
-        fun load(context: Context): SpanishContent {
-            val vocab = JSONObject(context.assets.open("vocab.json").bufferedReader().use { it.readText() })
-            val campaign = JSONObject(context.assets.open("campaign.json").bufferedReader().use { it.readText() })
+        fun load(context: Context): SpanishContent = parse(
+            vocabJson = context.assets.open("vocab.json").bufferedReader().use { it.readText() },
+            campaignJson = context.assets.open("campaign.json").bufferedReader().use { it.readText() }
+        )
+
+        fun parse(vocabJson: String, campaignJson: String): SpanishContent {
+            val vocab = JSONObject(vocabJson)
+            val campaign = JSONObject(campaignJson)
 
             val categories = vocab.getJSONArray("categories").objects().map { c ->
                 VocabCategory(
@@ -250,7 +257,6 @@ private fun pair(a: String, b: String, aEn: String, bEn: String = aEn) = WordPai
 
 val SYNONYMS = listOf(
     pair("bonito", "lindo", "pretty"),
-    pair("bello", "hermoso", "beautiful"),
     pair("rápido", "veloz", "fast"),
     pair("contento", "alegre", "happy / cheerful"),
     pair("empezar", "comenzar", "to begin"),
@@ -287,7 +293,6 @@ val SYNONYMS = listOf(
     pair("ayudar", "asistir", "to help"),
     pair("lugar", "sitio", "place"),
     pair("dinero", "plata", "money"),
-    pair("feliz", "dichoso", "happy"),
     pair("error", "fallo", "mistake")
 )
 

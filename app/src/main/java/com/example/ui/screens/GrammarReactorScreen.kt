@@ -38,11 +38,15 @@ private const val SENTENCES_PER_RUN = 8
 private fun buildRun(data: SpanishContent, level: CefrLevel, language: HelperLanguage): List<ReactorSentence> {
     val phrases = data.phrases.filter { CefrLevel.fromCode(it.level) == level && it.spanish.split(" ").size >= 2 }
         .map { ReactorSentence(it.spanish, language.pick(it.arabic, it.english), language.pick(it.ruleAr, it.ruleEn)) }
+    // The frequency list stops at C1, so C2 runs mix C2 phrases with C1 example sentences.
+    val exampleLevel = if (level == CefrLevel.C2) CefrLevel.C1 else level
     val examples = data.frequency.asSequence()
-        .filter { CefrLevel.fromCode(it.level) == level && it.exampleEs.split(" ").size in 3..8 }
+        .filter { CefrLevel.fromCode(it.level) == exampleLevel && it.exampleEs.split(" ").size in 3..8 }
         .map { ReactorSentence(it.exampleEs, language.pick(it.exampleAr, it.exampleEn), "${it.shortSpanish} = ${it.meaning(language)}") }
         .toList()
-    val pool = (phrases.shuffled().take(4) + examples.shuffled().take(SENTENCES_PER_RUN)).distinctBy { it.spanish }
+    val shuffledPhrases = phrases.shuffled()
+    val pool = (shuffledPhrases.take(4) + examples.shuffled().take(SENTENCES_PER_RUN) + shuffledPhrases.drop(4))
+        .distinctBy { it.spanish }
     return pool.take(SENTENCES_PER_RUN).shuffled()
 }
 

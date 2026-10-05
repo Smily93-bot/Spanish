@@ -110,8 +110,8 @@ class SoundEffectsEngine {
 
     private fun mix(a: ShortArray, b: ShortArray): ShortArray =
         ShortArray(maxOf(a.size, b.size)) { i ->
-            ((if (i < a.size) a[i].toInt() else 0) + (if (i < b.size) b[i].toInt() else 0))
-                .coerceIn(Short.MIN_VALUE.toInt(), Short.MAX_VALUE.toInt())).toShort()
+            val sum = (if (i < a.size) a[i].toInt() else 0) + (if (i < b.size) b[i].toInt() else 0)
+            sum.coerceIn(Short.MIN_VALUE.toInt(), Short.MAX_VALUE.toInt()).toShort()
         }
 
     private fun concat(vararg parts: ShortArray): ShortArray {
