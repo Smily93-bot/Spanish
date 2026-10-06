@@ -367,7 +367,7 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
             Canvas(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(if (station == null) 240.dp else 150.dp)
+                    .height(if (station == null) 240.dp else 110.dp)
                     .pointerInput(Unit) {
                         detectTapGestures { tap ->
                             // Tap above Lía to jump, anywhere else to walk there.
@@ -902,7 +902,7 @@ private fun SentenceCard(step: Step.Sentence, viewModel: BlasterViewModel, langu
     }
 }
 
-/** A question answered by tapping one of four big answers. Wrong taps cost a diamond. */
+/** A question answered by jumping onto the right word bubble (Word Jump). Wrong jumps cost a diamond. */
 @Composable
 private fun ChoiceCard(step: Step.Choice, results: MutableMap<String, Boolean>, viewModel: BlasterViewModel, language: HelperLanguage) {
     val onMistake = LocalOnMistake.current
@@ -912,43 +912,31 @@ private fun ChoiceCard(step: Step.Choice, results: MutableMap<String, Boolean>, 
     AdventureCard(borderColor = if (solved) SuccessGreen else ExplorerBlue) {
         Text(step.prompt, color = TextPrimary, fontSize = 22.sp, lineHeight = 30.sp, fontWeight = FontWeight.Bold, modifier = Modifier.fillMaxWidth())
     }
-    step.options.chunked(2).forEach { row ->
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            row.forEach { option ->
-                val isRight = normalizeAnswer(option) in accepted
-                val color = when {
-                    solved && isRight -> SuccessGreen
-                    option in wrong -> MeteorRed
-                    else -> ExplorerBlue
-                }
-                Surface(
-                    onClick = {
-                        if (solved || option in wrong) return@Surface
-                        if (isRight) {
-                            results[step.key] = wrong.isEmpty()
-                            viewModel.soundEngine.hit()
-                            viewModel.speakSpanish(option)
-                        } else {
-                            wrong += option
-                            viewModel.soundEngine.error()
-                            onMistake()
-                            // After two misses the right answer lights up so the player can continue.
-                            if (wrong.size >= 2) results[step.key] = false
-                        }
-                    },
-                    shape = RoundedCornerShape(18.dp),
-                    color = color.copy(alpha = if (solved && isRight) 0.18f else 0.08f),
-                    border = BorderStroke(2.dp, color),
-                    modifier = Modifier.weight(1f).height(64.dp)
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Text(option, color = color, fontSize = 19.sp, fontWeight = FontWeight.ExtraBold, maxLines = 2)
-                    }
+    Text(
+        language.pick("اضغطي على الإجابة الصحيحة لتقفز ليا إليها!", "Tap the right answer and Lía jumps onto it!"),
+        color = TextSecondary, fontSize = 13.sp, fontWeight = FontWeight.SemiBold
+    )
+    WordJump(
+        options = step.options,
+        solved = solved,
+        wrong = wrong,
+        check = { normalizeAnswer(it) in accepted },
+        onLanded = { option ->
+            if (step.key !in results) {
+                if (normalizeAnswer(option) in accepted) {
+                    results[step.key] = wrong.isEmpty()
+                    viewModel.soundEngine.hit()
+                    viewModel.speakSpanish(option)
+                } else {
+                    wrong += option
+                    viewModel.soundEngine.error()
+                    onMistake()
+                    // After two misses the right answer lights up so the player can continue.
+                    if (wrong.size >= 2) results[step.key] = false
                 }
             }
-            if (row.size == 1) Spacer(Modifier.weight(1f))
         }
-    }
+    )
     if (wrong.isNotEmpty() && step.hint.isNotBlank()) {
         Text("💡 Nilo: " + step.hint, color = SolarAmber, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.fillMaxWidth())
     }
