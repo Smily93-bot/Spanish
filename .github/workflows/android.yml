@@ -23,6 +23,14 @@ jobs:
           chmod +x gradlew
           ./gradlew --no-daemon testDebugUnitTest assembleDebug assembleRelease
 
+      - name: Verify APK signatures
+        run: |
+          APKSIGNER=$(ls -d "$ANDROID_HOME"/build-tools/*/ | sort -V | tail -1)apksigner
+          for apk in app/build/outputs/apk/*/*.apk; do
+            echo "== $apk"
+            "$APKSIGNER" verify --verbose --print-certs "$apk" | grep -E "Verified|Signer #1 certificate (DN|SHA-256)|Number of signers"
+          done
+
       - name: Upload APKs
         uses: actions/upload-artifact@v4
         with:
