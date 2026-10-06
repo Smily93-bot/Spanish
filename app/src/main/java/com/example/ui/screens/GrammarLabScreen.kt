@@ -128,7 +128,7 @@ private fun TopicMap(topics: List<GrammarTopic>, viewModel: BlasterViewModel, la
                 ) {
                     Row(Modifier.padding(horizontal = 14.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
-                            Text(topic.titleEs, color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp, maxLines = 1)
+                            Text(topic.titleEs, color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp, maxLines = 1, modifier = Modifier.fillMaxWidth())
                             Text(topic.title(language), color = TextSecondary, fontSize = 12.sp, maxLines = 1)
                         }
                         Text("★".repeat(s) + "☆".repeat(3 - s), color = if (s > 0) SolarGold else AdventureCardBorder, fontSize = 16.sp)
@@ -190,7 +190,7 @@ private fun RuleCard(topic: GrammarTopic, viewModel: BlasterViewModel, language:
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(topic.level, color = DiamondCyan, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                Text(topic.titleEs, color = StarWhite, fontSize = 24.sp, fontWeight = FontWeight.ExtraBold)
+                Text(topic.titleEs, color = StarWhite, fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, modifier = Modifier.fillMaxWidth())
                 Text(topic.title(language), color = SolarGold, fontSize = 15.sp, fontWeight = FontWeight.Bold)
                 Text(topic.intro(language), color = StarWhite.copy(alpha = 0.9f), fontSize = 14.sp)
             }
@@ -199,7 +199,7 @@ private fun RuleCard(topic: GrammarTopic, viewModel: BlasterViewModel, language:
             Surface(shape = RoundedCornerShape(14.dp), color = AdventureSurface, border = BorderStroke(1.dp, AdventureCardBorder), modifier = Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(12.dp)) {
                     if (p.label.isNotBlank()) Text(p.label, color = NebulaPurple, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp)
-                    Text(p.formula, color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                    Text(p.formula, color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 15.sp, modifier = Modifier.fillMaxWidth())
                     if (p.note(language).isNotBlank()) Text(p.note(language), color = TextSecondary, fontSize = 12.sp)
                 }
             }
@@ -207,7 +207,7 @@ private fun RuleCard(topic: GrammarTopic, viewModel: BlasterViewModel, language:
         topic.examples.take(3).forEach { e ->
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
-                    Text(e.spanish, color = ExplorerBlue, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                    Text(e.spanish, color = ExplorerBlue, fontWeight = FontWeight.Bold, fontSize = 15.sp, modifier = Modifier.fillMaxWidth())
                     if (e.translation(language).isNotBlank()) Text(e.translation(language), color = TextSecondary, fontSize = 12.sp, modifier = Modifier.fillMaxWidth())
                 }
                 AudioButton(onClick = { viewModel.speakSpanish(e.spanish) }, size = 34.dp)
@@ -312,7 +312,7 @@ private fun QuestionCard(
                     )
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
-                            Text(q.filled(), color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                            Text(q.filled(), color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 15.sp, modifier = Modifier.fillMaxWidth())
                             if (q.translation(language).isNotBlank()) Text(q.translation(language), color = TextSecondary, fontSize = 13.sp, modifier = Modifier.fillMaxWidth())
                         }
                         AudioButton(onClick = { viewModel.speakSpanish(q.filled()) }, size = 34.dp)

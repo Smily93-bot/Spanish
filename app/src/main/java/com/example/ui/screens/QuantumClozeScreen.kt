@@ -128,7 +128,8 @@ private fun ClozeRun(
             Spacer(Modifier.height(8.dp))
             Text(
                 if (picked != null) question.fullSentence else question.sentenceWithGap,
-                color = TextPrimary, fontSize = 21.sp, fontWeight = FontWeight.Bold, lineHeight = 28.sp
+                color = TextPrimary, fontSize = 21.sp, fontWeight = FontWeight.Bold, lineHeight = 28.sp,
+                modifier = Modifier.fillMaxWidth()
             )
             Spacer(Modifier.height(6.dp))
             Text(question.translation, color = TextSecondary, fontSize = 14.sp, modifier = Modifier.fillMaxWidth())
