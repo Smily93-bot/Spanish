@@ -206,8 +206,6 @@ internal fun GrammarTableQuiz(
         Text(language.pick("🔧 أصلحي لوحة القواعد", "🔧 Repara la consola gramatical"), color = TextPrimary, fontWeight = FontWeight.ExtraBold)
         Text(language.pick("اكتبي التصريفات الناقصة", "Escribe las formas que faltan"), color = TextSecondary, fontSize = 12.sp)
         Spacer(Modifier.height(8.dp))
-        SpanishLtr {
-        Column {
         Row {
             table.headers.forEach { header ->
                 Text(header, color = ExplorerBlue, fontWeight = FontWeight.Bold, fontSize = 12.sp, modifier = Modifier.weight(1f))
@@ -232,8 +230,6 @@ internal fun GrammarTableQuiz(
                     }
                 }
             }
-        }
-        }
         }
     }
 }
@@ -366,8 +362,6 @@ internal fun OrderPuzzle(
         Text(language.pick("📡 أعيدي بناء الرسالة", "📡 Reconstruye la transmisión"), color = NebulaPurple, fontWeight = FontWeight.ExtraBold)
         Text("“$translation”", color = TextSecondary, fontSize = 13.sp)
         Spacer(Modifier.height(10.dp))
-        SpanishLtr {
-        Column {
         // Answer line
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -391,8 +385,6 @@ internal fun OrderPuzzle(
                     placed.add(frag)
                 }
             }
-        }
-        }
         }
         Spacer(Modifier.height(10.dp))
         if (solved) {
