@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.R
@@ -149,6 +150,10 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
     val solved = remember { mutableStateListOf<Int>() }
     val solvedAt = remember { mutableStateMapOf<Int, Float>() }
     val collected = remember { mutableStateListOf<Int>() }
+    // Each wrong answer costs one collected diamond, so diamonds are worth protecting.
+    var lostDiamonds by remember { mutableIntStateOf(0) }
+    var lostAt by remember { mutableFloatStateOf(-10f) }
+    var showStory by remember { mutableStateOf(false) }
     val results = remember { mutableStateMapOf<String, Boolean>() }
     var openStation by remember { mutableStateOf<Int?>(null) }
     var finished by remember { mutableStateOf(false) }
@@ -261,7 +266,8 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
             if (nextStation == null && liaX >= PORTAL_X - 4f && !finished) {
                 finished = true
                 say(NiloLines.home)
-                viewModel.completeTablet(tablet, results.values.count { it }, totalQuestions, bonusCredits = collected.size * 5)
+                val kept = (collected.size - lostDiamonds).coerceAtLeast(0)
+                viewModel.completeTablet(tablet, results.values.count { it }, totalQuestions, bonusCredits = kept * 5)
             }
         }
     }
@@ -285,100 +291,134 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
         if (i == Station.entries.lastIndex) targetX = PORTAL_X
     }
 
+    val diamonds = (collected.size - lostDiamonds).coerceAtLeast(0)
+    val onMistake: () -> Unit = {
+        if (collected.size - lostDiamonds > 0) {
+            lostDiamonds++
+            lostAt = clock
+        }
+    }
+    val keyboardOpen = WindowInsets.ime.getBottom(LocalDensity.current) > 0
+
     Column(Modifier.fillMaxSize()) {
-        // Header
+        // Header: chapter, a button to reread the story, and the diamonds still held.
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
             Column(Modifier.weight(1f)) {
                 Text("${tablet.level} · ${tablet.title(language)}", color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp, maxLines = 1)
                 Text(tablet.expeditionGoal(language), color = TextSecondary, fontSize = 11.sp, maxLines = 2)
             }
-            Text("💎 ${collected.size}", color = SolarAmber, fontWeight = FontWeight.ExtraBold, modifier = Modifier.padding(end = 8.dp))
-        }
-
-        // The game world
-        Canvas(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(250.dp)
-                .clip(RoundedCornerShape(0.dp))
-                .pointerInput(Unit) {
-                    detectTapGestures { tap ->
-                        // Tap above Lía to jump, anywhere else to walk there.
-                        val s = size.height / VIEW_H
-                        val viewW = size.width / s
-                        val camera = (liaX - viewW * 0.35f).coerceIn(0f, (WORLD_END - viewW).coerceAtLeast(0f))
-                        val worldX = tap.x / s + camera
-                        val worldY = tap.y / s
-                        when {
-                            abs(worldX - niloX) < 32f && worldY > GROUND - 140f -> say(NiloLines.greeting)
-                            abs(worldX - liaX) < 50f && worldY < GROUND - LIA_H * 0.5f -> jump()
-                            else -> targetX = worldX
-                        }
-                    }
-                }
-        ) {
-            val s = size.height / VIEW_H
-            val viewW = size.width / s
-            val camera = (liaX - viewW * 0.35f).coerceIn(0f, (WORLD_END - viewW).coerceAtLeast(0f))
-            withTransform({ scale(s, s, pivot = Offset.Zero) }) {
-                drawWorld(
-                    background = background,
-                    wisp = wisp,
-                    walkSprite = walkSprite,
-                    niloSprite = niloSprite,
-                    camera = camera,
-                    viewW = viewW,
-                    clock = clock,
-                    liaX = liaX,
-                    liaY = liaY,
-                    facing = facing,
-                    moving = moving,
-                    solved = solved,
-                    solvedAt = solvedAt,
-                    nextStation = nextStation,
-                    collected = collected,
-                    niloX = niloX,
-                    niloY = niloY,
-                    niloFacing = niloFacing,
-                    niloMoving = niloMoving,
-                    niloSays = niloLine?.es,
-                    textMeasurer = textMeasurer,
-                    unitScale = s,
-                    language = language
-                )
+            TextButton(onClick = { showStory = true }) {
+                Text(language.pick("📖 القصة", "📖 Story"), color = ExplorerBlue, fontWeight = FontWeight.Bold)
+            }
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(end = 6.dp)) {
+                Text("💎 $diamonds", color = SolarAmber, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp)
+                if (clock - lostAt < 1.5f) Text("−1", color = MeteorRed, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp)
             }
         }
 
+        // Questions on top, so they are always in view (also while the keyboard is open).
         val station = openStation
-        if (station == null) {
-            WalkPanel(
-                tablet = tablet,
-                language = language,
-                progress = solved.size,
-                niloLine = niloLine,
-                onSpeakNilo = { viewModel.speakSpanish((niloLine ?: NiloLines.idle).es) },
-                onLeft = { holdLeft = it },
-                onRight = { holdRight = it },
-                onJump = { jump() }
-            )
-        } else {
-            MissionPanel(
-                station = Station.entries[station],
-                tablet = tablet,
-                scene = scene,
-                searchTargets = searchTargets,
-                tableCells = tableCells,
-                results = results,
-                viewModel = viewModel,
-                language = language,
-                onClose = {
-                    openStation = null
-                    liaX = stationX(station) - 70f
-                    facing = -1f
-                },
-                onSolved = { solve(station) }
-            )
+        Box(Modifier.weight(1f).fillMaxWidth()) {
+            if (station == null) {
+                WalkPanel(
+                    tablet = tablet,
+                    language = language,
+                    progress = solved.size,
+                    niloLine = niloLine,
+                    onSpeakNilo = { viewModel.speakSpanish((niloLine ?: NiloLines.idle).es) },
+                    onLeft = { holdLeft = it },
+                    onRight = { holdRight = it },
+                    onJump = { jump() }
+                )
+            } else {
+                CompositionLocalProvider(LocalOnMistake provides onMistake) {
+                    MissionPanel(
+                        station = Station.entries[station],
+                        tablet = tablet,
+                        scene = scene,
+                        searchTargets = searchTargets,
+                        tableCells = tableCells,
+                        results = results,
+                        viewModel = viewModel,
+                        language = language,
+                        onClose = {
+                            openStation = null
+                            liaX = stationX(station) - 70f
+                            facing = -1f
+                        },
+                        onSolved = { solve(station) }
+                    )
+                }
+            }
         }
+
+        // Lía's walk at the bottom of the page; hidden while typing so the answer box stays visible.
+        if (!(keyboardOpen && station != null)) {
+            Canvas(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(if (station == null) 240.dp else 150.dp)
+                    .pointerInput(Unit) {
+                        detectTapGestures { tap ->
+                            // Tap above Lía to jump, anywhere else to walk there.
+                            val s = size.height / VIEW_H
+                            val viewW = size.width / s
+                            val camera = (liaX - viewW * 0.35f).coerceIn(0f, (WORLD_END - viewW).coerceAtLeast(0f))
+                            val worldX = tap.x / s + camera
+                            val worldY = tap.y / s
+                            when {
+                                abs(worldX - niloX) < 32f && worldY > GROUND - 140f -> say(NiloLines.greeting)
+                                abs(worldX - liaX) < 50f && worldY < GROUND - LIA_H * 0.5f -> jump()
+                                else -> targetX = worldX
+                            }
+                        }
+                    }
+            ) {
+                val s = size.height / VIEW_H
+                val viewW = size.width / s
+                val camera = (liaX - viewW * 0.35f).coerceIn(0f, (WORLD_END - viewW).coerceAtLeast(0f))
+                withTransform({ scale(s, s, pivot = Offset.Zero) }) {
+                    drawWorld(
+                        background = background,
+                        wisp = wisp,
+                        walkSprite = walkSprite,
+                        niloSprite = niloSprite,
+                        camera = camera,
+                        viewW = viewW,
+                        clock = clock,
+                        liaX = liaX,
+                        liaY = liaY,
+                        facing = facing,
+                        moving = moving,
+                        solved = solved,
+                        solvedAt = solvedAt,
+                        nextStation = nextStation,
+                        collected = collected,
+                        niloX = niloX,
+                        niloY = niloY,
+                        niloFacing = niloFacing,
+                        niloMoving = niloMoving,
+                        niloSays = niloLine?.es,
+                        textMeasurer = textMeasurer,
+                        unitScale = s,
+                        language = language
+                    )
+                }
+            }
+        }
+    }
+
+    if (showStory) {
+        AlertDialog(
+            onDismissRequest = { showStory = false },
+            containerColor = AdventureBg,
+            confirmButton = { TextButton(onClick = { showStory = false }) { Text(language.pick("إغلاق", "Close")) } },
+            text = {
+                Column(Modifier.verticalScroll(rememberScrollState())) {
+                    StoryCard(language.pick("📡 القصة", "📡 La historia"), tablet.story, tablet.storyAr, viewModel, language)
+                }
+            }
+        )
     }
 }
 
@@ -751,6 +791,7 @@ private fun HiddenObjectSearch(
     language: HelperLanguage
 ) {
     var mistakes by remember { mutableIntStateOf(0) }
+    val onMistake = LocalOnMistake.current
     /** Last wrong tap, as a fraction of the picture. */
     var wrongTap by remember { mutableStateOf<Offset?>(null) }
     var fullScreen by remember { mutableStateOf(false) }
@@ -774,6 +815,7 @@ private fun HiddenObjectSearch(
             mistakes++
             wrongTap = Offset(fx, fy)
             viewModel.soundEngine.error()
+            onMistake()
         }
     }
 

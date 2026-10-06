@@ -452,17 +452,19 @@ private fun IntroCard(
                 Spacer(Modifier.height(10.dp))
                 Text(word.meaning(language), color = SolarGold, fontSize = 22.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
                 Spacer(Modifier.height(12.dp))
-                AudioButton(onClick = { viewModel.speakSpanish(word.shortSpanish) }, size = 52.dp, tint = DiamondCyan)
+                AudioButton(onClick = { viewModel.speakSpanish(word.shortSpanish) }, size = 52.dp)
             }
         }
         if (word.exampleEs.isNotBlank()) {
             AdventureCard(borderColor = NebulaPurple.copy(alpha = 0.5f)) {
+                Text(language.pick("💬 مثال", "💬 Example"), color = NebulaPurple, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
+                Spacer(Modifier.height(4.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
                         Text(word.exampleEs, color = TextPrimary, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
                         Text(language.pick(word.exampleAr, word.exampleEn), color = TextSecondary, fontSize = 13.sp, modifier = Modifier.fillMaxWidth())
                     }
-                    AudioButton(onClick = { viewModel.speakSpanish(word.exampleEs) }, size = 36.dp, tint = NebulaPurple)
+                    AudioButton(onClick = { viewModel.speakSpanish(word.exampleEs) }, size = 36.dp)
                 }
             }
         }
@@ -546,7 +548,7 @@ private fun QuestionView(
                 GalaxyExercise.MEANING -> Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(word.shortSpanish, color = StarWhite, fontSize = 34.sp, fontWeight = FontWeight.ExtraBold)
                     Spacer(Modifier.width(10.dp))
-                    AudioButton(onClick = { viewModel.speakSpanish(word.shortSpanish) }, size = 40.dp, tint = DiamondCyan)
+                    AudioButton(onClick = { viewModel.speakSpanish(word.shortSpanish) }, size = 40.dp)
                 }
                 GalaxyExercise.REVERSE, GalaxyExercise.SPELL -> Text(
                     word.meaning(language), color = SolarGold, fontSize = 26.sp, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center
@@ -695,6 +697,7 @@ private fun Feedback(
                 color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp
             )
             if (word.exampleEs.isNotBlank()) {
+                Text(language.pick("💬 مثال", "💬 Example"), color = NebulaPurple, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
                 Text(word.exampleEs, color = TextPrimary, fontSize = 13.sp)
                 Text(language.pick(word.exampleAr, word.exampleEn), color = TextSecondary, fontSize = 12.sp, modifier = Modifier.fillMaxWidth())
             }

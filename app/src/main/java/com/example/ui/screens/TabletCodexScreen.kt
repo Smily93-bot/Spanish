@@ -182,14 +182,21 @@ internal fun StoryCard(title: String, story: String, translation: String?, viewM
 
 @Composable
 internal fun LessonCard(tablet: ReadingTablet, viewModel: BlasterViewModel, language: HelperLanguage) {
+    val examples = remember(tablet.lesson.example) {
+        tablet.lesson.example.split(Regex("(?<=[.!?])\\s+")).filter { it.isNotBlank() }
+    }
     AdventureCard(borderColor = ExplorerBlue) {
-        Text("📘 " + language.pick(tablet.lesson.titleAr, tablet.lesson.title), color = ExplorerBlue, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
+        Text(language.pick("📘 القاعدة", "📘 The rule"), color = ExplorerBlue, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
+        Text(language.pick(tablet.lesson.titleAr, tablet.lesson.title), color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp)
         Spacer(Modifier.height(6.dp))
-        Text(language.pick(tablet.lesson.arabic, tablet.lesson.english), color = TextPrimary, fontSize = 14.sp)
-        Spacer(Modifier.height(8.dp))
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(tablet.lesson.example, color = NebulaPurple, fontSize = 14.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-            AudioButton(onClick = { viewModel.speakSpanish(tablet.lesson.example) }, size = 32.dp, tint = NebulaPurple)
+        Text(language.pick(tablet.lesson.arabic, tablet.lesson.english), color = TextPrimary, fontSize = 15.sp, lineHeight = 24.sp, modifier = Modifier.fillMaxWidth())
+        Spacer(Modifier.height(10.dp))
+        Text(language.pick("💬 مثال", "💬 Example"), color = NebulaPurple, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
+        examples.forEach { sentence ->
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 3.dp)) {
+                Text(sentence, color = NebulaPurple, fontSize = 15.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                AudioButton(onClick = { viewModel.speakSpanish(sentence) }, size = 32.dp)
+            }
         }
     }
 }
@@ -234,14 +241,19 @@ internal fun GrammarTableQuiz(
     }
 }
 
+/** Called on every wrong answer inside an expedition (it costs a diamond there). */
+internal val LocalOnMistake = compositionLocalOf<() -> Unit> { {} }
+
 @Composable
 private fun CellInput(answer: String, key: String, results: MutableMap<String, Boolean>, viewModel: BlasterViewModel) {
     var text by rememberSaveable(key) { mutableStateOf("") }
     var mistakes by rememberSaveable(key) { mutableIntStateOf(0) }
     val solved = key in results
     val accepted = answer.split("/").map { normalizeAnswer(it) }
+    val onMistake = LocalOnMistake.current
     fun check() {
-        if (solved) return
+        // Ignore Enter on an empty box: pressing Enter twice must never give the answer away.
+        if (solved || text.isBlank()) return
         if (normalizeAnswer(text) in accepted || normalizeAnswer(text) == normalizeAnswer(answer)) {
             results[key] = mistakes == 0
             viewModel.soundEngine.hit()
@@ -249,11 +261,12 @@ private fun CellInput(answer: String, key: String, results: MutableMap<String, B
         } else {
             mistakes++
             viewModel.soundEngine.error()
-            if (mistakes >= 2) {
-                text = answer
-                results[key] = false
-            }
+            onMistake()
         }
+    }
+    fun reveal() {
+        text = answer.split("/").first().trim()
+        results[key] = false
     }
     OutlinedTextField(
         value = text,
@@ -264,8 +277,12 @@ private fun CellInput(answer: String, key: String, results: MutableMap<String, B
         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.None, autoCorrectEnabled = false, imeAction = ImeAction.Done),
         keyboardActions = KeyboardActions(onDone = { check() }),
         trailingIcon = {
-            if (solved) Text("✓", color = SuccessGreen)
-            else Text("↵", color = ExplorerBlue, modifier = Modifier.clickable { check() })
+            when {
+                solved -> Text("✓", color = SuccessGreen)
+                // After two wrong tries the eye shows the answer — only when tapped on purpose.
+                mistakes >= 2 -> Text("👁", modifier = Modifier.clickable { reveal() })
+                else -> Text("↵", color = ExplorerBlue, modifier = Modifier.clickable { check() })
+            }
         },
         modifier = Modifier.fillMaxWidth()
     )
@@ -295,6 +312,7 @@ private fun QuestionCard(
     var text by rememberSaveable(key) { mutableStateOf("") }
     var mistakes by rememberSaveable(key) { mutableIntStateOf(0) }
     val solved = key in results
+    val onMistake = LocalOnMistake.current
     fun check() {
         if (solved || text.isBlank()) return
         if (field.answers.any { normalizeAnswer(it) == normalizeAnswer(text) }) {
@@ -304,6 +322,7 @@ private fun QuestionCard(
         } else {
             mistakes++
             viewModel.soundEngine.error()
+            onMistake()
         }
     }
     AdventureCard(borderColor = if (solved) SuccessGreen else if (mistakes > 0) MeteorRed.copy(alpha = 0.6f) else AdventureCardBorder) {
@@ -357,6 +376,7 @@ internal fun OrderPuzzle(
     val placed = remember(fragments) { mutableStateListOf<IndexedValue<String>>() }
     var mistakes by remember(fragments) { mutableIntStateOf(0) }
     val solved = "order" in results
+    val onMistake = LocalOnMistake.current
 
     AdventureCard(borderColor = if (solved) SuccessGreen else NebulaPurple) {
         Text(language.pick("📡 أعيدي بناء الرسالة", "📡 Reconstruye la transmisión"), color = NebulaPurple, fontWeight = FontWeight.ExtraBold)
@@ -399,6 +419,7 @@ internal fun OrderPuzzle(
                     } else {
                         mistakes++
                         viewModel.soundEngine.error()
+                        onMistake()
                         placed.clear()
                     }
                 })

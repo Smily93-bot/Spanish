@@ -93,7 +93,7 @@ fun NiloSays(line: NiloLine, language: HelperLanguage, onSpeak: () -> Unit, size
                     Text("Nilo: " + line.es, color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 15.sp)
                     Text(line.meaning(language), color = TextSecondary, fontSize = 12.sp)
                 }
-                AudioButton(onClick = onSpeak, size = 32.dp, tint = SolarAmber)
+                AudioButton(onClick = onSpeak, size = 32.dp)
             }
         }
     }

@@ -180,7 +180,7 @@ private fun Arena(state: MeteorGameState, viewModel: BlasterViewModel, language:
                     Text("(${word.hint})", color = StarWhite.copy(alpha = 0.6f), fontSize = 12.sp)
                 }
             }
-            AudioButton(onClick = { viewModel.speakSpanish(word.spanishToSpeak) }, tint = DiamondCyan, size = 42.dp)
+            AudioButton(onClick = { viewModel.speakSpanish(word.spanishToSpeak) }, size = 42.dp)
         }
 
         state.lastHitEffect?.let {

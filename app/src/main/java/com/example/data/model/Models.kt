@@ -5,7 +5,21 @@ enum class HelperLanguage { ARABIC, ENGLISH }
 
 /** Picks the Arabic or English variant of a helper string. */
 fun HelperLanguage.pick(arabic: String, english: String): String =
-    if (this == HelperLanguage.ARABIC) arabic else english
+    if (this == HelperLanguage.ARABIC) isolateLatin(arabic) else english
+
+private val LATIN_RUN = Regex(
+    "[¿¡]?[A-Za-zÀ-ÖØ-öø-ÿ][A-Za-zÀ-ÖØ-öø-ÿ0-9'’\\-]*" +
+        "(?:[ ,/·:+]+[¿¡]?[A-Za-zÀ-ÖØ-öø-ÿ][A-Za-zÀ-ÖØ-öø-ÿ0-9'’\\-]*)*"
+)
+
+/**
+ * Wraps each run of Spanish/English words inside Arabic text in Unicode isolates (LRI…PDI) so
+ * mixed sentences such as "يشترك ir وser في fui، fuiste، fue" keep the Spanish in reading order.
+ */
+fun isolateLatin(text: String): String {
+    if (text.none { it in '\u0600'..'\u06FF' }) return text
+    return LATIN_RUN.replace(text) { "\u2066${it.value}\u2069" }
+}
 
 /** CEFR levels covered by the bundled content. */
 enum class CefrLevel(val code: String) {
