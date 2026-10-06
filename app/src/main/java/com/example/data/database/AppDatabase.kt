@@ -15,7 +15,9 @@ import androidx.room.RoomDatabase
         MilestoneGoalEntity::class
     ],
     version = 1,
-    exportSchema = true
+    // Schema export is off: debug and release KSP tasks wrote the same schema file concurrently and
+    // corrupted it. Re-enable with the androidx.room Gradle plugin before adding the first migration.
+    exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
 
