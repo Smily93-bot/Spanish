@@ -32,6 +32,19 @@ data class StreakState(
         return lastGoalDay >= 0 && missed in 1..freezes.toLong()
     }
 
+    /** Last day any XP was earned; -1 when the player never studied. */
+    val lastActiveDay: Long get() = maxOf(lastGoalDay, xpDay)
+
+    /** Whole days since the player last studied (0 = today). */
+    fun daysAway(day: Long): Int = if (lastActiveDay < 0) 0 else (day - lastActiveDay).toInt().coerceAtLeast(0)
+
+    /** How Lía feels on the widget: sad once the streak is lost and days went by without study. */
+    fun liaMood(day: Long): LiaMood = when {
+        goalMetOn(day) -> LiaMood.HAPPY
+        lastActiveDay >= 0 && daysAway(day) >= 2 && liveStreak(day) == 0 -> LiaMood.SAD
+        else -> LiaMood.WAITING
+    }
+
     /** Applies missed days (freezes or reset) so that [lastGoalDay] is today or yesterday. */
     fun rollTo(day: Long): StreakState {
         if (lastGoalDay < 0 || lastGoalDay >= day - 1) return this
@@ -80,6 +93,8 @@ data class StreakState(
         private fun Set<Long>.recent(day: Long) = filter { it > day - 60 }.toSet()
     }
 }
+
+enum class LiaMood { HAPPY, WAITING, SAD }
 
 sealed interface StreakEvent {
     data object None : StreakEvent

@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -17,6 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import com.example.R
+import com.example.data.engagement.LiaMood
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -76,7 +80,12 @@ fun StreakCard(viewModel: BlasterViewModel, language: HelperLanguage) {
 
     AdventureCard(borderColor = SolarAmber.copy(alpha = 0.6f)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(if (done) "🔥" else "🕯️", fontSize = 40.sp)
+            val mood = streak.liaMood(today)
+            Image(
+                painter = painterResource(if (mood == LiaMood.SAD) R.drawable.lia_sad else R.drawable.lia_happy),
+                contentDescription = "Lía",
+                modifier = Modifier.size(64.dp)
+            )
             Spacer(Modifier.width(10.dp))
             Column(Modifier.weight(1f)) {
                 Text(
@@ -86,6 +95,10 @@ fun StreakCard(viewModel: BlasterViewModel, language: HelperLanguage) {
                 Text(
                     when {
                         done -> language.pick("أنجزتِ هدف اليوم! عودي غدًا 💪", "Goal done today! Come back tomorrow 💪")
+                        streak.liaMood(today) == LiaMood.SAD -> language.pick(
+                            "ليا حزينة، غبتِ ${streak.daysAway(today)} أيام. أكملي هدف اليوم لتفرح من جديد!",
+                            "Lía is sad, you were away ${streak.daysAway(today)} days. Hit today's goal to cheer her up!"
+                        )
                         live > 0 -> language.pick("أكملي هدف اليوم حتى لا تنطفئ الشعلة", "Hit today's goal to keep the flame alive")
                         else -> language.pick("أكملي هدف اليوم لتبدئي سلسلة", "Hit today's goal to start a streak")
                     },

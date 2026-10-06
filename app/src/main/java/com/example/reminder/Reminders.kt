@@ -48,7 +48,10 @@ object Reminders {
         val arabic = EngagementStore.helperArabic(prefs)
         val live = streak.liveStreak(today)
         val due = EngagementStore.dueCount(prefs, today)
+        val sad = streak.liaMood(today) == com.example.data.engagement.LiaMood.SAD
         val title = when {
+            sad && arabic -> "😢 ليا حزينة، تفتقدك!"
+            sad -> "😢 Lía is sad, she misses you!"
             live > 0 && arabic -> "🔥 حافظي على سلسلة $live يوم!"
             live > 0 -> "🔥 Keep your $live-day streak alive!"
             arabic -> "🚀 ليا ونيلو بانتظارك"

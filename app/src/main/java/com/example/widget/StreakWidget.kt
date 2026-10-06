@@ -11,6 +11,7 @@ import android.widget.RemoteViews
 import com.example.MainActivity
 import com.example.R
 import com.example.data.engagement.EngagementStore
+import com.example.data.engagement.LiaMood
 
 /**
  * Home-screen widget: streak flame, today's XP goal, words waiting for review and a word of the day.
@@ -38,21 +39,34 @@ class StreakWidget : AppWidgetProvider() {
             val arabic = EngagementStore.helperArabic(prefs)
             val xp = streak.xpOn(today)
             val goal = streak.dailyGoal
-            val done = streak.goalMetOn(today)
             val live = streak.liveStreak(today)
             val due = EngagementStore.dueCount(prefs, today)
             val word = EngagementStore.wordOfDay(prefs, today)
 
+            val mood = streak.liaMood(today)
+            val away = streak.daysAway(today)
+
             fun t(ar: String, en: String) = if (arabic) ar else en
 
             return RemoteViews(context.packageName, R.layout.widget_streak).apply {
+                setImageViewResource(R.id.widget_lia, if (mood == LiaMood.SAD) R.drawable.lia_sad else R.drawable.lia_happy)
                 setTextViewText(R.id.widget_streak_count, live.toString())
-                setTextViewText(R.id.widget_streak_label, t("يوم متتالي", if (live == 1) "day streak" else "day streak"))
-                setTextViewText(R.id.widget_flame, if (done) "🔥" else "🕯️")
+                setTextViewText(R.id.widget_streak_label, t("يوم متتالي", "day streak"))
+                setTextViewText(
+                    R.id.widget_flame,
+                    when (mood) {
+                        LiaMood.HAPPY -> "🔥"
+                        LiaMood.WAITING -> "🕯️"
+                        LiaMood.SAD -> "💧"
+                    }
+                )
                 setTextViewText(
                     R.id.widget_goal,
-                    if (done) t("✅ أنجزتِ هدف اليوم!", "✅ Daily goal done!")
-                    else t("الهدف: $xp / $goal نقطة", "Goal: $xp / $goal XP")
+                    when (mood) {
+                        LiaMood.HAPPY -> t("✅ أنجزتِ هدف اليوم! ليا سعيدة", "✅ Goal done! Lía is happy")
+                        LiaMood.SAD -> t("😢 ليا حزينة… $away أيام بلا دراسة", "😢 Lía misses you… $away days away")
+                        LiaMood.WAITING -> t("الهدف: $xp / $goal نقطة", "Goal: $xp / $goal XP")
+                    }
                 )
                 setProgressBar(R.id.widget_progress, goal, xp.coerceAtMost(goal), false)
                 setTextViewText(

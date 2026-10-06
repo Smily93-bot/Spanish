@@ -3,6 +3,7 @@ package com.example
 import com.example.data.content.GalaxyExercise
 import com.example.data.content.GalaxyQuiz
 import com.example.data.engagement.Galaxy
+import com.example.data.engagement.LiaMood
 import com.example.data.engagement.StreakEvent
 import com.example.data.engagement.StreakState
 import com.example.data.engagement.WordCard
@@ -103,5 +104,22 @@ class EngagementTest {
             assertTrue(q.answer in q.options)
         }
         assertEquals("meaning1", quiz.question(words[0], GalaxyExercise.MEANING, HelperLanguage.ENGLISH).answer)
+    }
+
+    @Test
+    fun liaIsSadOnlyWhenStreakBrokenAndDaysMissed() {
+        assertEquals(LiaMood.WAITING, StreakState().liaMood(50))  // brand-new player
+        var s = StreakState(dailyGoal = 10, freezes = 0)
+        s = s.addXp(10, 10).first
+        assertEquals(LiaMood.HAPPY, s.liaMood(10))
+        assertEquals(LiaMood.WAITING, s.liaMood(11))   // streak still alive
+        assertEquals(LiaMood.SAD, s.liaMood(12))       // a whole day missed, streak gone
+        assertEquals(2, s.daysAway(12))
+        val frozen = s.copy(freezes = 1)
+        assertEquals(LiaMood.WAITING, frozen.liaMood(12))  // a freeze still saves it
+        s = s.addXp(15, 3).first
+        assertEquals(LiaMood.WAITING, s.liaMood(15))   // studying again cheers her up
+        s = s.addXp(15, 10).first
+        assertEquals(LiaMood.HAPPY, s.liaMood(15))
     }
 }
