@@ -336,7 +336,7 @@ private fun QuestionCard(
         }
         if (mistakes > 0 && !solved) {
             Spacer(Modifier.height(6.dp))
-            Text("💡 " + language.pick(field.hintAr, field.hint), color = SolarAmber, fontSize = 12.sp)
+            Text("💡 Nilo: " + language.pick(field.hintAr, field.hint), color = SolarAmber, fontSize = 12.sp)
         }
     }
 }

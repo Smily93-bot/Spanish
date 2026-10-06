@@ -142,7 +142,23 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
     val results = remember { mutableStateMapOf<String, Boolean>() }
     var openStation by remember { mutableStateOf<Int?>(null) }
     var finished by remember { mutableStateOf(false) }
-    var toast by remember { mutableStateOf<String?>(null) }
+
+    // Nilo, Lía's co-pilot: follows her, jumps after her and comments in Spanish.
+    var niloX by remember { mutableFloatStateOf(START_X - 72f) }
+    var niloY by remember { mutableFloatStateOf(0f) }
+    var niloVelocityY by remember { mutableFloatStateOf(0f) }
+    var niloFacing by remember { mutableFloatStateOf(1f) }
+    var niloMoving by remember { mutableStateOf(false) }
+    var niloJumpAt by remember { mutableStateOf<Float?>(null) }
+    var niloLine by remember { mutableStateOf<NiloLine?>(null) }
+    var niloLineUntil by remember { mutableFloatStateOf(0f) }
+    var lastMoveAt by remember { mutableFloatStateOf(0f) }
+
+    fun say(line: NiloLine, speak: Boolean = true) {
+        niloLine = line
+        niloLineUntil = clock + 3.5f
+        if (speak) viewModel.speakSpanish(line.es)
+    }
 
     val scene = data.scenes[tablet.scene]
     val searchTargets = remember(tablet.id) { tablet.targets.mapNotNull { id -> scene?.objects?.firstOrNull { it.id == id } } }
@@ -161,8 +177,11 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
             val dt = ((now - last) / 1_000_000_000f).coerceAtMost(0.05f)
             last = now
             clock += dt
+            if (niloLine != null && clock > niloLineUntil && openStation == null) niloLine = null
+            if (clock in 0.6f..0.7f && niloLine == null) say(NiloLines.start)
             if (openStation != null || finished) {
                 moving = false
+                niloMoving = false
                 continue
             }
             val target = targetX
@@ -180,6 +199,34 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
             liaX = (liaX + dir * WALK_SPEED * dt).coerceIn(40f, maxX)
             moving = abs(liaX - before) > 0.01f
             if (dir != 0f) facing = dir
+            if (moving) lastMoveAt = clock
+            if (!moving && clock - lastMoveAt > 8f && niloLine == null) {
+                say(NiloLines.idle, speak = false)
+                lastMoveAt = clock
+            }
+            // Nilo keeps a few steps behind Lía and catches up when she runs ahead.
+            val niloTarget = (liaX - 72f * facing).coerceAtLeast(30f)
+            val gap = niloTarget - niloX
+            val niloStep = (if (gap > 0) 1f else -1f) * minOf(abs(gap) * 4f, WALK_SPEED * 1.2f) * dt
+            niloMoving = abs(gap) > 3f
+            if (niloMoving) {
+                niloX += niloStep
+                niloFacing = if (gap > 0) 1f else -1f
+            } else {
+                niloFacing = facing
+            }
+            niloJumpAt?.let { at ->
+                if (clock >= at && niloY == 0f) {
+                    niloVelocityY = JUMP_VELOCITY * 0.9f
+                    niloY = -0.1f
+                    niloJumpAt = null
+                }
+            }
+            if (niloY < 0f || niloVelocityY < 0f) {
+                niloVelocityY += GRAVITY * dt
+                niloY = (niloY + niloVelocityY * dt).coerceAtMost(0f)
+                if (niloY >= 0f) niloVelocityY = 0f
+            }
             // Jump physics.
             if (liaY < 0f || velocityY < 0f) {
                 velocityY += GRAVITY * dt
@@ -191,6 +238,7 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
                 if (i !in collected && abs(d.x - liaX) < 30f && abs(d.y - (GROUND + liaY - LIA_H / 2)) < 62f) {
                     collected += i
                     viewModel.soundEngine.click()
+                    if (collected.size == 1) say(NiloLines.diamond)
                 }
             }
             // Reaching the next glowing wisp opens its mission.
@@ -202,6 +250,7 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
             // Walking into the open portal finishes the expedition.
             if (nextStation == null && liaX >= PORTAL_X - 4f && !finished) {
                 finished = true
+                say(NiloLines.home)
                 viewModel.completeTablet(tablet, results.values.count { it }, totalQuestions, bonusCredits = collected.size * 5)
             }
         }
@@ -211,6 +260,7 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
         if (liaY == 0f && openStation == null) {
             velocityY = JUMP_VELOCITY
             liaY = -0.1f
+            niloJumpAt = clock + 0.2f
             viewModel.soundEngine.laser()
         }
     }
@@ -221,11 +271,7 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
         solvedAt[i] = clock
         openStation = null
         viewModel.soundEngine.fanfare()
-        toast = if (i == Station.entries.lastIndex) {
-            language.pick("🌀 البوابة مفتوحة! امشي إليها", "🌀 ¡El portal está abierto! Camina hacia él")
-        } else {
-            language.pick("✨ أحسنتِ! تابعي المشي ▶", "✨ ¡Bien hecho! Sigue caminando ▶")
-        }
+        say(if (i == Station.entries.lastIndex) NiloLines.portalOpen else NiloLines.praise.random())
         if (i == Station.entries.lastIndex) targetX = PORTAL_X
     }
 
@@ -255,7 +301,12 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
                         val viewW = size.width / s
                         val camera = (liaX - viewW * 0.35f).coerceIn(0f, (WORLD_END - viewW).coerceAtLeast(0f))
                         val worldX = tap.x / s + camera
-                        if (abs(worldX - liaX) < 50f && tap.y / s < GROUND - LIA_H * 0.5f) jump() else targetX = worldX
+                        val worldY = tap.y / s
+                        when {
+                            abs(worldX - niloX) < 32f && worldY > GROUND - 140f -> say(NiloLines.greeting)
+                            abs(worldX - liaX) < 50f && worldY < GROUND - LIA_H * 0.5f -> jump()
+                            else -> targetX = worldX
+                        }
                     }
                 }
         ) {
@@ -278,6 +329,11 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
                     solvedAt = solvedAt,
                     nextStation = nextStation,
                     collected = collected,
+                    niloX = niloX,
+                    niloY = niloY,
+                    niloFacing = niloFacing,
+                    niloMoving = niloMoving,
+                    niloSays = niloLine?.es,
                     textMeasurer = textMeasurer,
                     unitScale = s,
                     language = language
@@ -291,7 +347,8 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
                 tablet = tablet,
                 language = language,
                 progress = solved.size,
-                toast = toast,
+                niloLine = niloLine,
+                onSpeakNilo = { viewModel.speakSpanish((niloLine ?: NiloLines.idle).es) },
                 onLeft = { holdLeft = it },
                 onRight = { holdRight = it },
                 onJump = { jump() }
@@ -334,6 +391,11 @@ private fun DrawScope.drawWorld(
     solvedAt: Map<Int, Float>,
     nextStation: Int?,
     collected: List<Int>,
+    niloX: Float,
+    niloY: Float,
+    niloFacing: Float,
+    niloMoving: Boolean,
+    niloSays: String?,
     textMeasurer: androidx.compose.ui.text.TextMeasurer,
     unitScale: Float,
     language: HelperLanguage
@@ -433,6 +495,16 @@ private fun DrawScope.drawWorld(
             }
         }
 
+        // Nilo (drawn behind Lía, scaled so his helmet top lines up with hers)
+        drawOval(Color(0x55000000), topLeft = Offset(niloX - 22f, GROUND - 4f), size = Size(44f, 8f))
+        withTransform({
+            translate(niloX, GROUND + niloY)
+            scale(niloFacing * 0.84f, 0.84f, pivot = Offset.Zero)
+        }) {
+            drawNilo(phase = clock * 11f, moving = niloMoving && niloY == 0f, airborne = niloY < 0f)
+        }
+        niloSays?.let { drawBubble(textMeasurer, unitScale, it, niloX, GROUND + niloY - 128f) }
+
         // Lía
         val frame = when {
             liaY < 0f -> 1
@@ -474,6 +546,26 @@ private fun DrawScope.drawLabel(
     }
 }
 
+/** Speech bubble whose bottom edge sits at [bottomY], centred on [centerX]. Text keeps its natural size. */
+private fun DrawScope.drawBubble(
+    textMeasurer: androidx.compose.ui.text.TextMeasurer,
+    unitScale: Float,
+    text: String,
+    centerX: Float,
+    bottomY: Float
+) {
+    val layout = textMeasurer.measure(text, TextStyle(color = TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.Bold))
+    val w = layout.size.width / unitScale + 18f
+    val h = layout.size.height / unitScale + 10f
+    val left = centerX - w / 2
+    val top = bottomY - h
+    drawRoundRect(AdventureSurface, topLeft = Offset(left, top), size = Size(w, h), cornerRadius = CornerRadius(9f))
+    drawRoundRect(SolarAmber, topLeft = Offset(left, top), size = Size(w, h), cornerRadius = CornerRadius(9f), style = Stroke(2f))
+    withTransform({ scale(1f / unitScale, 1f / unitScale, pivot = Offset(centerX, top + h / 2)) }) {
+        drawText(layout, topLeft = Offset(centerX - layout.size.width / 2f, top + h / 2 - layout.size.height / 2f))
+    }
+}
+
 // --------------------------------------------------------------------------- Panels
 
 @Composable
@@ -481,7 +573,8 @@ private fun WalkPanel(
     tablet: ReadingTablet,
     language: HelperLanguage,
     progress: Int,
-    toast: String?,
+    niloLine: NiloLine?,
+    onSpeakNilo: () -> Unit,
     onLeft: (Boolean) -> Unit,
     onRight: (Boolean) -> Unit,
     onJump: () -> Unit
@@ -497,15 +590,8 @@ private fun WalkPanel(
             )
             Spacer(Modifier.height(4.dp))
             ProgressBar(progress / Station.entries.size.toFloat(), color = SolarGold, height = 8.dp)
-            Spacer(Modifier.height(8.dp))
-            Text(
-                toast ?: language.pick(
-                    "امشي مع ليا نحو الضوء الأزرق لبدء المهمة. اقفزي لجمع الألماس 💎",
-                    "Walk Lía to the blue light to start the mission. Jump to collect diamonds 💎"
-                ),
-                color = TextPrimary, fontSize = 14.sp
-            )
         }
+        NiloSays(niloLine ?: NiloLines.idle, language, onSpeak = onSpeakNilo)
         Spacer(Modifier.weight(1f))
         // Controls stay left-to-right even in Arabic so ◀ and ▶ point the way Lía walks.
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
@@ -578,6 +664,8 @@ private fun MissionPanel(
             Text(station.label(language), color = TextSecondary, fontSize = 13.sp, modifier = Modifier.weight(1f))
             TextButton(onClick = onClose) { Text("✕", color = TextSecondary, fontSize = 18.sp) }
         }
+        val intro = NiloLines.missionIntro[station.ordinal]
+        NiloSays(intro, language, onSpeak = { viewModel.speakSpanish(intro.es) })
 
         val complete: Boolean = when (station) {
             Station.STORY -> {
@@ -738,7 +826,7 @@ private fun HiddenObjectSearch(
         }
     }
     if (hinted != null) {
-        Text(language.pick("💡 تلميح: انظري إلى الدائرة الذهبية", "💡 Hint: look inside the gold circle"), color = SolarAmber, fontSize = 12.sp)
+        NiloSays(NiloLines.searchHint, language, onSpeak = { viewModel.speakSpanish(NiloLines.searchHint.es) }, size = 44.dp)
     }
     Text(
         language.pick("اضغطي على الكلمة لسماع نطقها.", "Tap a word to hear it."),
