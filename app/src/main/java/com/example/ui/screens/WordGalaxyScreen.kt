@@ -445,8 +445,9 @@ private fun IntroCard(
                 Text("#${word.rank} · ${word.level}", color = DiamondCyan, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.height(6.dp))
                 Text(word.shortSpanish, color = StarWhite, fontSize = 40.sp, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center)
-                if (word.partOfSpeech.isNotBlank()) {
-                    Text(partLabel(word.partOfSpeech, language), color = StarWhite.copy(alpha = 0.6f), fontSize = 12.sp)
+                val part = partLabel(word.partOfSpeech, language)
+                if (word.partOfSpeech.isNotBlank() && part !in word.meaning(language)) {
+                    Text(part, color = StarWhite.copy(alpha = 0.6f), fontSize = 12.sp)
                 }
                 Spacer(Modifier.height(10.dp))
                 Text(word.meaning(language), color = SolarGold, fontSize = 22.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
@@ -459,7 +460,7 @@ private fun IntroCard(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
                         Text(word.exampleEs, color = TextPrimary, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
-                        Text(language.pick(word.exampleAr, word.exampleEn), color = TextSecondary, fontSize = 13.sp)
+                        Text(language.pick(word.exampleAr, word.exampleEn), color = TextSecondary, fontSize = 13.sp, modifier = Modifier.fillMaxWidth())
                     }
                     AudioButton(onClick = { viewModel.speakSpanish(word.exampleEs) }, size = 36.dp, tint = NebulaPurple)
                 }
@@ -695,7 +696,7 @@ private fun Feedback(
             )
             if (word.exampleEs.isNotBlank()) {
                 Text(word.exampleEs, color = TextPrimary, fontSize = 13.sp)
-                Text(language.pick(word.exampleAr, word.exampleEn), color = TextSecondary, fontSize = 12.sp)
+                Text(language.pick(word.exampleAr, word.exampleEn), color = TextSecondary, fontSize = 12.sp, modifier = Modifier.fillMaxWidth())
             }
             Button(
                 onClick = onContinue,

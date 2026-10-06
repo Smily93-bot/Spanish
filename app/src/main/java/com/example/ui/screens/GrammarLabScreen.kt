@@ -208,7 +208,7 @@ private fun RuleCard(topic: GrammarTopic, viewModel: BlasterViewModel, language:
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text(e.spanish, color = ExplorerBlue, fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                    if (e.translation(language).isNotBlank()) Text(e.translation(language), color = TextSecondary, fontSize = 12.sp)
+                    if (e.translation(language).isNotBlank()) Text(e.translation(language), color = TextSecondary, fontSize = 12.sp, modifier = Modifier.fillMaxWidth())
                 }
                 AudioButton(onClick = { viewModel.speakSpanish(e.spanish) }, size = 34.dp)
             }
@@ -313,7 +313,7 @@ private fun QuestionCard(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
                             Text(q.filled(), color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                            if (q.translation(language).isNotBlank()) Text(q.translation(language), color = TextSecondary, fontSize = 13.sp)
+                            if (q.translation(language).isNotBlank()) Text(q.translation(language), color = TextSecondary, fontSize = 13.sp, modifier = Modifier.fillMaxWidth())
                         }
                         AudioButton(onClick = { viewModel.speakSpanish(q.filled()) }, size = 34.dp)
                     }

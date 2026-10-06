@@ -26,8 +26,8 @@ import com.example.ui.theme.*
 import com.example.ui.viewmodel.BlasterViewModel
 
 /**
- * First launch: two taps — pick a helper language, pick how long to study each day — and the
- * first five-word lesson starts right away.
+ * First launch: two taps — pick a helper language, pick how long to study each day — then Home,
+ * where a one-time tour card explains what the app contains.
  */
 @Composable
 fun OnboardingScreen(viewModel: BlasterViewModel) {
@@ -76,7 +76,7 @@ fun OnboardingScreen(viewModel: BlasterViewModel) {
                 BigChoice(language.pick("15 دقيقة", "15 minutes"), language.pick("جاد", "Serious")) { viewModel.finishOnboarding(100) }
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    language.pick("بعدها نبدأ فورًا بأول 5 كلمات!", "Then we start right away with your first 5 words!"),
+                    language.pick("بعدها ستظهر لكِ الصفحة الرئيسية.", "Then you'll see your home screen."),
                     color = StarWhite.copy(alpha = 0.8f), fontSize = 14.sp, textAlign = TextAlign.Center
                 )
             }

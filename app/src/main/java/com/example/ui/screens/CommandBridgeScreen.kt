@@ -8,6 +8,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -48,6 +50,7 @@ fun CommandBridgeScreen(viewModel: BlasterViewModel) {
     val done by viewModel.pathDone.collectAsStateWithLifecycle()
     val tablets by viewModel.tabletProgress.collectAsStateWithLifecycle()
     val data = content ?: return LoadingContent(language == HelperLanguage.ARABIC)
+    val showTour by viewModel.showTour.collectAsStateWithLifecycle()
 
     val today = EngagementStore.today()
     val mood = streak.liaMood(today)
@@ -92,6 +95,8 @@ fun CommandBridgeScreen(viewModel: BlasterViewModel) {
                 )
             }
         }
+
+        if (showTour) WelcomeTour(language) { viewModel.dismissTour() }
 
         // Today's goal
         val xp = streak.xpOn(today)
@@ -206,5 +211,40 @@ private fun PathRow(
             }
             Text("›", color = if (current) SolarAmber else TextSecondary, fontSize = 26.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.End)
         }
+    }
+}
+
+/** One-time card for new players: what each part of the app is for. */
+@Composable
+private fun WelcomeTour(language: HelperLanguage, onDismiss: () -> Unit) {
+    Surface(
+        shape = RoundedCornerShape(20.dp),
+        color = NebulaPurple.copy(alpha = 0.08f),
+        border = BorderStroke(1.5.dp, NebulaPurple.copy(alpha = 0.5f)),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text(language.pick("👋 أهلًا بكِ! هذا ما في التطبيق:", "👋 Welcome! Here's what's inside:"), color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp)
+            TourLine("▶", language.pick("زر «ابدئي» يختار لكِ درس اليوم خطوة بخطوة.", "START picks today's lesson for you, step by step."))
+            TourLine("🌌", language.pick("الكلمات: تعلّمي أهم 5000 كلمة إسبانية.", "Words: learn the 5000 most-used Spanish words."))
+            TourLine("🕵️", language.pick("القواعد: افهمي لماذا تكون الإجابة صحيحة.", "Grammar: understand why each answer is right."))
+            TourLine("🗺️", language.pick("المغامرة: امشي مع ليا ونيلو وأنجزي المهمات.", "Adventure: walk with Lía and Nilo and finish missions."))
+            TourLine("🎮", language.pick("«تمارين» في الأسفل: كل الألعاب في مكان واحد.", "Practice (bottom bar): every game in one place."))
+            TourLine("👤", language.pick("«أنا»: تقدّمك وجوائزك والإعدادات.", "Me: your progress, trophies and settings."))
+            Button(
+                onClick = onDismiss,
+                colors = ButtonDefaults.buttonColors(containerColor = NebulaPurple),
+                shape = RoundedCornerShape(14.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) { Text(language.pick("فهمت!", "Got it!"), fontWeight = FontWeight.ExtraBold) }
+        }
+    }
+}
+
+@Composable
+private fun TourLine(emoji: String, text: String) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(emoji, fontSize = 20.sp, modifier = Modifier.width(34.dp))
+        Text(text, color = TextPrimary, fontSize = 14.sp, modifier = Modifier.weight(1f))
     }
 }

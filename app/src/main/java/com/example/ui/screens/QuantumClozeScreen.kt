@@ -131,7 +131,7 @@ private fun ClozeRun(
                 color = TextPrimary, fontSize = 21.sp, fontWeight = FontWeight.Bold, lineHeight = 28.sp
             )
             Spacer(Modifier.height(6.dp))
-            Text(question.translation, color = TextSecondary, fontSize = 14.sp)
+            Text(question.translation, color = TextSecondary, fontSize = 14.sp, modifier = Modifier.fillMaxWidth())
         }
 
         question.options.forEach { option ->

@@ -277,12 +277,22 @@ class BlasterViewModel(
         if (_helperLanguage.value != language) toggleHelperLanguage()
     }
 
-    /** Finishes the welcome flow and starts the very first word lesson. */
+    /** Finishes the welcome flow on Home, where a one-time tour card shows what the app contains. */
     fun finishOnboarding(dailyGoal: Int) {
         prefs.edit().putBoolean(KEY_ONBOARDED, true).apply()
         _onboarded.value = true
         setDailyGoal(dailyGoal)
-        startFromHome(PathStep.WORDS)
+        backStack.clear()
+        _currentScreen.value = Screen.CommandBridge
+    }
+
+    private val _showTour = MutableStateFlow(!prefs.getBoolean(KEY_TOUR_SEEN, false))
+    /** True until the player closes the welcome tour card on Home. */
+    val showTour: StateFlow<Boolean> = _showTour.asStateFlow()
+
+    fun dismissTour() {
+        prefs.edit().putBoolean(KEY_TOUR_SEEN, true).apply()
+        _showTour.value = false
     }
 
     /** The next step of today's path, or null when all three are done. */
@@ -681,6 +691,7 @@ class BlasterViewModel(
     private companion object {
         const val KEY_HELPER = "helper_language"
         const val KEY_ONBOARDED = "onboarded"
+        const val KEY_TOUR_SEEN = "tour_seen"
         const val GRAMMAR_QUESTIONS = 6
     }
 }
