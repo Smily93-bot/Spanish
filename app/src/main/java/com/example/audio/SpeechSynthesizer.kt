@@ -2,11 +2,11 @@ package com.example.audio
 
 import android.content.Context
 import android.speech.tts.TextToSpeech
-import java.util.Locale
+import com.example.flavor.TargetLanguage
 
 /**
- * Spanish pronunciation through the device's built-in Android TextToSpeech engine (works offline
- * once a Spanish voice is installed — no cloud API key).
+ * Target-language (Spanish or Italian) pronunciation through the device's built-in Android TextToSpeech engine (works offline
+ * once a voice for the language is installed — no cloud API key).
  */
 class SpeechSynthesizer(context: Context) : TextToSpeech.OnInitListener {
 
@@ -15,7 +15,7 @@ class SpeechSynthesizer(context: Context) : TextToSpeech.OnInitListener {
     @Volatile var isReady: Boolean = false
         private set
 
-    /** True when the device has no Spanish voice; the UI can suggest installing one. */
+    /** True when the device has no voice for the target language; the UI can suggest installing one. */
     @Volatile var spanishVoiceMissing: Boolean = false
         private set
 
@@ -23,8 +23,7 @@ class SpeechSynthesizer(context: Context) : TextToSpeech.OnInitListener {
 
     override fun onInit(status: Int) {
         if (status != TextToSpeech.SUCCESS) return
-        val candidates = listOf(Locale("es", "ES"), Locale("es", "MX"), Locale("es", "US"), Locale("es"))
-        val chosen = candidates.firstOrNull {
+        val chosen = TargetLanguage.voiceLocales.firstOrNull {
             tts.isLanguageAvailable(it) >= TextToSpeech.LANG_AVAILABLE
         }
         if (chosen == null) {

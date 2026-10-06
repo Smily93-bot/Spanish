@@ -1,5 +1,6 @@
 package com.example.ui.screens
 
+import com.example.flavor.tl
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -64,7 +65,7 @@ fun CommandBridgeScreen(viewModel: BlasterViewModel) {
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 Text(
-                    language.pick("مرحبًا أيتها المستكشفة!", "¡Hola, exploradora!"),
+                    language.pick("مرحبًا أيتها المستكشفة!", tl("¡Hola, exploradora!")),
                     color = DiamondCyan, fontSize = 13.sp, fontWeight = FontWeight.Bold
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -72,7 +73,7 @@ fun CommandBridgeScreen(viewModel: BlasterViewModel) {
                     Spacer(Modifier.width(10.dp))
                     Column {
                         Text(rank.spanish, color = StarWhite, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold)
-                        Text("${rank.label(language)} · NIVEL $level", color = StarWhite.copy(alpha = 0.75f), fontSize = 12.sp)
+                        Text("${rank.label(language)} · ${tl("NIVEL")} $level", color = StarWhite.copy(alpha = 0.75f), fontSize = 12.sp)
                     }
                 }
                 ProgressBar(
@@ -81,25 +82,25 @@ fun CommandBridgeScreen(viewModel: BlasterViewModel) {
                 )
                 Text(
                     "${progress?.currentXp ?: 0} / ${progress?.xpToNextLevel ?: 300} XP" +
-                        (nextRank?.let { "  ·  " + language.pick("الرتبة التالية: ", "Next: ") + "${it.spanish} (Nv ${it.minLevel})" } ?: ""),
+                        (nextRank?.let { "  ·  " + language.pick("الرتبة التالية: ", "Next: ") + "${it.spanish} (${tl("Nv")} ${it.minLevel})" } ?: ""),
                     color = StarWhite.copy(alpha = 0.8f), fontSize = 11.sp
                 )
             }
         }
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            HudStatCard(language.pick("نجوم", "Créditos"), "${progress?.starCredits ?: 0}", "⭐", Modifier.weight(1f), SolarAmber)
-            HudStatCard(language.pick("ألواح", "Tablillas"), "${completedIds.size}/${data.tablets.size}", "📜", Modifier.weight(1f))
-            HudStatCard(language.pick("كلمات", "Palabras"), "${progress?.totalWordsMastered ?: 0}", "🧠", Modifier.weight(1f), SuccessGreen)
-            HudStatCard(language.pick("رقم قياسي", "Récord"), "$personalBest", "🏆", Modifier.weight(1f), NebulaPurple)
+            HudStatCard(language.pick("نجوم", tl("Créditos")), "${progress?.starCredits ?: 0}", "⭐", Modifier.weight(1f), SolarAmber)
+            HudStatCard(language.pick("ألواح", tl("Tablillas")), "${completedIds.size}/${data.tablets.size}", "📜", Modifier.weight(1f))
+            HudStatCard(language.pick("كلمات", tl("Palabras")), "${progress?.totalWordsMastered ?: 0}", "🧠", Modifier.weight(1f), SuccessGreen)
+            HudStatCard(language.pick("رقم قياسي", tl("Récord")), "$personalBest", "🏆", Modifier.weight(1f), NebulaPurple)
         }
 
         if (viewModel.speechEngine.spanishVoiceMissing) {
             AdventureCard(borderColor = MeteorRed) {
                 Text(
                     language.pick(
-                        "🔈 لا يوجد صوت إسباني على جهازك. ثبّتيه من: الإعدادات ← تحويل النص إلى كلام ← تثبيت بيانات الصوت ← Español.",
-                        "🔈 No Spanish voice found. Install one in Settings → Text-to-speech → Install voice data → Español."
+                        tl("🔈 لا يوجد صوت إسباني على جهازك. ثبّتيه من: الإعدادات ← تحويل النص إلى كلام ← تثبيت بيانات الصوت ← Español."),
+                        tl("🔈 No Spanish voice found. Install one in Settings → Text-to-speech → Install voice data → Español.")
                     ),
                     color = TextPrimary, fontSize = 12.sp
                 )
@@ -110,7 +111,7 @@ fun CommandBridgeScreen(viewModel: BlasterViewModel) {
         AdventureCard(borderColor = SolarGold) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
-                    Text(language.pick("كلمة اليوم", "PALABRA DEL DÍA"), color = SolarAmber, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold)
+                    Text(language.pick("كلمة اليوم", tl("PALABRA DEL DÍA")), color = SolarAmber, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold)
                     Text(wordOfDay.shortSpanish, color = TextPrimary, fontSize = 26.sp, fontWeight = FontWeight.ExtraBold)
                     Text(wordOfDay.meaning(language), color = ExplorerBlue, fontSize = 14.sp, fontWeight = FontWeight.Bold)
                 }
@@ -128,7 +129,7 @@ fun CommandBridgeScreen(viewModel: BlasterViewModel) {
             }
         }
 
-        SectionHeader(language.pick("المهمات", "MISIONES"), language.pick("اختاري مهمة للانطلاق", "Choose a mission to launch"))
+        SectionHeader(language.pick("المهمات", tl("MISIONES")), language.pick("اختاري مهمة للانطلاق", "Choose a mission to launch"))
 
         if (nextTablet != null) {
             MissionCard(
@@ -145,13 +146,13 @@ fun CommandBridgeScreen(viewModel: BlasterViewModel) {
         MissionCard("☄️", language.pick("مدفع النيازك", "Meteor Blaster"), language.pick("دمّري النيازك بالكلمة الصحيحة", "Blast meteors with the right word"), MeteorRed) {
             viewModel.navigateTo(Screen.MeteorBlaster)
         }
-        MissionCard("⚛️", "Reactor Gramatical", language.pick("رتّبي الكلمات لبناء الجملة", "Rebuild sentences word by word"), NebulaPurple) {
+        MissionCard("⚛️", tl("Reactor Gramatical"), language.pick("رتّبي الكلمات لبناء الجملة", "Rebuild sentences word by word"), NebulaPurple) {
             viewModel.navigateTo(Screen.GrammarReactor)
         }
-        MissionCard("🌀", "Cloze Cuántico", language.pick("أكملي الجملة بالكلمة المفقودة", "Fill the missing word in context"), ExplorerBlue) {
+        MissionCard("🌀", tl("Cloze Cuántico"), language.pick("أكملي الجملة بالكلمة المفقودة", "Fill the missing word in context"), ExplorerBlue) {
             viewModel.navigateTo(Screen.QuantumCloze)
         }
-        MissionCard("🗺️", language.pick("خريطة المجرة", "Mapa galáctico"), language.pick("12 فصلًا من A1 إلى C2", "12 chapters from A1 to C2"), DiamondCyan) {
+        MissionCard("🗺️", language.pick("خريطة المجرة", tl("Mapa galáctico")), language.pick("12 فصلًا من A1 إلى C2", "12 chapters from A1 to C2"), DiamondCyan) {
             viewModel.navigateTo(Screen.AdventureMap)
         }
         Spacer(Modifier.height(8.dp))

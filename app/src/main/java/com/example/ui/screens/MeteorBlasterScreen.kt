@@ -1,5 +1,6 @@
 package com.example.ui.screens
 
+import com.example.flavor.tl
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
@@ -98,15 +99,15 @@ private fun ModeSelect(viewModel: BlasterViewModel, language: HelperLanguage) {
                 Text("${ship.emoji} ${ship.name} · 🛡️ ${ship.maxShield}", color = DiamondCyan, fontSize = 12.sp, fontWeight = FontWeight.Bold)
             }
         }
-        ModeCard("🔤", BlasterMode.TRANSLATION, language.pick("كلمة إسبانية ← معناها", "Spanish word → its meaning"), ExplorerBlue, viewModel, language)
-        ModeCard("🔁", BlasterMode.SYNONYM, language.pick("اختاري الكلمة الإسبانية المرادفة", "Pick the Spanish synonym"), NebulaPurple, viewModel, language)
-        ModeCard("⚖️", BlasterMode.ANTONYM, language.pick("اختاري الكلمة الإسبانية المضادة", "Pick the Spanish opposite"), SolarAmber, viewModel, language)
+        ModeCard("🔤", BlasterMode.TRANSLATION, language.pick(tl("كلمة إسبانية ← معناها"), tl("Spanish word → its meaning")), ExplorerBlue, viewModel, language)
+        ModeCard("🔁", BlasterMode.SYNONYM, language.pick(tl("اختاري الكلمة الإسبانية المرادفة"), tl("Pick the Spanish synonym")), NebulaPurple, viewModel, language)
+        ModeCard("⚖️", BlasterMode.ANTONYM, language.pick(tl("اختاري الكلمة الإسبانية المضادة"), tl("Pick the Spanish opposite")), SolarAmber, viewModel, language)
         OutlinedButton(
             onClick = { viewModel.fetchLocalHighScores("ALL") },
             shape = RoundedCornerShape(14.dp),
             border = BorderStroke(1.2.dp, SolarGold),
             modifier = Modifier.fillMaxWidth()
-        ) { Text("🏆 " + language.pick("لوحة الشرف", "Salón de récords"), color = SolarAmber, fontWeight = FontWeight.Bold) }
+        ) { Text("🏆 " + language.pick("لوحة الشرف", tl("Salón de récords")), color = SolarAmber, fontWeight = FontWeight.Bold) }
     }
 }
 
@@ -288,30 +289,30 @@ private fun GameOverPanel(state: MeteorGameState, viewModel: BlasterViewModel, l
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Spacer(Modifier.height(12.dp))
-        Text(language.pick("انتهت الجولة", "FIN DE LA PARTIDA"), color = MeteorRed, fontSize = 24.sp, fontWeight = FontWeight.ExtraBold)
+        Text(language.pick("انتهت الجولة", tl("FIN DE LA PARTIDA")), color = MeteorRed, fontSize = 24.sp, fontWeight = FontWeight.ExtraBold)
         Text("${state.score}", color = SolarGold, fontSize = 56.sp, fontWeight = FontWeight.ExtraBold, fontFamily = FontFamily.Monospace)
-        state.reward?.let { Text(language.pick("التقدير ", "Rango ") + it.rankGrade, color = DiamondCyan, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold) }
+        state.reward?.let { Text(language.pick("التقدير ", tl("Rango ")) + it.rankGrade, color = DiamondCyan, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold) }
         if (state.isNewPersonalBest) {
-            Text(language.pick("🏆 رقم قياسي شخصي جديد!", "🏆 ¡NUEVO RÉCORD PERSONAL!"), color = SolarGold, fontSize = 18.sp, fontWeight = FontWeight.ExtraBold)
+            Text(language.pick("🏆 رقم قياسي شخصي جديد!", tl("🏆 ¡NUEVO RÉCORD PERSONAL!")), color = SolarGold, fontSize = 18.sp, fontWeight = FontWeight.ExtraBold)
         } else if (state.personalBest > 0) {
-            Text(language.pick("رقمك القياسي: ", "Tu récord: ") + state.personalBest, color = StarWhite.copy(alpha = 0.8f))
+            Text(language.pick("رقمك القياسي: ", tl("Tu récord: ")) + state.personalBest, color = StarWhite.copy(alpha = 0.8f))
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            HudStatCard(language.pick("كلمات", "Palabras"), "${state.wordsBlasted}", "☄️", Modifier.weight(1f))
-            HudStatCard(language.pick("أفضل سلسلة", "Racha"), "x${state.maxStreak}", "🔥", Modifier.weight(1f), SolarAmber)
+            HudStatCard(language.pick("كلمات", tl("Palabras")), "${state.wordsBlasted}", "☄️", Modifier.weight(1f))
+            HudStatCard(language.pick("أفضل سلسلة", tl("Racha")), "x${state.maxStreak}", "🔥", Modifier.weight(1f), SolarAmber)
             HudStatCard("XP", "+${state.reward?.xpGained ?: 0}", "✨", Modifier.weight(1f), NebulaPurple)
-            HudStatCard(language.pick("نجوم", "Créditos"), "+${state.reward?.creditsGained ?: 0}", "⭐", Modifier.weight(1f), SolarAmber)
+            HudStatCard(language.pick("نجوم", tl("Créditos")), "+${state.reward?.creditsGained ?: 0}", "⭐", Modifier.weight(1f), SolarAmber)
         }
         state.reward?.let { reward ->
-            if (reward.leveledUp) Text(language.pick("🚀 المستوى ${reward.newLevel}!", "🚀 ¡Nivel ${reward.newLevel}!"), color = DiamondCyan, fontWeight = FontWeight.Bold)
+            if (reward.leveledUp) Text(language.pick("🚀 المستوى ${reward.newLevel}!", tl("🚀 ¡Nivel %d!").format(reward.newLevel)), color = DiamondCyan, fontWeight = FontWeight.Bold)
             reward.unlockedMilestones.forEach { Text("🎖️ ${it.title} (+${it.rewardCredits} ⭐)", color = SuccessGreen, fontWeight = FontWeight.Bold) }
         }
-        BlasterCyberButton(language.pick("العبي مجددًا", "JUGAR OTRA VEZ"), { viewModel.startMeteorGame(state.mode) }, Modifier.fillMaxWidth(), SolarAmber)
-        BlasterCyberButton(language.pick("🏆 لوحة الشرف", "🏆 Récords"), { viewModel.fetchLocalHighScores(state.mode.name) }, Modifier.fillMaxWidth(), NebulaPurple)
+        BlasterCyberButton(language.pick("العبي مجددًا", tl("JUGAR OTRA VEZ")), { viewModel.startMeteorGame(state.mode) }, Modifier.fillMaxWidth(), SolarAmber)
+        BlasterCyberButton(language.pick("🏆 لوحة الشرف", tl("🏆 Récords")), { viewModel.fetchLocalHighScores(state.mode.name) }, Modifier.fillMaxWidth(), NebulaPurple)
         OutlinedButton(
             onClick = { viewModel.exitMeteorGame() },
             border = BorderStroke(1.dp, StarWhite.copy(alpha = 0.6f)),
             modifier = Modifier.fillMaxWidth()
-        ) { Text(language.pick("تغيير الوضع", "Cambiar modo"), color = StarWhite) }
+        ) { Text(language.pick("تغيير الوضع", tl("Cambiar modo")), color = StarWhite) }
     }
 }

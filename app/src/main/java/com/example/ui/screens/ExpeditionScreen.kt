@@ -1,5 +1,6 @@
 package com.example.ui.screens
 
+import com.example.flavor.tl
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -56,12 +57,12 @@ import kotlin.math.sin
 
 /** The seven stops of every expedition, in the order Lía reaches them. */
 private enum class Station(val emoji: String, val es: String, val ar: String, val en: String) {
-    STORY("📡", "Transmisión", "الرسالة", "Transmission"),
-    OPENING("❓", "Primeras preguntas", "الأسئلة الأولى", "First questions"),
-    SEARCH("🔍", "Búsqueda", "البحث", "Search"),
-    CONSOLE("🔧", "Consola gramatical", "لوحة القواعد", "Grammar console"),
-    ORDER("🧩", "Mensaje roto", "الرسالة المبعثرة", "Broken message"),
-    MISSION("🛰️", "Misión", "المهمة", "Mission"),
+    STORY("📡", tl("Transmisión"), "الرسالة", "Transmission"),
+    OPENING("❓", tl("Primeras preguntas"), "الأسئلة الأولى", "First questions"),
+    SEARCH("🔍", tl("Búsqueda"), "البحث", "Search"),
+    CONSOLE("🔧", tl("Consola gramatical"), "لوحة القواعد", "Grammar console"),
+    ORDER("🧩", tl("Mensaje roto"), "الرسالة المبعثرة", "Broken message"),
+    MISSION("🛰️", tl("Misión"), "المهمة", "Mission"),
     PORTAL("🌀", "Portal", "البوابة", "Portal");
 
     fun label(language: HelperLanguage) = language.pick(ar, en)
@@ -222,9 +223,9 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
         openStation = null
         viewModel.soundEngine.fanfare()
         toast = if (i == Station.entries.lastIndex) {
-            language.pick("🌀 البوابة مفتوحة! امشي إليها", "🌀 ¡El portal está abierto! Camina hacia él")
+            language.pick("🌀 البوابة مفتوحة! امشي إليها", tl("🌀 ¡El portal está abierto! Camina hacia él"))
         } else {
-            language.pick("✨ أحسنتِ! تابعي المشي ▶", "✨ ¡Bien hecho! Sigue caminando ▶")
+            language.pick("✨ أحسنتِ! تابعي المشي ▶", tl("✨ ¡Bien hecho! Sigue caminando ▶"))
         }
         if (i == Station.entries.lastIndex) targetX = PORTAL_X
     }
@@ -377,7 +378,7 @@ private fun DrawScope.drawWorld(
                 size = Size(68f, 140f)
             )
         }
-        drawLabel(textMeasurer, unitScale, language.pick("صفحة الأطلس", "PÁGINA"), PORTAL_X, GROUND - 168f, portalColor)
+        drawLabel(textMeasurer, unitScale, language.pick("صفحة الأطلس", tl("PÁGINA")), PORTAL_X, GROUND - 168f, portalColor)
 
         // Diamonds
         DIAMONDS.forEachIndexed { i, d ->
@@ -492,7 +493,7 @@ private fun WalkPanel(
     ) {
         AdventureCard(borderColor = SolarGold) {
             Text(
-                language.pick("المهمة ${progress + 1} من ${Station.entries.size}", "Misión ${minOf(progress + 1, Station.entries.size)} / ${Station.entries.size}"),
+                language.pick("المهمة ${progress + 1} من ${Station.entries.size}", "${tl("Misión")} ${minOf(progress + 1, Station.entries.size)} / ${Station.entries.size}"),
                 color = SolarAmber, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold
             )
             Spacer(Modifier.height(4.dp))
@@ -519,7 +520,7 @@ private fun WalkPanel(
                     modifier = Modifier.size(78.dp).pointerInput(Unit) { detectTapGestures(onPress = { onJump() }) }
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        Text(language.pick("قفز", "SALTO"), color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp)
+                        Text(language.pick("قفز", tl("SALTO")), color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp)
                     }
                 }
             }
@@ -581,7 +582,7 @@ private fun MissionPanel(
 
         val complete: Boolean = when (station) {
             Station.STORY -> {
-                StoryCard(language.pick("📡 رسالة واردة", "📡 Transmisión entrante"), tablet.story, tablet.storyAr, viewModel, language)
+                StoryCard(language.pick("📡 رسالة واردة", tl("📡 Transmisión entrante")), tablet.story, tablet.storyAr, viewModel, language)
                 true
             }
             Station.OPENING -> {
@@ -606,20 +607,20 @@ private fun MissionPanel(
             }
             Station.MISSION -> {
                 AdventureCard(borderColor = NebulaPurple) {
-                    Text(language.pick("🛰️ المهمة", "🛰️ Misión"), color = NebulaPurple, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
+                    Text(language.pick("🛰️ المهمة", tl("🛰️ Misión")), color = NebulaPurple, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
                     Text(language.pick(tablet.missionAr, tablet.mission), color = TextPrimary, fontSize = 14.sp)
                 }
                 QuestionGroup("fields", tablet.fields, results, viewModel, language)
                 tablet.fields.indices.all { "fields-$it" in results }
             }
             Station.PORTAL -> {
-                StoryCard(language.pick("📖 خاتمة الفصل", "📖 Final del capítulo"), tablet.ending, null, viewModel, language)
+                StoryCard(language.pick("📖 خاتمة الفصل", tl("📖 Final del capítulo")), tablet.ending, null, viewModel, language)
                 QuestionGroup("gate", tablet.gate, results, viewModel, language)
                 val done = tablet.gate.indices.all { "gate-$it" in results }
                 if (done) {
                     AdventureCard(borderColor = SuccessGreen) {
                         Text("🏁 " + tablet.expeditionPayoff(language), color = SuccessGreen, fontWeight = FontWeight.Bold)
-                        Text(language.pick("المكافأة: ", "Recompensa: ") + tablet.reward(language), color = TextSecondary, fontSize = 12.sp)
+                        Text(language.pick("المكافأة: ", tl("Recompensa: ")) + tablet.reward(language), color = TextSecondary, fontSize = 12.sp)
                     }
                 }
                 done
@@ -627,8 +628,8 @@ private fun MissionPanel(
         }
 
         BlasterCyberButton(
-            text = if (station == Station.PORTAL) language.pick("افتحي البوابة 🌀", "Abrir el portal 🌀")
-            else language.pick("تمّ! تابعي المشي ▶", "¡Hecho! Seguir caminando ▶"),
+            text = if (station == Station.PORTAL) language.pick("افتحي البوابة 🌀", tl("Abrir el portal 🌀"))
+            else language.pick("تمّ! تابعي المشي ▶", tl("¡Hecho! Seguir caminando ▶")),
             onClick = onSolved,
             enabled = complete,
             color = SuccessGreen,

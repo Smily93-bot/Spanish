@@ -1,5 +1,6 @@
 package com.example.ui.screens
 
+import com.example.flavor.tl
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -66,11 +67,11 @@ fun HangarAndGoalsScreen(viewModel: BlasterViewModel) {
                 Text(language.pick("حظيرة السفن", "HANGAR"), color = DiamondCyan, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold)
                 Text(current.emoji, fontSize = 56.sp)
                 Text(current.name, color = StarWhite, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold)
-                Text("🛡️ ${current.maxShield} · " + language.pick("الفئة", "Nivel") + " ${current.tier}/${SHIP_TIERS.size}", color = StarWhite.copy(alpha = 0.8f), fontSize = 13.sp)
+                Text("🛡️ ${current.maxShield} · " + language.pick("الفئة", tl("Nivel")) + " ${current.tier}/${SHIP_TIERS.size}", color = StarWhite.copy(alpha = 0.8f), fontSize = 13.sp)
                 Text("⭐ $credits", color = SolarGold, fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, fontFamily = FontFamily.Monospace)
                 if (next != null) {
                     BlasterCyberButton(
-                        text = language.pick("ترقية إلى ${next.name} (⭐ ${next.cost})", "Mejorar a ${next.name} (⭐ ${next.cost})"),
+                        text = language.pick("ترقية إلى ${next.name} (⭐ ${next.cost})", "${tl("Mejorar a")} ${next.name} (⭐ ${next.cost})"),
                         onClick = { viewModel.upgradeShip() },
                         enabled = credits >= next.cost,
                         color = SolarAmber,
@@ -81,7 +82,7 @@ fun HangarAndGoalsScreen(viewModel: BlasterViewModel) {
                         color = StarWhite.copy(alpha = 0.7f), fontSize = 11.sp
                     )
                 } else {
-                    Text(language.pick("💎 سفينتك في أعلى فئة!", "💎 ¡Tu nave está al máximo!"), color = DiamondCyan, fontWeight = FontWeight.Bold)
+                    Text(language.pick("💎 سفينتك في أعلى فئة!", tl("💎 ¡Tu nave está al máximo!")), color = DiamondCyan, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -105,7 +106,7 @@ fun HangarAndGoalsScreen(viewModel: BlasterViewModel) {
 
         // Hall of Fame
         item {
-            SectionHeader(language.pick("قاعة المشاهير", "SALÓN DE LA FAMA"), language.pick("أفضل نتائجك في كل وضع", "Your best results per mode"))
+            SectionHeader(language.pick("قاعة المشاهير", tl("SALÓN DE LA FAMA")), language.pick("أفضل نتائجك في كل وضع", "Your best results per mode"))
         }
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -121,10 +122,10 @@ fun HangarAndGoalsScreen(viewModel: BlasterViewModel) {
                 shape = RoundedCornerShape(14.dp),
                 border = BorderStroke(1.2.dp, SolarGold),
                 modifier = Modifier.fillMaxWidth()
-            ) { Text("🏆 " + language.pick("عرض لوحة الشرف", "Ver récords locales"), color = SolarAmber, fontWeight = FontWeight.Bold) }
+            ) { Text("🏆 " + language.pick("عرض لوحة الشرف", tl("Ver récords locales")), color = SolarAmber, fontWeight = FontWeight.Bold) }
         }
         if (recent.isNotEmpty()) {
-            item { SectionHeader(language.pick("آخر الجولات", "PARTIDAS RECIENTES")) }
+            item { SectionHeader(language.pick("آخر الجولات", tl("PARTIDAS RECIENTES"))) }
             items(recent.take(5)) { run ->
                 AdventureCard {
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -143,8 +144,8 @@ fun HangarAndGoalsScreen(viewModel: BlasterViewModel) {
         // Milestones
         item {
             SectionHeader(
-                language.pick("الإنجازات", "LOGROS"),
-                "${milestones.count { it.isUnlocked }}/${milestones.size} " + language.pick("مفتوحة", "desbloqueados")
+                language.pick("الإنجازات", tl("LOGROS")),
+                "${milestones.count { it.isUnlocked }}/${milestones.size} " + language.pick("مفتوحة", tl("desbloqueados"))
             )
         }
         items(milestones, key = { it.goalId }) { goal ->

@@ -1,5 +1,6 @@
 package com.example.data.repository
 
+import com.example.flavor.tl
 import android.content.Context
 import com.example.data.content.SpanishContent
 import com.example.data.database.*
@@ -267,20 +268,20 @@ class BlasterRepository(private val dao: AppDao) {
         }
 
         val MILESTONES = listOf(
-            MilestoneGoalEntity("games_1", "Primer vuelo", "Play your first arcade game", targetValue = 1, rewardCredits = 50),
-            MilestoneGoalEntity("games_10", "Piloto constante", "Play 10 arcade games", targetValue = 10, rewardCredits = 120),
-            MilestoneGoalEntity("games_50", "Leyenda del arcade", "Play 50 arcade games", targetValue = 50, rewardCredits = 400),
-            MilestoneGoalEntity("score_500", "Lluvia de meteoros", "Score 500 points in one run", targetValue = 500, rewardCredits = 80),
-            MilestoneGoalEntity("score_2000", "Rango S+", "Score 2000 points in one run", targetValue = 2000, rewardCredits = 300),
-            MilestoneGoalEntity("tablets_1", "Primera señal", "Complete your first expedition with Lía", targetValue = 1, rewardCredits = 80),
-            MilestoneGoalEntity("tablets_6", "Mitad del atlas", "Complete 6 expeditions", targetValue = 6, rewardCredits = 250),
-            MilestoneGoalEntity("tablets_12", "Vuelo a casa", "Complete all 12 expeditions", targetValue = 12, rewardCredits = 600),
-            MilestoneGoalEntity("words_25", "Léxico en marcha", "Master 25 words", targetValue = 25, rewardCredits = 100),
-            MilestoneGoalEntity("words_100", "Cien palabras", "Master 100 words", targetValue = 100, rewardCredits = 250),
-            MilestoneGoalEntity("words_300", "Diccionario viviente", "Master 300 words", targetValue = 300, rewardCredits = 500),
-            MilestoneGoalEntity("level_5", "Nivel 5", "Reach explorer level 5", targetValue = 5, rewardCredits = 100),
-            MilestoneGoalEntity("level_10", "Nivel 10", "Reach explorer level 10", targetValue = 10, rewardCredits = 250),
-            MilestoneGoalEntity("ship_3", "Nave mejorada", "Upgrade your ship to tier 3", targetValue = 3, rewardCredits = 150)
+            MilestoneGoalEntity("games_1", tl("Primer vuelo"), "Play your first arcade game", targetValue = 1, rewardCredits = 50),
+            MilestoneGoalEntity("games_10", tl("Piloto constante"), "Play 10 arcade games", targetValue = 10, rewardCredits = 120),
+            MilestoneGoalEntity("games_50", tl("Leyenda del arcade"), "Play 50 arcade games", targetValue = 50, rewardCredits = 400),
+            MilestoneGoalEntity("score_500", tl("Lluvia de meteoros"), "Score 500 points in one run", targetValue = 500, rewardCredits = 80),
+            MilestoneGoalEntity("score_2000", tl("Rango S+"), "Score 2000 points in one run", targetValue = 2000, rewardCredits = 300),
+            MilestoneGoalEntity("tablets_1", tl("Primera señal"), "Complete your first expedition with Lía", targetValue = 1, rewardCredits = 80),
+            MilestoneGoalEntity("tablets_6", tl("Mitad del atlas"), "Complete 6 expeditions", targetValue = 6, rewardCredits = 250),
+            MilestoneGoalEntity("tablets_12", tl("Vuelo a casa"), "Complete all 12 expeditions", targetValue = 12, rewardCredits = 600),
+            MilestoneGoalEntity("words_25", tl("Léxico en marcha"), "Master 25 words", targetValue = 25, rewardCredits = 100),
+            MilestoneGoalEntity("words_100", tl("Cien palabras"), "Master 100 words", targetValue = 100, rewardCredits = 250),
+            MilestoneGoalEntity("words_300", tl("Diccionario viviente"), "Master 300 words", targetValue = 300, rewardCredits = 500),
+            MilestoneGoalEntity("level_5", tl("Nivel 5"), "Reach explorer level 5", targetValue = 5, rewardCredits = 100),
+            MilestoneGoalEntity("level_10", tl("Nivel 10"), "Reach explorer level 10", targetValue = 10, rewardCredits = 250),
+            MilestoneGoalEntity("ship_3", tl("Nave mejorada"), "Upgrade your ship to tier 3", targetValue = 3, rewardCredits = 150)
         )
     }
 }

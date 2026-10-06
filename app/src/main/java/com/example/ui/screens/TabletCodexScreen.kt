@@ -1,5 +1,6 @@
 package com.example.ui.screens
 
+import com.example.flavor.tl
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -51,7 +52,7 @@ fun TabletCodexScreen(viewModel: BlasterViewModel) {
     }
 
     reward?.let {
-        RewardDialog(it, isArabic, language.pick("📜 استعدتِ صفحة الأطلس!", "📜 ¡Página del atlas recuperada!")) {
+        RewardDialog(it, isArabic, language.pick("📜 استعدتِ صفحة الأطلس!", tl("📜 ¡Página del atlas recuperada!"))) {
             viewModel.dismissPracticeReward()
             viewModel.closeTablet()
         }
@@ -71,7 +72,7 @@ private fun CodexIndex(data: SpanishContent, viewModel: BlasterViewModel, langua
         verticalArrangement = Arrangement.spacedBy(10.dp),
         modifier = Modifier.fillMaxSize()
     ) {
-        item { SectionHeader(language.pick("بعثات ليا", "EXPEDICIONES DE LÍA"), language.pick("امشي مع ليا وأنجزي المهمات لاستعادة صفحات الأطلس", "Walk with Lía and complete missions to recover the atlas pages")) }
+        item { SectionHeader(language.pick("بعثات ليا", tl("EXPEDICIONES DE LÍA")), language.pick("امشي مع ليا وأنجزي المهمات لاستعادة صفحات الأطلس", "Walk with Lía and complete missions to recover the atlas pages")) }
         items(data.tablets) { tablet ->
             val index = data.tablets.indexOf(tablet)
             val unlocked = index == 0 || done.containsKey(data.tablets[index - 1].id) || done.containsKey(tablet.id)
@@ -97,7 +98,7 @@ private fun CodexIndex(data: SpanishContent, viewModel: BlasterViewModel, langua
         }
         item {
             Spacer(Modifier.height(6.dp))
-            SectionHeader(language.pick("مجموعات المفردات", "COLECCIONES DE VOCABULARIO"), language.pick("اضغطي على كلمة لسماعها", "Tap a word to hear it"))
+            SectionHeader(language.pick("مجموعات المفردات", tl("COLECCIONES DE VOCABULARIO")), language.pick("اضغطي على كلمة لسماعها", "Tap a word to hear it"))
         }
         items(data.categories) { category ->
             val expanded = expandedCategory == category.id
@@ -150,7 +151,7 @@ internal fun StoryCard(title: String, story: String, translation: String?, viewM
             AudioButton(onClick = { viewModel.speakSpanish(story) })
         }
         Spacer(Modifier.height(8.dp))
-        Text(language.pick("اضغطي على أي جملة لسماعها", "Toca una frase para escucharla"), color = TextSecondary, fontSize = 11.sp)
+        Text(language.pick("اضغطي على أي جملة لسماعها", tl("Toca una frase para escucharla")), color = TextSecondary, fontSize = 11.sp)
         Spacer(Modifier.height(4.dp))
         sentences.forEach { sentence ->
             Text(
@@ -203,8 +204,8 @@ internal fun GrammarTableQuiz(
     language: HelperLanguage
 ) {
     AdventureCard {
-        Text(language.pick("🔧 أصلحي لوحة القواعد", "🔧 Repara la consola gramatical"), color = TextPrimary, fontWeight = FontWeight.ExtraBold)
-        Text(language.pick("اكتبي التصريفات الناقصة", "Escribe las formas que faltan"), color = TextSecondary, fontSize = 12.sp)
+        Text(language.pick("🔧 أصلحي لوحة القواعد", tl("🔧 Repara la consola gramatical")), color = TextPrimary, fontWeight = FontWeight.ExtraBold)
+        Text(language.pick("اكتبي التصريفات الناقصة", tl("Escribe las formas que faltan")), color = TextSecondary, fontSize = 12.sp)
         Spacer(Modifier.height(8.dp))
         Row {
             table.headers.forEach { header ->
@@ -313,7 +314,7 @@ private fun QuestionCard(
             value = text,
             onValueChange = { if (!solved) text = it },
             singleLine = true,
-            placeholder = { Text(language.pick("اكتبي الإجابة بالإسبانية", "Escribe en español")) },
+            placeholder = { Text(language.pick(tl("اكتبي الإجابة بالإسبانية"), tl("Escribe en español"))) },
             keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.None, autoCorrectEnabled = false, imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = { check() }),
             modifier = Modifier.fillMaxWidth()
@@ -325,12 +326,12 @@ private fun QuestionCard(
                 color = SuccessGreen, fontWeight = FontWeight.Bold
             )
             else -> Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                BlasterCyberButton(language.pick("تحقّق", "Comprobar"), { check() })
+                BlasterCyberButton(language.pick("تحقّق", tl("Comprobar")), { check() })
                 if (mistakes >= 2) {
                     OutlinedButton(onClick = {
                         text = field.answers.first()
                         results[key] = false
-                    }) { Text(language.pick("أظهري الإجابة", "Ver respuesta"), color = TextSecondary) }
+                    }) { Text(language.pick("أظهري الإجابة", tl("Ver respuesta")), color = TextSecondary) }
                 }
             }
         }
@@ -359,7 +360,7 @@ internal fun OrderPuzzle(
     val solved = "order" in results
 
     AdventureCard(borderColor = if (solved) SuccessGreen else NebulaPurple) {
-        Text(language.pick("📡 أعيدي بناء الرسالة", "📡 Reconstruye la transmisión"), color = NebulaPurple, fontWeight = FontWeight.ExtraBold)
+        Text(language.pick("📡 أعيدي بناء الرسالة", tl("📡 Reconstruye la transmisión")), color = NebulaPurple, fontWeight = FontWeight.ExtraBold)
         Text("“$translation”", color = TextSecondary, fontSize = 13.sp)
         Spacer(Modifier.height(10.dp))
         // Answer line
@@ -391,7 +392,7 @@ internal fun OrderPuzzle(
             Text("✅ " + fragments.joinToString(" "), color = SuccessGreen, fontWeight = FontWeight.Bold)
         } else if (placed.size == fragments.size) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                BlasterCyberButton(language.pick("تحقّق", "Comprobar"), {
+                BlasterCyberButton(language.pick("تحقّق", tl("Comprobar")), {
                     if (placed.map { it.value } == fragments) {
                         results["order"] = mistakes == 0
                         viewModel.soundEngine.hit()
@@ -409,7 +410,7 @@ internal fun OrderPuzzle(
                 placed.clear()
                 placed.addAll(fragments.withIndex())
                 results["order"] = false
-            }) { Text(language.pick("أظهري الترتيب الصحيح", "Ver el orden correcto"), color = TextSecondary) }
+            }) { Text(language.pick("أظهري الترتيب الصحيح", tl("Ver el orden correcto")), color = TextSecondary) }
         }
     }
 }

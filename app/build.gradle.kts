@@ -29,6 +29,22 @@ android {
         }
     }
 
+    // One app per target language. They share all game code; each flavor brings its own content
+    // (src/<flavor>/assets), app name and TargetLanguage object, and installs side by side.
+    flavorDimensions += "language"
+    productFlavors {
+        create("spanish") {
+            dimension = "language"
+            applicationId = "com.bluediamond.spanishblaster.app"
+        }
+        create("italian") {
+            dimension = "language"
+            applicationId = "com.bluediamond.italianblaster.app"
+            versionCode = 1
+            versionName = "1.0.0"
+        }
+    }
+
     buildTypes {
         debug {
             signingConfig = signingConfigs.getByName("shared")

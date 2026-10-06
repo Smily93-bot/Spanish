@@ -1,5 +1,6 @@
 package com.example.ui.screens
 
+import com.example.flavor.tl
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -64,7 +65,7 @@ fun GrammarReactorScreen(viewModel: BlasterViewModel) {
     val selected = level
     if (selected == null) {
         LevelPicker(
-            title = "⚛️ Reactor Gramatical",
+            title = tl("⚛️ Reactor Gramatical"),
             subtitle = language.pick(
                 "رتّبي أجزاء الجملة لتشغيل المفاعل. كل جملة صحيحة من المحاولة الأولى تمنحك طاقة إضافية.",
                 "Put the sentence fragments in order to power the reactor. First-try answers charge it faster."
@@ -80,7 +81,7 @@ fun GrammarReactorScreen(viewModel: BlasterViewModel) {
     }
 
     reward?.let {
-        RewardDialog(it, isArabic, language.pick("⚛️ المفاعل مشحون بالكامل!", "⚛️ ¡Reactor cargado!")) {
+        RewardDialog(it, isArabic, language.pick("⚛️ المفاعل مشحون بالكامل!", tl("⚛️ ¡Reactor cargado!"))) {
             viewModel.dismissPracticeReward()
             level = null
         }
@@ -104,7 +105,7 @@ fun LevelPicker(title: String, subtitle: String, color: Color, language: HelperL
             Spacer(Modifier.height(6.dp))
             Text(subtitle, color = StarWhite.copy(alpha = 0.85f), fontSize = 13.sp)
         }
-        SectionHeader(language.pick("اختاري المستوى", "Elige tu nivel"))
+        SectionHeader(language.pick("اختاري المستوى", tl("Elige tu nivel")))
         CefrLevel.entries.chunked(2).forEach { pair ->
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 pair.forEach { lvl ->
@@ -170,7 +171,7 @@ private fun ReactorRun(
         if (streak >= 2) Text("🔥 x$streak", color = SolarAmber, fontWeight = FontWeight.Bold)
 
         AdventureCard(borderColor = NebulaPurple.copy(alpha = 0.5f)) {
-            Text(language.pick("ابني هذه الجملة بالإسبانية:", "Build this sentence in Spanish:"), color = TextSecondary, fontSize = 12.sp)
+            Text(language.pick(tl("ابني هذه الجملة بالإسبانية:"), tl("Build this sentence in Spanish:")), color = TextSecondary, fontSize = 12.sp)
             Text(sentence.translation, color = TextPrimary, fontSize = 17.sp, fontWeight = FontWeight.Bold)
         }
 
@@ -201,7 +202,7 @@ private fun ReactorRun(
         }
 
         if (!solved && placed.size == sentence.words.size) {
-            BlasterCyberButton(language.pick("شغّلي المفاعل", "Activar reactor"), {
+            BlasterCyberButton(language.pick("شغّلي المفاعل", tl("Activar reactor")), {
                 if (placed.map { it.value } == sentence.words) {
                     solved = true
                     val firstTry = mistakes == 0
@@ -230,7 +231,7 @@ private fun ReactorRun(
                 placed.addAll(sentence.words.withIndex())
                 solved = true
                 streak = 0
-            }, modifier = Modifier.fillMaxWidth()) { Text(language.pick("أظهري الحل", "Ver la solución"), color = TextSecondary) }
+            }, modifier = Modifier.fillMaxWidth()) { Text(language.pick("أظهري الحل", tl("Ver la solución")), color = TextSecondary) }
         }
 
         if (solved) {
@@ -245,7 +246,7 @@ private fun ReactorRun(
                 }
             }
             BlasterCyberButton(
-                if (index + 1 < run.size) language.pick("الجملة التالية ›", "Siguiente ›") else language.pick("إنهاء الجولة", "Terminar"),
+                if (index + 1 < run.size) language.pick("الجملة التالية ›", tl("Siguiente ›")) else language.pick("إنهاء الجولة", tl("Terminar")),
                 {
                     if (index + 1 < run.size) index++
                     else if (!finished) {

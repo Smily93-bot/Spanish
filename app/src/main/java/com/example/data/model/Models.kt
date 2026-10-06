@@ -1,5 +1,7 @@
 package com.example.data.model
 
+import com.example.flavor.tl
+
 /** Language used for hints, translations and UI helper text. Spanish is always the target language. */
 enum class HelperLanguage { ARABIC, ENGLISH }
 
@@ -137,9 +139,9 @@ data class ReadingTablet(
 
 /** The three Meteor Blaster game modes. Names are stored in the arcade_scores table. */
 enum class BlasterMode(val labelEs: String, val labelEn: String, val labelAr: String) {
-    TRANSLATION("Significado", "Meaning", "المعنى"),
-    SYNONYM("Sinónimos", "Synonyms", "المرادفات"),
-    ANTONYM("Antónimos", "Antonyms", "الأضداد");
+    TRANSLATION(tl("Significado"), "Meaning", "المعنى"),
+    SYNONYM(tl("Sinónimos"), "Synonyms", "المرادفات"),
+    ANTONYM(tl("Antónimos"), "Antonyms", "الأضداد");
 
     fun label(language: HelperLanguage) = language.pick(labelAr, labelEn)
 }
@@ -170,12 +172,12 @@ data class ClozeQuestion(
 
 /** Explorer ranks unlocked by player level. */
 enum class Rank(val minLevel: Int, val spanish: String, val english: String, val arabic: String, val emoji: String) {
-    CADET(1, "Cadete", "Cadet", "طالب طيران", "🧑‍🚀"),
-    EXPLORER(3, "Exploradora", "Explorer", "مستكشفة", "🛰️"),
-    PILOT(6, "Piloto", "Pilot", "طيّارة", "🚀"),
-    CAPTAIN(10, "Capitana", "Captain", "قبطانة", "🌟"),
-    COMMANDER(15, "Comandante", "Commander", "قائدة", "🪐"),
-    ADMIRAL(22, "Almirante galáctica", "Galactic Admiral", "أميرال المجرة", "👑");
+    CADET(1, tl("Cadete"), "Cadet", "طالب طيران", "🧑‍🚀"),
+    EXPLORER(3, tl("Exploradora"), "Explorer", "مستكشفة", "🛰️"),
+    PILOT(6, tl("Piloto"), "Pilot", "طيّارة", "🚀"),
+    CAPTAIN(10, tl("Capitana"), "Captain", "قبطانة", "🌟"),
+    COMMANDER(15, tl("Comandante"), "Commander", "قائدة", "🪐"),
+    ADMIRAL(22, tl("Almirante galáctica"), "Galactic Admiral", "أميرال المجرة", "👑");
 
     fun label(language: HelperLanguage) = language.pick(arabic, english)
 
@@ -195,11 +197,11 @@ data class ShipTier(
 )
 
 val SHIP_TIERS = listOf(
-    ShipTier(1, "Colibrí", 0, 100, "🛸"),
-    ShipTier(2, "Halcón", 250, 120, "🚀"),
-    ShipTier(3, "Cóndor", 600, 140, "🛰️"),
-    ShipTier(4, "Quetzal", 1200, 165, "🌠"),
-    ShipTier(5, "Estrella Azul", 2200, 200, "💎")
+    ShipTier(1, tl("Colibrí"), 0, 100, "🛸"),
+    ShipTier(2, tl("Halcón"), 250, 120, "🚀"),
+    ShipTier(3, tl("Cóndor"), 600, 140, "🛰️"),
+    ShipTier(4, tl("Quetzal"), 1200, 165, "🌠"),
+    ShipTier(5, tl("Estrella Azul"), 2200, 200, "💎")
 )
 
 fun shipTier(tier: Int): ShipTier = SHIP_TIERS.firstOrNull { it.tier == tier } ?: SHIP_TIERS.first()

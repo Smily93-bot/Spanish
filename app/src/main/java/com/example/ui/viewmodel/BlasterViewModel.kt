@@ -1,5 +1,6 @@
 package com.example.ui.viewmodel
 
+import com.example.flavor.tl
 import android.app.Application
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
@@ -267,7 +268,7 @@ class BlasterViewModel(
                 comboStreak = combo,
                 maxStreak = maxOf(state.maxStreak, combo),
                 blastedIndex = index,
-                lastHitEffect = if (combo >= 3) "¡COMBO x$combo! +$points" else "¡Impacto! +$points"
+                lastHitEffect = if (combo >= 3) tl("¡COMBO x%d!").format(combo) + " +$points" else tl("¡Impacto!") + " +$points"
             )
             recordWord(word.spanishToSpeak, word.englishMeaning, word.category, state.wrongPicks.isEmpty())
             speechEngine.speakSpanish(word.spanishToSpeak)
@@ -278,7 +279,7 @@ class BlasterViewModel(
             }
         } else {
             soundEngine.error()
-            damageShield(20, state.copy(wrongPicks = state.wrongPicks + index, comboStreak = 0, lastHitEffect = "¡Fallaste! −20 🛡️"))
+            damageShield(20, state.copy(wrongPicks = state.wrongPicks + index, comboStreak = 0, lastHitEffect = tl("¡Fallaste! −20 🛡️")))
         }
     }
 

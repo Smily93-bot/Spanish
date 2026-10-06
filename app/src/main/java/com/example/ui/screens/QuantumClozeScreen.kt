@@ -1,5 +1,6 @@
 package com.example.ui.screens
 
+import com.example.flavor.tl
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -42,7 +43,7 @@ fun QuantumClozeScreen(viewModel: BlasterViewModel) {
     val selected = level
     if (selected == null) {
         LevelPicker(
-            title = "🌀 Cloze Cuántico",
+            title = tl("🌀 Cloze Cuántico"),
             subtitle = language.pick(
                 "اختاري الكلمة التي تكمل الجملة قبل أن ينهار الحقل الكمي. الجمل مأخوذة من قائمة أكثر 5000 كلمة استخدامًا.",
                 "Pick the word that completes the sentence before the quantum field collapses. Sentences come from the 5000 most frequent words."
@@ -56,7 +57,7 @@ fun QuantumClozeScreen(viewModel: BlasterViewModel) {
     }
 
     reward?.let {
-        RewardDialog(it, isArabic, language.pick("🌀 استقر الحقل الكمي!", "🌀 ¡Campo cuántico estabilizado!")) {
+        RewardDialog(it, isArabic, language.pick("🌀 استقر الحقل الكمي!", tl("🌀 ¡Campo cuántico estabilizado!"))) {
             viewModel.dismissPracticeReward()
             level = null
         }
@@ -160,9 +161,9 @@ private fun ClozeRun(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
                         Text(
-                            if (picked == question.answer) language.pick("✅ أحسنتِ!", "✅ ¡Correcto!")
-                            else if (picked == "") language.pick("⏱️ انتهى الوقت", "⏱️ ¡Tiempo!")
-                            else language.pick("❌ الإجابة الصحيحة: ", "❌ Respuesta: ") + question.answer,
+                            if (picked == question.answer) language.pick("✅ أحسنتِ!", tl("✅ ¡Correcto!"))
+                            else if (picked == "") language.pick("⏱️ انتهى الوقت", tl("⏱️ ¡Tiempo!"))
+                            else language.pick("❌ الإجابة الصحيحة: ", tl("❌ Respuesta: ")) + question.answer,
                             color = TextPrimary, fontWeight = FontWeight.Bold
                         )
                         Text("${question.answer} = ${question.meaning}", color = TextSecondary, fontSize = 13.sp)
@@ -171,7 +172,7 @@ private fun ClozeRun(
                 }
             }
             BlasterCyberButton(
-                if (index + 1 < CLOZE_QUESTIONS) language.pick("التالي ›", "Siguiente ›") else language.pick("إنهاء الجولة", "Terminar"),
+                if (index + 1 < CLOZE_QUESTIONS) language.pick("التالي ›", tl("Siguiente ›")) else language.pick("إنهاء الجولة", tl("Terminar")),
                 {
                     if (index + 1 < CLOZE_QUESTIONS) index++
                     else if (!finished) {

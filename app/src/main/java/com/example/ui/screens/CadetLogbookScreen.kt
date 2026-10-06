@@ -1,5 +1,6 @@
 package com.example.ui.screens
 
+import com.example.flavor.tl
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -27,10 +28,10 @@ import com.example.ui.theme.*
 import com.example.ui.viewmodel.BlasterViewModel
 
 private enum class LogTab(val es: String, val ar: String, val en: String) {
-    LEXICON("Léxico", "معجمي", "My words"),
-    DICTIONARY("Diccionario", "القاموس", "Dictionary"),
-    GRAMMAR("Gramática", "القواعد", "Grammar"),
-    SETTINGS("Ajustes", "الإعدادات", "Settings")
+    LEXICON(tl("Léxico"), "معجمي", "My words"),
+    DICTIONARY(tl("Diccionario"), "القاموس", "Dictionary"),
+    GRAMMAR(tl("Gramática"), "القواعد", "Grammar"),
+    SETTINGS(tl("Ajustes"), "الإعدادات", "Settings")
 }
 
 @Composable
@@ -58,10 +59,10 @@ fun CadetLogbookScreen(viewModel: BlasterViewModel) {
                     Text(rank.emoji, fontSize = 36.sp)
                     Spacer(Modifier.width(12.dp))
                     Column(Modifier.weight(1f)) {
-                        Text(language.pick("سجل المستكشفة", "BITÁCORA DE CADETE"), color = NebulaPurple, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold)
+                        Text(language.pick("سجل المستكشفة", tl("BITÁCORA DE CADETE")), color = NebulaPurple, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold)
                         Text("${rank.spanish} · ${rank.label(language)}", color = TextPrimary, fontSize = 18.sp, fontWeight = FontWeight.ExtraBold)
                         Text(
-                            language.pick("المستوى $level · ${mastery.size} كلمة تمت مواجهتها", "Nivel $level · ${mastery.size} words encountered"),
+                            language.pick("المستوى $level · ${mastery.size} كلمة تمت مواجهتها", "${tl("Nivel")} $level · ${mastery.size} words encountered"),
                             color = TextSecondary, fontSize = 12.sp
                         )
                     }
@@ -196,11 +197,11 @@ fun CadetLogbookScreen(viewModel: BlasterViewModel) {
                             valueRange = 0.5f..1.3f,
                             steps = 7
                         )
-                        BlasterCyberButton(language.pick("جرّبي الصوت", "Probar voz"), { viewModel.speakSpanish("¡Hola! Bienvenida a Spanish Blaster.") })
+                        BlasterCyberButton(language.pick("جرّبي الصوت", tl("Probar voz")), { viewModel.speakSpanish(tl("¡Hola! Bienvenida a Spanish Blaster.")) })
                         if (viewModel.speechEngine.spanishVoiceMissing) {
                             Spacer(Modifier.height(6.dp))
                             Text(
-                                language.pick("لا يوجد صوت إسباني مثبت على الجهاز.", "No Spanish voice installed on this device."),
+                                language.pick(tl("لا يوجد صوت إسباني مثبت على الجهاز."), tl("No Spanish voice installed on this device.")),
                                 color = MeteorRed, fontSize = 12.sp
                             )
                         }
@@ -229,7 +230,7 @@ private fun SearchField(query: String, onChange: (String) -> Unit, language: Hel
         value = query,
         onValueChange = onChange,
         singleLine = true,
-        placeholder = { Text(language.pick("ابحثي بالإسبانية أو العربية…", "Search in Spanish or English…")) },
+        placeholder = { Text(language.pick(tl("ابحثي بالإسبانية أو العربية…"), tl("Search in Spanish or English…"))) },
         shape = RoundedCornerShape(14.dp),
         modifier = Modifier.fillMaxWidth()
     )

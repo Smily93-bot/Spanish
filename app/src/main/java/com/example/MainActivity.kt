@@ -1,5 +1,6 @@
 package com.example
 
+import com.example.flavor.tl
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -84,7 +85,7 @@ fun MainAppContent(viewModel: BlasterViewModel) {
                 title = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = if (isArabic) "مستكشف الإسبانية" else "SPANISH BLASTER",
+                            text = if (isArabic) tl("مستكشف الإسبانية") else tl("SPANISH BLASTER"),
                             color = SolarAmber,
                             fontSize = 17.sp,
                             fontWeight = FontWeight.ExtraBold,
@@ -96,7 +97,7 @@ fun MainAppContent(viewModel: BlasterViewModel) {
                             color = AdventureSurfaceVariant
                         ) {
                             Text(
-                                text = "NIVEL ${userProgress?.level ?: 1}",
+                                text = "${tl("NIVEL")} ${userProgress?.level ?: 1}",
                                 color = ExplorerBlue,
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold,

@@ -1,5 +1,6 @@
 package com.example.ui.components
 
+import com.example.flavor.tl
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -65,7 +66,7 @@ fun AudioButton(onClick: () -> Unit, modifier: Modifier = Modifier, tint: Color 
         modifier = modifier.size(size)
     ) {
         Box(contentAlignment = Alignment.Center) {
-            Icon(Icons.Default.VolumeUp, contentDescription = "Escuchar", tint = tint, modifier = Modifier.size(size * 0.55f))
+            Icon(Icons.Default.VolumeUp, contentDescription = tl("Escuchar"), tint = tint, modifier = Modifier.size(size * 0.55f))
         }
     }
 }
@@ -150,7 +151,7 @@ fun LoadingContent(isArabic: Boolean) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             CircularProgressIndicator(color = ExplorerBlue)
             Spacer(Modifier.height(12.dp))
-            Text(if (isArabic) "جارٍ تحميل المجرة…" else "Cargando la galaxia…", color = TextSecondary)
+            Text(if (isArabic) "جارٍ تحميل المجرة…" else tl("Cargando la galaxia…"), color = TextSecondary)
         }
     }
 }
@@ -169,17 +170,17 @@ fun RewardDialog(reward: RewardResult, isArabic: Boolean, title: String, onDismi
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (reward.rankGrade.isNotEmpty()) {
                     Text(
-                        (if (isArabic) "التقدير: " else "Rango: ") + reward.rankGrade,
+                        (if (isArabic) "التقدير: " else tl("Rango: ")) + reward.rankGrade,
                         color = NebulaPurple, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp
                     )
                 }
                 Text("+${reward.xpGained} XP   ⭐ +${reward.creditsGained}", color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 if (reward.isNewPersonalBest) {
-                    Text(if (isArabic) "🏆 رقم قياسي جديد!" else "🏆 ¡Nuevo récord personal!", color = SolarGold, fontWeight = FontWeight.Bold)
+                    Text(if (isArabic) "🏆 رقم قياسي جديد!" else tl("🏆 ¡Nuevo récord personal!"), color = SolarGold, fontWeight = FontWeight.Bold)
                 }
                 if (reward.leveledUp) {
                     Text(
-                        if (isArabic) "🚀 ارتقيتِ إلى المستوى ${reward.newLevel}! (+50 ⭐)" else "🚀 ¡Subiste al nivel ${reward.newLevel}! (+50 ⭐)",
+                        if (isArabic) "🚀 ارتقيتِ إلى المستوى ${reward.newLevel}! (+50 ⭐)" else tl("🚀 ¡Subiste al nivel %d! (+50 ⭐)").format(reward.newLevel),
                         color = ExplorerBlue, fontWeight = FontWeight.Bold
                     )
                 }
@@ -189,7 +190,7 @@ fun RewardDialog(reward: RewardResult, isArabic: Boolean, title: String, onDismi
             }
         },
         confirmButton = {
-            BlasterCyberButton(text = if (isArabic) "متابعة" else "Continuar", onClick = onDismiss)
+            BlasterCyberButton(text = if (isArabic) "متابعة" else tl("Continuar"), onClick = onDismiss)
         }
     )
 }
@@ -199,12 +200,12 @@ fun gameModeLabel(mode: String, isArabic: Boolean): String =
     HIGH_SCORE_FILTERS.firstOrNull { it.first == mode }?.let { if (isArabic) it.second else it.third } ?: mode
 
 private val HIGH_SCORE_FILTERS = listOf(
-    Triple("ALL", "الكل", "Todos"),
-    Triple("TRANSLATION", "المعنى", "Significado"),
-    Triple("SYNONYM", "المرادفات", "Sinónimos"),
-    Triple("ANTONYM", "الأضداد", "Antónimos"),
-    Triple("CLOZE", "الفراغات", "Huecos"),
-    Triple("REACTOR", "الجمل", "Frases")
+    Triple("ALL", "الكل", tl("Todos")),
+    Triple("TRANSLATION", "المعنى", tl("Significado")),
+    Triple("SYNONYM", "المرادفات", tl("Sinónimos")),
+    Triple("ANTONYM", "الأضداد", tl("Antónimos")),
+    Triple("CLOZE", "الفراغات", tl("Huecos")),
+    Triple("REACTOR", "الجمل", tl("Frases"))
 )
 
 @Composable
@@ -241,7 +242,7 @@ fun ArcadeHighScoresDialog(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = if (isArabic) "لوحة الشرف والأرقام القياسية" else "SALÓN DE RÉCORDS LOCALES",
+                        text = if (isArabic) "لوحة الشرف والأرقام القياسية" else tl("SALÓN DE RÉCORDS LOCALES"),
                         color = SolarAmber,
                         fontSize = 17.sp,
                         fontWeight = FontWeight.ExtraBold
@@ -281,13 +282,13 @@ fun ArcadeHighScoresDialog(
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
                             Text(
-                                text = if (isArabic) "رقمك القياسي الشخصي (Personal Best)" else "TU RÉCORD PERSONAL MÁXIMO",
+                                text = if (isArabic) "رقمك القياسي الشخصي (Personal Best)" else tl("TU RÉCORD PERSONAL MÁXIMO"),
                                 color = SolarAmber,
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.ExtraBold
                             )
                             Text(
-                                text = if (personalBest > 0) "$personalBest PTS" else (if (isArabic) "لا يوجد بعد" else "Sin récord"),
+                                text = if (personalBest > 0) "$personalBest PTS" else (if (isArabic) "لا يوجد بعد" else tl("Sin récord")),
                                 color = TextPrimary,
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.ExtraBold,
@@ -295,9 +296,9 @@ fun ArcadeHighScoresDialog(
                             )
                             Text(
                                 text = if (personalBest > 0) {
-                                    if (isArabic) "🚀 تحدَّ نفسك وحطم هذا الرقم في جولتك القادمة!" else "🚀 ¡Supera tu récord en tu próxima partida!"
+                                    if (isArabic) "🚀 تحدَّ نفسك وحطم هذا الرقم في جولتك القادمة!" else tl("🚀 ¡Supera tu récord en tu próxima partida!")
                                 } else {
-                                    if (isArabic) "✨ العب جولة الآن لتسجيل أول رقم قياسي لك!" else "✨ ¡Juega una partida para registrar tu primera marca!"
+                                    if (isArabic) "✨ العب جولة الآن لتسجيل أول رقم قياسي لك!" else tl("✨ ¡Juega una partida para registrar tu primera marca!")
                                 },
                                 color = ExplorerBlue,
                                 fontSize = 11.sp
@@ -333,7 +334,7 @@ fun ArcadeHighScoresDialog(
 
                 if (scores.isEmpty()) {
                     Text(
-                        if (isArabic) "لا توجد جولات مسجلة في هذا الوضع بعد." else "Aún no hay partidas en este modo.",
+                        if (isArabic) "لا توجد جولات مسجلة في هذا الوضع بعد." else tl("Aún no hay partidas en este modo."),
                         color = TextSecondary,
                         fontSize = 12.sp,
                         modifier = Modifier.padding(vertical = 12.dp)
@@ -376,7 +377,7 @@ fun ArcadeHighScoresDialog(
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Column {
                                         Text("${gameModeLabel(scoreItem.gameMode, isArabic)} · ${scoreItem.rankGrade}", color = TextPrimary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                                        Text(if (isArabic) "${scoreItem.wordsBlasted} كلمة • سلسلة x${scoreItem.maxComboStreak}" else "${scoreItem.wordsBlasted} palabras • Racha x${scoreItem.maxComboStreak}", color = TextSecondary, fontSize = 10.sp)
+                                        Text(if (isArabic) "${scoreItem.wordsBlasted} كلمة • سلسلة x${scoreItem.maxComboStreak}" else "${scoreItem.wordsBlasted} ${tl("palabras")} • ${tl("Racha")} x${scoreItem.maxComboStreak}", color = TextSecondary, fontSize = 10.sp)
                                     }
                                 }
                                 Text("${scoreItem.score} pts", color = SolarAmber, fontSize = 14.sp, fontWeight = FontWeight.ExtraBold)
@@ -389,7 +390,7 @@ fun ArcadeHighScoresDialog(
         confirmButton = {
             if (onPlayAgain != null) {
                 BlasterCyberButton(
-                    text = if (isArabic) "العب لتحطيم الرقم" else "JUGAR (NUEVO RÉCORD)",
+                    text = if (isArabic) "العب لتحطيم الرقم" else tl("JUGAR (NUEVO RÉCORD)"),
                     onClick = { onDismiss(); onPlayAgain() },
                     modifier = Modifier.fillMaxWidth(),
                     color = SolarAmber
@@ -403,7 +404,7 @@ fun ArcadeHighScoresDialog(
                 border = BorderStroke(1.2.dp, ExplorerBlue),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(if (isArabic) "إغلاق النافذة" else "Cerrar", color = ExplorerBlue, fontWeight = FontWeight.Bold)
+                Text(if (isArabic) "إغلاق النافذة" else tl("Cerrar"), color = ExplorerBlue, fontWeight = FontWeight.Bold)
             }
         }
     )

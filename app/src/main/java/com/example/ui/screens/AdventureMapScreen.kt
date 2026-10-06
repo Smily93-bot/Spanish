@@ -1,5 +1,6 @@
 package com.example.ui.screens
 
+import com.example.flavor.tl
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -37,12 +38,12 @@ import com.example.ui.viewmodel.BlasterViewModel
 private data class Sector(val level: CefrLevel, val name: String, val nameAr: String, val color: Color, val planet: String)
 
 private val SECTORS = listOf(
-    Sector(CefrLevel.A1, "Sector Amanecer", "قطاع الفجر", Color(0xFF2E9F5B), "🌍"),
-    Sector(CefrLevel.A2, "Cinturón de Archivos", "حزام الأرشيف", Color(0xFF1667C9), "🪐"),
-    Sector(CefrLevel.B1, "Jardín de Memorias", "حديقة الذكريات", Color(0xFF7C4DDB), "🌸"),
-    Sector(CefrLevel.B2, "Nebulosa Condicional", "سديم الشرط", Color(0xFFE07A10), "🌌"),
-    Sector(CefrLevel.C1, "Observatorio del Tiempo", "مرصد الزمن", Color(0xFFE5484D), "🔭"),
-    Sector(CefrLevel.C2, "Consejo de Mundos", "مجلس العوالم", Color(0xFF0A1633), "💎")
+    Sector(CefrLevel.A1, tl("Sector Amanecer"), "قطاع الفجر", Color(0xFF2E9F5B), "🌍"),
+    Sector(CefrLevel.A2, tl("Cinturón de Archivos"), "حزام الأرشيف", Color(0xFF1667C9), "🪐"),
+    Sector(CefrLevel.B1, tl("Jardín de Memorias"), "حديقة الذكريات", Color(0xFF7C4DDB), "🌸"),
+    Sector(CefrLevel.B2, tl("Nebulosa Condicional"), "سديم الشرط", Color(0xFFE07A10), "🌌"),
+    Sector(CefrLevel.C1, tl("Observatorio del Tiempo"), "مرصد الزمن", Color(0xFFE5484D), "🔭"),
+    Sector(CefrLevel.C2, tl("Consejo de Mundos"), "مجلس العوالم", Color(0xFF0A1633), "💎")
 )
 
 @Composable
@@ -70,7 +71,7 @@ fun AdventureMapScreen(viewModel: BlasterViewModel) {
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                Text(language.pick("أطلس أوربيتا", "ATLAS DE ÓRBITA"), color = DiamondCyan, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold)
+                Text(language.pick("أطلس أوربيتا", tl("ATLAS DE ÓRBITA")), color = DiamondCyan, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold)
                 Text(
                     language.pick(
                         "ساعدي ليا ونيلو على جمع صفحات الأطلس الاثنتي عشرة للعودة إلى الوطن.",
@@ -79,7 +80,7 @@ fun AdventureMapScreen(viewModel: BlasterViewModel) {
                     color = StarWhite, fontSize = 14.sp
                 )
                 ProgressBar(completed / data.tablets.size.toFloat(), color = SolarGold)
-                Text("$completed / ${data.tablets.size} " + language.pick("صفحات", "páginas"), color = StarWhite.copy(alpha = 0.8f), fontSize = 11.sp)
+                Text("$completed / ${data.tablets.size} " + language.pick("صفحات", tl("páginas")), color = StarWhite.copy(alpha = 0.8f), fontSize = 11.sp)
             }
         }
         items(SECTORS) { sector ->
