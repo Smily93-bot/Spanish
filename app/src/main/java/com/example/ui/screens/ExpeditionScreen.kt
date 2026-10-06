@@ -6,6 +6,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.calculatePan
+import androidx.compose.foundation.gestures.calculateZoom
+import androidx.compose.ui.input.pointer.positionChanged
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -13,11 +18,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -44,6 +51,8 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.example.R
 import com.example.data.content.SpanishContent
 import com.example.data.model.*
@@ -741,101 +750,267 @@ private fun HiddenObjectSearch(
     viewModel: BlasterViewModel,
     language: HelperLanguage
 ) {
-    var imageSize by remember { mutableStateOf(IntSize.Zero) }
     var mistakes by remember { mutableIntStateOf(0) }
+    /** Last wrong tap, as a fraction of the picture. */
     var wrongTap by remember { mutableStateOf<Offset?>(null) }
+    var fullScreen by remember { mutableStateOf(false) }
     val found = targets.filter { "search-${it.id}" in results }
     val remaining = targets.filter { "search-${it.id}" !in results }
     val hinted = if (mistakes >= 3) remaining.firstOrNull() else null
 
+    val onTap: (Float, Float) -> Unit = { fx, fy ->
+        val hit = remaining.firstOrNull { obj ->
+            obj.boxes.any { b -> fx in (b[0] - 0.02f)..(b[0] + b[2] + 0.02f) && fy in (b[1] - 0.02f)..(b[1] + b[3] + 0.02f) }
+        }
+        if (hit != null) {
+            results["search-${hit.id}"] = mistakes == 0
+            mistakes = 0
+            wrongTap = null
+            viewModel.soundEngine.hit()
+            viewModel.speakSpanish(hit.spanish)
+            viewModel.recordWord(hit.spanish.substringAfter(' '), hit.english, "search", true)
+            if (remaining.size == 1) fullScreen = false
+        } else {
+            mistakes++
+            wrongTap = Offset(fx, fy)
+            viewModel.soundEngine.error()
+        }
+    }
+
     AdventureCard(borderColor = ExplorerBlue) {
         Text(language.pick("🔍 ابحثي عن هذه الأشياء في الغرفة واضغطي عليها:", "🔍 Find these objects in the room and tap them:"), color = TextPrimary, fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(8.dp))
-        FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            targets.forEach { obj ->
-                val done = obj in found
-                Surface(
-                    onClick = { viewModel.speakSpanish(obj.spanish) },
-                    shape = RoundedCornerShape(10.dp),
-                    color = if (done) SuccessGreen.copy(alpha = 0.15f) else AdventureSurfaceVariant,
-                    border = BorderStroke(1.dp, if (done) SuccessGreen else ExplorerBlue)
+        TargetChips(targets, found, viewModel)
+    }
+
+    ZoomableScene(
+        scene = scene,
+        found = found,
+        hinted = hinted,
+        wrongTap = wrongTap,
+        fillHeight = false,
+        onTap = onTap,
+        modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(SCENE_ASPECT)
+            .clip(RoundedCornerShape(14.dp))
+            .border(2.dp, ExplorerBlue, RoundedCornerShape(14.dp))
+    )
+    Button(
+        onClick = { fullScreen = true },
+        colors = ButtonDefaults.buttonColors(containerColor = ExplorerBlue),
+        shape = RoundedCornerShape(14.dp),
+        modifier = Modifier.fillMaxWidth().height(52.dp)
+    ) {
+        Text(language.pick("⛶ تكبير الصورة إلى ملء الشاشة", "⛶ Make the picture full screen"), fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
+    }
+    Text(
+        language.pick(
+            "🤏 قرّبي بإصبعين أو اضغطي مرتين للتكبير · اضغطي على الكلمة لسماعها.",
+            "🤏 Pinch or double-tap to zoom · tap a word to hear it."
+        ),
+        color = TextSecondary, fontSize = 12.sp
+    )
+    if (hinted != null) {
+        NiloSays(NiloLines.searchHint, language, onSpeak = { viewModel.speakSpanish(NiloLines.searchHint.es) }, size = 44.dp)
+    }
+
+    if (fullScreen) {
+        Dialog(
+            onDismissRequest = { fullScreen = false },
+            properties = DialogProperties(usePlatformDefaultWidth = false)
+        ) {
+            Box(Modifier.fillMaxSize().background(Color.Black)) {
+                ZoomableScene(
+                    scene = scene,
+                    found = found,
+                    hinted = hinted,
+                    wrongTap = wrongTap,
+                    fillHeight = true,
+                    onTap = onTap,
+                    modifier = Modifier.fillMaxSize()
+                )
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .background(Color.Black.copy(alpha = 0.55f))
+                        .padding(10.dp)
                 ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            language.pick("ابحثي عن: ${found.size}/${targets.size}", "Find: ${found.size}/${targets.size}"),
+                            color = Color.White, fontWeight = FontWeight.ExtraBold, modifier = Modifier.weight(1f)
+                        )
+                        IconButton(onClick = { fullScreen = false }) {
+                            Icon(Icons.Default.Close, contentDescription = language.pick("إغلاق", "Close"), tint = Color.White)
+                        }
+                    }
+                    TargetChips(targets, found, viewModel)
+                }
+                if (hinted != null) {
                     Text(
-                        (if (done) "✓ " else "🔊 ") + obj.spanish,
-                        color = if (done) SuccessGreen else TextPrimary,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+                        "💡 " + NiloLines.searchHint.meaning(language),
+                        color = SolarGold, fontWeight = FontWeight.Bold,
+                        modifier = Modifier.align(Alignment.BottomCenter).background(Color.Black.copy(alpha = 0.55f)).padding(12.dp)
                     )
                 }
             }
+        }
+    }
+}
+
+private const val SCENE_ASPECT = 1536f / 1024f
+
+@Composable
+private fun TargetChips(targets: List<HiddenObject>, found: List<HiddenObject>, viewModel: BlasterViewModel) {
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        targets.forEach { obj ->
+            val done = obj in found
+            Surface(
+                onClick = { viewModel.speakSpanish(obj.spanish) },
+                shape = RoundedCornerShape(10.dp),
+                color = if (done) SuccessGreen.copy(alpha = 0.25f) else AdventureSurfaceVariant,
+                border = BorderStroke(1.dp, if (done) SuccessGreen else ExplorerBlue)
+            ) {
+                Text(
+                    (if (done) "✓ " else "🔊 ") + obj.spanish,
+                    color = if (done) SuccessGreen else TextPrimary,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 15.sp,
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+                )
+            }
+        }
+    }
+}
+
+/**
+ * The hidden-object picture with pinch-zoom, drag and double-tap zoom. Taps are converted back to
+ * fractions of the picture so hit boxes work at any zoom. With [fillHeight] the picture starts
+ * zoomed so it fills the screen height (drag sideways to look around).
+ */
+@Composable
+private fun ZoomableScene(
+    scene: HiddenScene,
+    found: List<HiddenObject>,
+    hinted: HiddenObject?,
+    wrongTap: Offset?,
+    fillHeight: Boolean,
+    onTap: (Float, Float) -> Unit,
+    modifier: Modifier
+) {
+    var container by remember { mutableStateOf(IntSize.Zero) }
+    var scale by remember { mutableFloatStateOf(1f) }
+    var offset by remember { mutableStateOf(Offset.Zero) }
+    var initialised by remember { mutableStateOf(false) }
+    val currentOnTap by rememberUpdatedState(onTap)
+
+    val w = container.width.toFloat()
+    val h = w / SCENE_ASPECT                       // picture height when it fits the width
+    val top = (container.height - h) / 2f
+    val minScale = if (fillHeight && h > 0f) maxOf(1f, container.height / h) else 1f
+
+    fun clamp(o: Offset, s: Float): Offset {
+        val maxX = maxOf(0f, (w * s - w) / 2f)
+        val maxY = maxOf(0f, (h * s - container.height) / 2f)
+        return Offset(o.x.coerceIn(-maxX, maxX), o.y.coerceIn(-maxY, maxY))
+    }
+
+    LaunchedEffect(container) {
+        if (container.width > 0 && !initialised) {
+            scale = minScale
+            offset = Offset.Zero
+            initialised = true
         }
     }
 
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(1536f / 1024f)
-            .clip(RoundedCornerShape(14.dp))
-            .border(2.dp, ExplorerBlue, RoundedCornerShape(14.dp))
-            .onSizeChanged { imageSize = it }
-            .pointerInput(remaining.size) {
-                detectTapGestures { tap ->
-                    if (imageSize.width == 0) return@detectTapGestures
-                    val fx = tap.x / imageSize.width
-                    val fy = tap.y / imageSize.height
-                    val hit = remaining.firstOrNull { obj ->
-                        obj.boxes.any { b -> fx in (b[0] - 0.02f)..(b[0] + b[2] + 0.02f) && fy in (b[1] - 0.02f)..(b[1] + b[3] + 0.02f) }
-                    }
-                    if (hit != null) {
-                        results["search-${hit.id}"] = mistakes == 0
-                        mistakes = 0
-                        wrongTap = null
-                        viewModel.soundEngine.hit()
-                        viewModel.speakSpanish(hit.spanish)
-                        viewModel.recordWord(hit.spanish.substringAfter(' '), hit.english, "search", true)
-                    } else {
-                        mistakes++
-                        wrongTap = tap
-                        viewModel.soundEngine.error()
-                    }
+        modifier
+            .onSizeChanged { container = it }
+            .pointerInput(container, minScale) {
+                // One finger only pans once zoomed (or in full screen), so the page can still scroll.
+                awaitEachGesture {
+                    awaitFirstDown(requireUnconsumed = false)
+                    do {
+                        val event = awaitPointerEvent()
+                        val fingers = event.changes.count { it.pressed }
+                        if (fingers >= 2 || fillHeight || scale > minScale + 0.01f) {
+                            val zoom = event.calculateZoom()
+                            val pan = event.calculatePan()
+                            if (zoom != 1f || pan != Offset.Zero) {
+                                val s = (scale * zoom).coerceIn(minScale, minScale * 4f)
+                                scale = s
+                                offset = clamp(offset + pan, s)
+                                event.changes.forEach { if (it.positionChanged()) it.consume() }
+                            }
+                        }
+                    } while (event.changes.any { it.pressed })
                 }
             }
+            .pointerInput(container, minScale) {
+                detectTapGestures(
+                    onDoubleTap = { tap ->
+                        val zoomIn = scale < minScale * 1.8f
+                        val s = if (zoomIn) minScale * 2.5f else minScale
+                        // Zoom towards the tapped point.
+                        val centre = Offset(w / 2f, top + h / 2f)
+                        offset = if (zoomIn) clamp((centre - tap) * (s / scale - 1f) + offset * (s / scale), s) else Offset.Zero
+                        scale = s
+                    },
+                    onTap = { tap ->
+                        if (w == 0f) return@detectTapGestures
+                        val centre = Offset(w / 2f, top + h / 2f)
+                        val local = (tap - centre - offset) / scale
+                        val fx = (local.x + w / 2f) / w
+                        val fy = (local.y + h / 2f) / h
+                        if (fx in 0f..1f && fy in 0f..1f) currentOnTap(fx, fy)
+                    }
+                )
+            },
+        contentAlignment = Alignment.Center
     ) {
-        Image(
-            painter = painterResource(sceneDrawable(scene.asset)),
-            contentDescription = scene.name,
-            contentScale = ContentScale.FillBounds,
-            modifier = Modifier.matchParentSize()
-        )
-        Canvas(Modifier.matchParentSize()) {
-            found.forEach { obj ->
-                obj.boxes.forEach { b ->
-                    drawRoundRect(
-                        SuccessGreen,
-                        topLeft = Offset(b[0] * size.width, b[1] * size.height),
-                        size = Size(b[2] * size.width, b[3] * size.height),
-                        cornerRadius = CornerRadius(10f),
-                        style = Stroke(width = 5f)
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .aspectRatio(SCENE_ASPECT)
+                .graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
+                    translationX = offset.x
+                    translationY = offset.y
+                }
+        ) {
+            Image(
+                painter = painterResource(sceneDrawable(scene.asset)),
+                contentDescription = scene.name,
+                contentScale = ContentScale.FillBounds,
+                modifier = Modifier.matchParentSize()
+            )
+            Canvas(Modifier.matchParentSize()) {
+                val line = 5f / scale
+                found.forEach { obj ->
+                    obj.boxes.forEach { b ->
+                        drawRoundRect(
+                            SuccessGreen,
+                            topLeft = Offset(b[0] * size.width, b[1] * size.height),
+                            size = Size(b[2] * size.width, b[3] * size.height),
+                            cornerRadius = CornerRadius(10f / scale),
+                            style = Stroke(width = line)
+                        )
+                    }
+                }
+                hinted?.boxes?.firstOrNull()?.let { b ->
+                    drawCircle(
+                        SolarGold.copy(alpha = 0.6f),
+                        radius = maxOf(b[2] * size.width, b[3] * size.height) * 0.9f,
+                        center = Offset((b[0] + b[2] / 2) * size.width, (b[1] + b[3] / 2) * size.height),
+                        style = Stroke(width = 6f / scale)
                     )
                 }
+                wrongTap?.let {
+                    drawCircle(MeteorRed, radius = 18f / scale, center = Offset(it.x * size.width, it.y * size.height), style = Stroke(width = 4f / scale))
+                }
             }
-            hinted?.boxes?.firstOrNull()?.let { b ->
-                drawCircle(
-                    SolarGold.copy(alpha = 0.5f),
-                    radius = maxOf(b[2] * size.width, b[3] * size.height) * 0.9f,
-                    center = Offset((b[0] + b[2] / 2) * size.width, (b[1] + b[3] / 2) * size.height),
-                    style = Stroke(width = 6f)
-                )
-            }
-            wrongTap?.let { drawCircle(MeteorRed, radius = 18f, center = it, style = Stroke(width = 4f)) }
         }
     }
-    if (hinted != null) {
-        NiloSays(NiloLines.searchHint, language, onSpeak = { viewModel.speakSpanish(NiloLines.searchHint.es) }, size = 44.dp)
-    }
-    Text(
-        language.pick("اضغطي على الكلمة لسماع نطقها.", "Tap a word to hear it."),
-        color = TextSecondary, fontSize = 11.sp
-    )
 }
