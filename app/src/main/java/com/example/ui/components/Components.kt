@@ -194,6 +194,10 @@ fun RewardDialog(reward: RewardResult, isArabic: Boolean, title: String, onDismi
     )
 }
 
+/** Localised name of an arcade mode stored in the scores table. */
+fun gameModeLabel(mode: String, isArabic: Boolean): String =
+    HIGH_SCORE_FILTERS.firstOrNull { it.first == mode }?.let { if (isArabic) it.second else it.third } ?: mode
+
 private val HIGH_SCORE_FILTERS = listOf(
     Triple("ALL", "الكل", "Todos"),
     Triple("TRANSLATION", "المعنى", "Significado"),
@@ -371,8 +375,8 @@ fun ArcadeHighScoresDialog(
                                     }
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Column {
-                                        Text("${scoreItem.gameMode} · ${scoreItem.rankGrade}", color = TextPrimary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                                        Text("${scoreItem.wordsBlasted} palabras • Racha x${scoreItem.maxComboStreak}", color = TextSecondary, fontSize = 10.sp)
+                                        Text("${gameModeLabel(scoreItem.gameMode, isArabic)} · ${scoreItem.rankGrade}", color = TextPrimary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                        Text(if (isArabic) "${scoreItem.wordsBlasted} كلمة • سلسلة x${scoreItem.maxComboStreak}" else "${scoreItem.wordsBlasted} palabras • Racha x${scoreItem.maxComboStreak}", color = TextSecondary, fontSize = 10.sp)
                                     }
                                 }
                                 Text("${scoreItem.score} pts", color = SolarAmber, fontSize = 14.sp, fontWeight = FontWeight.ExtraBold)

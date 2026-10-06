@@ -114,7 +114,7 @@ fun CadetLogbookScreen(viewModel: BlasterViewModel) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Column(Modifier.weight(1f)) {
                                 Text(w.spanishWord, color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                                Text(entry?.meaning(language) ?: w.englishWord, color = ExplorerBlue, fontSize = 12.sp)
+                                Text(entry?.meaning(language) ?: language.pick("", w.englishWord), color = ExplorerBlue, fontSize = 12.sp)
                                 Text("✓ ${w.timesCorrect}/${w.timesEncountered}", color = TextSecondary, fontSize = 11.sp)
                             }
                             Text("★".repeat(w.masteryLevel) + "☆".repeat(5 - w.masteryLevel), color = SolarGold, fontSize = 14.sp)
@@ -127,7 +127,7 @@ fun CadetLogbookScreen(viewModel: BlasterViewModel) {
                 val q = normalizeAnswer(query)
                 val results = if (q.length < 2) data.topicWords.take(30) else
                     (data.topicWords + data.frequency).filter {
-                        normalizeAnswer(it.spanish).contains(q) || it.english.lowercase().contains(q) || it.arabic.contains(query.trim())
+                        normalizeAnswer(it.spanish).contains(q) || normalizeAnswer(it.meaning(language)).contains(q)
                     }.distinctBy { it.spanish }.take(60)
                 items(results) { w ->
                     AdventureCard(onClick = { viewModel.speakSpanish(w.shortSpanish) }) {
@@ -138,7 +138,7 @@ fun CadetLogbookScreen(viewModel: BlasterViewModel) {
                                     Spacer(Modifier.width(6.dp))
                                     LevelChip(w.level)
                                 }
-                                Text("🇬🇧 ${w.english}   ·   ${w.arabic}", color = ExplorerBlue, fontSize = 12.sp)
+                                Text(w.meaning(language), color = ExplorerBlue, fontSize = 12.sp)
                                 if (w.exampleEs.isNotBlank()) Text(w.exampleEs, color = TextSecondary, fontSize = 12.sp)
                             }
                             Text("🔊", fontSize = 16.sp)
@@ -153,7 +153,7 @@ fun CadetLogbookScreen(viewModel: BlasterViewModel) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             LevelChip(g.level, ExplorerBlue)
                             Spacer(Modifier.width(8.dp))
-                            Text(g.title, color = TextPrimary, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                            Text(language.pick(g.titleAr, g.title), color = TextPrimary, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                             Text(if (open) "▲" else "▼", color = TextSecondary)
                         }
                         if (open) {
@@ -229,7 +229,7 @@ private fun SearchField(query: String, onChange: (String) -> Unit, language: Hel
         value = query,
         onValueChange = onChange,
         singleLine = true,
-        placeholder = { Text(language.pick("ابحثي بالإسبانية أو العربية أو الإنجليزية…", "Search in Spanish, English or Arabic…")) },
+        placeholder = { Text(language.pick("ابحثي بالإسبانية أو العربية…", "Search in Spanish or English…")) },
         shape = RoundedCornerShape(14.dp),
         modifier = Modifier.fillMaxWidth()
     )

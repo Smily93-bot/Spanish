@@ -9,20 +9,27 @@ import kotlin.random.Random
 /**
  * All learning content bundled with the app (no network, no API keys):
  *  - assets/vocab.json    → Parliva topic collections, Frequency 5000, course phrases, grammar guides
- *  - assets/campaign.json → the twelve Órbita chapters (A1.1 → C2.2) used as Reading Tablets
+ *  - assets/campaign.json → the twelve Órbita chapters (A1.1 → C2.2) and their hidden-object scenes
+ *
+ * Everything expensive (word pools, cloze sentences) is computed once in [parse], which runs on a
+ * background thread, so starting a game never stalls the UI.
  */
 class SpanishContent(
     val categories: List<VocabCategory>,
     val frequency: List<VocabWord>,
     val phrases: List<Phrase>,
     val grammar: List<GrammarGuide>,
-    val tablets: List<ReadingTablet>
+    val tablets: List<ReadingTablet>,
+    val scenes: Map<String, HiddenScene>
 ) {
     val topicWords: List<VocabWord> = categories.flatMap { it.words }
     private val bySpanish: Map<String, VocabWord> =
         (topicWords + frequency).associateBy { normalizeAnswer(it.shortSpanish) }
 
     fun lookup(spanish: String): VocabWord? = bySpanish[normalizeAnswer(spanish)]
+
+    private val singleTopicWords = topicWords.filter { !it.spanish.contains(' ') || it.spanish.contains('/') }
+    private val poolCache = HashMap<Int, List<VocabWord>>()
 
     /** Words the player sees for a given level: topic collections first, then frequency words up to that CEFR band. */
     fun wordPool(playerLevel: Int): List<VocabWord> {
@@ -32,8 +39,13 @@ class SpanishContent(
             playerLevel <= 9 -> 2500
             else -> 5000
         }
-        return topicWords.filter { !it.spanish.contains(' ') || it.spanish.contains('/') } +
-            frequency.filter { it.rank <= maxRank && it.partOfSpeech !in SKIPPED_PARTS && it.shortSpanish.length > 2 }
+        return synchronized(poolCache) {
+            poolCache.getOrPut(maxRank) {
+                singleTopicWords + frequency.filter {
+                    it.rank <= maxRank && it.partOfSpeech !in SKIPPED_PARTS && it.shortSpanish.length > 2
+                }
+            }
+        }
     }
 
     // ---------------------------------------------------------------- Meteor Blaster
@@ -41,16 +53,16 @@ class SpanishContent(
     fun meteorRound(mode: BlasterMode, language: HelperLanguage, playerLevel: Int, random: Random = Random): MeteorWord =
         when (mode) {
             BlasterMode.TRANSLATION -> translationMeteor(language, playerLevel, random)
-            BlasterMode.SYNONYM -> pairMeteor(SYNONYMS, random)
-            BlasterMode.ANTONYM -> pairMeteor(ANTONYMS, random)
+            BlasterMode.SYNONYM -> pairMeteor(SYNONYMS, language, random)
+            BlasterMode.ANTONYM -> pairMeteor(ANTONYMS, language, random)
         }
 
     private fun translationMeteor(language: HelperLanguage, playerLevel: Int, random: Random): MeteorWord {
         val pool = wordPool(playerLevel)
         val target = pool.random(random)
         val answer = target.meaning(language).split("/").first().trim()
-        val distractors = pool.asSequence()
-            .shuffled(random)
+        val distractors = generateSequence { pool.random(random) }
+            .take(60)
             .map { it.meaning(language).split("/").first().trim() }
             .filter { normalizeAnswer(it) != normalizeAnswer(answer) && it.isNotBlank() }
             .distinct()
@@ -62,11 +74,12 @@ class SpanishContent(
             options = (distractors + answer).shuffled(random),
             spanishToSpeak = target.shortSpanish,
             category = target.category,
+            hint = answer,
             englishMeaning = target.english
         )
     }
 
-    private fun pairMeteor(pairs: List<WordPair>, random: Random): MeteorWord {
+    private fun pairMeteor(pairs: List<WordPair>, language: HelperLanguage, random: Random): MeteorWord {
         val pair = pairs.random(random)
         val flipped = random.nextBoolean()
         val prompt = if (flipped) pair.second else pair.first
@@ -75,6 +88,7 @@ class SpanishContent(
             .filter { it != pair }
             .shuffled(random)
             .map { if (random.nextBoolean()) it.first else it.second }
+            .filter { it != prompt && it != answer }
             .distinct()
             .take(3)
             .toList()
@@ -84,25 +98,35 @@ class SpanishContent(
             options = (distractors + answer).shuffled(random),
             spanishToSpeak = prompt,
             category = "pairs",
+            hint = if (flipped) language.pick(pair.secondAr, pair.secondEn) else language.pick(pair.firstAr, pair.firstEn),
             englishMeaning = if (flipped) pair.secondEn else pair.firstEn
         )
     }
 
     // ---------------------------------------------------------------- Quantum Cloze
 
+    /** A frequency word whose example sentence contains it, with the position of the gap precomputed. */
+    private class ClozeSource(val word: VocabWord, val range: IntRange)
+
+    private val clozeReady: List<ClozeSource> = frequency.mapNotNull { w ->
+        if (w.exampleEs.isBlank() || w.shortSpanish.length <= 1 || w.partOfSpeech in SKIPPED_PARTS) return@mapNotNull null
+        findWord(w.exampleEs, w.shortSpanish)?.let { ClozeSource(w, it) }
+    }
+    private val clozeByLevel: Map<String, List<ClozeSource>> = clozeReady.groupBy { it.word.level }
+    private val clozeByPart: Map<String, List<ClozeSource>> = clozeReady.groupBy { it.word.partOfSpeech }
+
     fun clozeQuestion(language: HelperLanguage, level: CefrLevel?, random: Random = Random): ClozeQuestion {
         // The frequency list stops at C1, so C2 players get the hardest (C1) sentences.
         val band = if (level == CefrLevel.C2) CefrLevel.C1 else level
-        val candidates = clozeReady.filter { band == null || it.level == band.code }.ifEmpty { clozeReady }
-        val word = candidates.random(random)
-        val gapRegex = wordRegex(word.shortSpanish)
-        val match = gapRegex.find(word.exampleEs)!!
-        val answer = match.value
-        val gapped = word.exampleEs.replaceRange(match.range, "_____")
+        val candidates = band?.let { clozeByLevel[it.code] }.orEmpty().ifEmpty { clozeReady }
+        val source = candidates.random(random)
+        val word = source.word
+        val answer = word.exampleEs.substring(source.range)
+        val gapped = word.exampleEs.replaceRange(source.range, "_____")
         // Prefer distractors with the same part of speech; top up from the whole list if there are too few.
-        val samePart = clozeReady.filter { it.partOfSpeech == word.partOfSpeech }.shuffled(random)
-        val distractors = (samePart.asSequence() + clozeReady.asSequence().shuffled(random))
-            .map { matchCase(it.shortSpanish, answer) }
+        val samePart = clozeByPart[word.partOfSpeech].orEmpty()
+        val distractors = (generateSequence { samePart.random(random) }.take(40) + generateSequence { clozeReady.random(random) }.take(40))
+            .map { matchCase(it.word.shortSpanish, answer) }
             .filter { normalizeAnswer(it) != normalizeAnswer(answer) }
             .distinct()
             .take(3)
@@ -118,21 +142,25 @@ class SpanishContent(
         )
     }
 
-    private val clozeReady: List<VocabWord> by lazy {
-        frequency.filter {
-            it.exampleEs.isNotBlank() && it.shortSpanish.length > 1 && it.partOfSpeech !in SKIPPED_PARTS &&
-                wordRegex(it.shortSpanish).containsMatchIn(it.exampleEs)
-        }
-    }
-
-    private fun wordRegex(word: String) =
-        Regex("(?<![\\p{L}])" + Regex.escape(word) + "(?![\\p{L}])", setOf(RegexOption.IGNORE_CASE))
-
     private fun matchCase(word: String, model: String) =
         if (model.firstOrNull()?.isUpperCase() == true) word.replaceFirstChar { it.uppercase() } else word
 
     companion object {
         private val SKIPPED_PARTS = setOf("article", "punctuation", "number", "contraction")
+
+        /** Case-insensitive whole-word search without regex (fast enough to run over all 5000 sentences). */
+        fun findWord(sentence: String, word: String): IntRange? {
+            var from = 0
+            while (true) {
+                val i = sentence.indexOf(word, from, ignoreCase = true)
+                if (i < 0) return null
+                val end = i + word.length
+                val before = i == 0 || !sentence[i - 1].isLetter()
+                val after = end >= sentence.length || !sentence[end].isLetter()
+                if (before && after) return i until end
+                from = i + 1
+            }
+        }
 
         fun load(context: Context): SpanishContent = parse(
             vocabJson = context.assets.open("vocab.json").bufferedReader().use { it.readText() },
@@ -192,6 +220,7 @@ class SpanishContent(
                     id = g.getString("id"),
                     level = g.optString("level"),
                     title = g.optString("title"),
+                    titleAr = g.optString("titleAr", g.optString("title")),
                     english = g.optString("en"),
                     arabic = g.optString("ar"),
                     formula = g.optString("formula"),
@@ -208,14 +237,17 @@ class SpanishContent(
                     id = l.getString("id"),
                     level = l.getString("level"),
                     title = l.getString("title"),
+                    titleAr = l.optString("titleAr", l.getString("title")),
                     goal = l.optString("goal"),
                     goalAr = l.optString("goalAr"),
                     reward = l.optString("reward"),
+                    rewardAr = l.optString("rewardAr", l.optString("reward")),
                     story = l.getString("story"),
                     storyAr = l.optString("storyAr"),
                     opening = l.getJSONArray("opening").fields(),
                     lesson = TabletLesson(
                         title = lesson.optString("title"),
+                        titleAr = lesson.optString("titleAr", lesson.optString("title")),
                         english = lesson.optString("en"),
                         arabic = lesson.optString("ar"),
                         example = lesson.optString("example")
@@ -226,20 +258,46 @@ class SpanishContent(
                     ),
                     order = l.getJSONArray("order").strings(),
                     orderEn = l.optString("orderEn"),
+                    orderAr = l.optString("orderAr", l.optString("orderEn")),
                     mission = l.optString("mission"),
                     missionAr = l.optString("missionAr"),
                     fields = l.getJSONArray("fields").fields(),
                     ending = l.optString("ending"),
                     gate = l.getJSONArray("gate").fields(),
                     expeditionGoal = expedition?.optString("goal").orEmpty(),
-                    expeditionPayoff = expedition?.optString("payoff").orEmpty()
+                    expeditionGoalAr = expedition?.optString("goalAr").orEmpty(),
+                    expeditionPayoff = expedition?.optString("payoff").orEmpty(),
+                    expeditionPayoffAr = expedition?.optString("payoffAr").orEmpty(),
+                    scene = l.optString("scene", "cabin"),
+                    targets = l.optJSONArray("targets")?.strings().orEmpty()
                 )
             }
-            return SpanishContent(categories, frequency, phrases, grammar, tablets)
+            val scenesJson = campaign.optJSONObject("scenes") ?: JSONObject()
+            val scenes = scenesJson.keys().asSequence().associateWith { id ->
+                val s = scenesJson.getJSONObject(id)
+                HiddenScene(
+                    id = id,
+                    asset = s.getString("asset"),
+                    name = s.optString("name"),
+                    objects = s.getJSONArray("objects").objects().map { o ->
+                        val boxes = mutableListOf(o.getJSONArray("box").floats())
+                        o.optJSONArray("extra")?.let { extra -> (0 until extra.length()).forEach { boxes += extra.getJSONArray(it).floats() } }
+                        HiddenObject(
+                            id = o.getString("id"),
+                            spanish = o.getString("es"),
+                            english = o.optString("en"),
+                            arabic = o.optString("ar"),
+                            boxes = boxes
+                        )
+                    }
+                )
+            }
+            return SpanishContent(categories, frequency, phrases, grammar, tablets, scenes)
         }
 
         private fun JSONArray.objects(): List<JSONObject> = (0 until length()).map { getJSONObject(it) }
         private fun JSONArray.strings(): List<String> = (0 until length()).map { getString(it) }
+        private fun JSONArray.floats(): List<Float> = (0 until length()).map { getDouble(it).toFloat() }
         private fun JSONArray.fields(): List<TabletField> = objects().map { f ->
             TabletField(
                 label = f.getString("label"),
@@ -251,90 +309,101 @@ class SpanishContent(
     }
 }
 
-data class WordPair(val first: String, val second: String, val firstEn: String, val secondEn: String)
+data class WordPair(
+    val first: String,
+    val second: String,
+    val firstEn: String,
+    val secondEn: String,
+    val firstAr: String,
+    val secondAr: String
+)
 
-private fun pair(a: String, b: String, aEn: String, bEn: String = aEn) = WordPair(a, b, aEn, bEn)
+/** Synonym pair: both words share one meaning. */
+private fun syn(a: String, b: String, en: String, ar: String) = WordPair(a, b, en, en, ar, ar)
+
+/** Antonym pair with the meaning of each side. */
+private fun ant(a: String, b: String, aEn: String, bEn: String, aAr: String, bAr: String) = WordPair(a, b, aEn, bEn, aAr, bAr)
 
 val SYNONYMS = listOf(
-    pair("bonito", "lindo", "pretty"),
-    pair("rápido", "veloz", "fast"),
-    pair("contento", "alegre", "happy / cheerful"),
-    pair("empezar", "comenzar", "to begin"),
-    pair("terminar", "acabar", "to finish"),
-    pair("casa", "hogar", "house / home"),
-    pair("coche", "auto", "car"),
-    pair("mirar", "observar", "to look / to observe"),
-    pair("caminar", "andar", "to walk"),
-    pair("enorme", "gigante", "huge"),
-    pair("listo", "inteligente", "clever"),
-    pair("fácil", "sencillo", "easy / simple"),
-    pair("difícil", "complicado", "difficult / complicated"),
-    pair("cara", "rostro", "face"),
-    pair("volver", "regresar", "to return"),
-    pair("conseguir", "lograr", "to achieve"),
-    pair("pelo", "cabello", "hair"),
-    pair("alumno", "estudiante", "student"),
-    pair("trabajo", "empleo", "job"),
-    pair("idioma", "lengua", "language"),
-    pair("delgado", "flaco", "thin"),
-    pair("enfadado", "enojado", "angry"),
-    pair("contestar", "responder", "to answer"),
-    pair("querer", "desear", "to want / to wish"),
-    pair("elegir", "escoger", "to choose"),
-    pair("comida", "alimento", "food"),
-    pair("anciano", "viejo", "old (person)"),
-    pair("barco", "buque", "ship"),
-    pair("cansado", "agotado", "tired / exhausted"),
-    pair("enseguida", "inmediatamente", "right away"),
-    pair("rico", "adinerado", "rich"),
-    pair("miedo", "temor", "fear"),
-    pair("chico", "muchacho", "boy"),
-    pair("hablar", "conversar", "to talk"),
-    pair("ayudar", "asistir", "to help"),
-    pair("lugar", "sitio", "place"),
-    pair("dinero", "plata", "money"),
-    pair("error", "fallo", "mistake")
+    syn("bonito", "lindo", "pretty", "جميل"),
+    syn("rápido", "veloz", "fast", "سريع"),
+    syn("contento", "alegre", "happy / cheerful", "مسرور"),
+    syn("empezar", "comenzar", "to begin", "يبدأ"),
+    syn("terminar", "acabar", "to finish", "يُنهي"),
+    syn("casa", "hogar", "house / home", "بيت"),
+    syn("coche", "auto", "car", "سيارة"),
+    syn("mirar", "observar", "to look / to observe", "ينظر"),
+    syn("caminar", "andar", "to walk", "يمشي"),
+    syn("enorme", "gigante", "huge", "ضخم"),
+    syn("listo", "inteligente", "clever", "ذكي"),
+    syn("fácil", "sencillo", "easy / simple", "سهل"),
+    syn("difícil", "complicado", "difficult / complicated", "صعب"),
+    syn("cara", "rostro", "face", "وجه"),
+    syn("volver", "regresar", "to return", "يعود"),
+    syn("conseguir", "lograr", "to achieve", "يحقق"),
+    syn("pelo", "cabello", "hair", "شعر"),
+    syn("alumno", "estudiante", "student", "طالب"),
+    syn("trabajo", "empleo", "job", "عمل"),
+    syn("idioma", "lengua", "language", "لغة"),
+    syn("delgado", "flaco", "thin", "نحيف"),
+    syn("enfadado", "enojado", "angry", "غاضب"),
+    syn("contestar", "responder", "to answer", "يجيب"),
+    syn("querer", "desear", "to want / to wish", "يريد"),
+    syn("elegir", "escoger", "to choose", "يختار"),
+    syn("comida", "alimento", "food", "طعام"),
+    syn("anciano", "viejo", "old (person)", "مُسن"),
+    syn("barco", "buque", "ship", "سفينة"),
+    syn("cansado", "agotado", "tired / exhausted", "متعب"),
+    syn("enseguida", "inmediatamente", "right away", "فورًا"),
+    syn("rico", "adinerado", "rich", "غني"),
+    syn("miedo", "temor", "fear", "خوف"),
+    syn("chico", "muchacho", "boy", "صبي"),
+    syn("hablar", "conversar", "to talk", "يتحدث"),
+    syn("ayudar", "asistir", "to help", "يساعد"),
+    syn("lugar", "sitio", "place", "مكان"),
+    syn("dinero", "plata", "money", "مال"),
+    syn("error", "fallo", "mistake", "خطأ")
 )
 
 val ANTONYMS = listOf(
-    pair("grande", "pequeño", "big", "small"),
-    pair("feliz", "triste", "happy", "sad"),
-    pair("arriba", "abajo", "up", "down"),
-    pair("rápido", "lento", "fast", "slow"),
-    pair("nuevo", "viejo", "new", "old"),
-    pair("fácil", "difícil", "easy", "difficult"),
-    pair("entrar", "salir", "to enter", "to leave"),
-    pair("abrir", "cerrar", "to open", "to close"),
-    pair("alto", "bajo", "tall", "short"),
-    pair("cerca", "lejos", "near", "far"),
-    pair("caliente", "frío", "hot", "cold"),
-    pair("dentro", "fuera", "inside", "outside"),
-    pair("día", "noche", "day", "night"),
-    pair("comprar", "vender", "to buy", "to sell"),
-    pair("antes", "después", "before", "after"),
-    pair("siempre", "nunca", "always", "never"),
-    pair("bueno", "malo", "good", "bad"),
-    pair("mucho", "poco", "a lot", "a little"),
-    pair("ganar", "perder", "to win", "to lose"),
-    pair("rico", "pobre", "rich", "poor"),
-    pair("limpio", "sucio", "clean", "dirty"),
-    pair("lleno", "vacío", "full", "empty"),
-    pair("claro", "oscuro", "light", "dark"),
-    pair("fuerte", "débil", "strong", "weak"),
-    pair("subir", "bajar", "to go up", "to go down"),
-    pair("encender", "apagar", "to switch on", "to switch off"),
-    pair("recordar", "olvidar", "to remember", "to forget"),
-    pair("aceptar", "rechazar", "to accept", "to reject"),
-    pair("joven", "mayor", "young", "older"),
-    pair("temprano", "tarde", "early", "late"),
-    pair("verdad", "mentira", "truth", "lie"),
-    pair("amor", "odio", "love", "hate"),
-    pair("preguntar", "responder", "to ask", "to answer"),
-    pair("ancho", "estrecho", "wide", "narrow"),
-    pair("caro", "barato", "expensive", "cheap"),
-    pair("primero", "último", "first", "last"),
-    pair("mejor", "peor", "better", "worse"),
-    pair("ruido", "silencio", "noise", "silence"),
-    pair("llegar", "partir", "to arrive", "to depart"),
-    pair("guerra", "paz", "war", "peace")
+    ant("grande", "pequeño", "big", "small", "كبير", "صغير"),
+    ant("feliz", "triste", "happy", "sad", "سعيد", "حزين"),
+    ant("arriba", "abajo", "up", "down", "فوق", "تحت"),
+    ant("rápido", "lento", "fast", "slow", "سريع", "بطيء"),
+    ant("nuevo", "viejo", "new", "old", "جديد", "قديم"),
+    ant("fácil", "difícil", "easy", "difficult", "سهل", "صعب"),
+    ant("entrar", "salir", "to enter", "to leave", "يدخل", "يخرج"),
+    ant("abrir", "cerrar", "to open", "to close", "يفتح", "يغلق"),
+    ant("alto", "bajo", "tall", "short", "طويل", "قصير"),
+    ant("cerca", "lejos", "near", "far", "قريب", "بعيد"),
+    ant("caliente", "frío", "hot", "cold", "ساخن", "بارد"),
+    ant("dentro", "fuera", "inside", "outside", "داخل", "خارج"),
+    ant("día", "noche", "day", "night", "نهار", "ليل"),
+    ant("comprar", "vender", "to buy", "to sell", "يشتري", "يبيع"),
+    ant("antes", "después", "before", "after", "قبل", "بعد"),
+    ant("siempre", "nunca", "always", "never", "دائمًا", "أبدًا"),
+    ant("bueno", "malo", "good", "bad", "جيد", "سيئ"),
+    ant("mucho", "poco", "a lot", "a little", "كثير", "قليل"),
+    ant("ganar", "perder", "to win", "to lose", "يفوز", "يخسر"),
+    ant("rico", "pobre", "rich", "poor", "غني", "فقير"),
+    ant("limpio", "sucio", "clean", "dirty", "نظيف", "متسخ"),
+    ant("lleno", "vacío", "full", "empty", "ممتلئ", "فارغ"),
+    ant("claro", "oscuro", "light", "dark", "فاتح", "مظلم"),
+    ant("fuerte", "débil", "strong", "weak", "قوي", "ضعيف"),
+    ant("subir", "bajar", "to go up", "to go down", "يصعد", "ينزل"),
+    ant("encender", "apagar", "to switch on", "to switch off", "يُشغّل", "يُطفئ"),
+    ant("recordar", "olvidar", "to remember", "to forget", "يتذكر", "ينسى"),
+    ant("aceptar", "rechazar", "to accept", "to reject", "يقبل", "يرفض"),
+    ant("joven", "mayor", "young", "older", "شاب", "أكبر سنًا"),
+    ant("temprano", "tarde", "early", "late", "باكرًا", "متأخرًا"),
+    ant("verdad", "mentira", "truth", "lie", "حقيقة", "كذبة"),
+    ant("amor", "odio", "love", "hate", "حب", "كره"),
+    ant("preguntar", "responder", "to ask", "to answer", "يسأل", "يجيب"),
+    ant("ancho", "estrecho", "wide", "narrow", "عريض", "ضيق"),
+    ant("caro", "barato", "expensive", "cheap", "غالٍ", "رخيص"),
+    ant("primero", "último", "first", "last", "أول", "آخر"),
+    ant("mejor", "peor", "better", "worse", "أفضل", "أسوأ"),
+    ant("ruido", "silencio", "noise", "silence", "ضجيج", "صمت"),
+    ant("llegar", "partir", "to arrive", "to depart", "يصل", "يغادر"),
+    ant("guerra", "paz", "war", "peace", "حرب", "سلام")
 )

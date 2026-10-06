@@ -58,6 +58,7 @@ data class GrammarGuide(
     val id: String,
     val level: String,
     val title: String,
+    val titleAr: String,
     val english: String,
     val arabic: String,
     val formula: String,
@@ -76,16 +77,32 @@ data class TabletField(
 
 data class GrammarTable(val headers: List<String>, val rows: List<List<String>>)
 
-data class TabletLesson(val title: String, val english: String, val arabic: String, val example: String)
+data class TabletLesson(val title: String, val titleAr: String, val english: String, val arabic: String, val example: String)
+
+/** A tappable object in a hidden-object scene. Boxes are (x, y, width, height) as fractions of the image. */
+data class HiddenObject(
+    val id: String,
+    val spanish: String,
+    val english: String,
+    val arabic: String,
+    val boxes: List<List<Float>>
+) {
+    fun meaning(language: HelperLanguage) = language.pick(arabic, english)
+}
+
+/** A detailed room illustration (cabin, lab, archive) used by the expedition search missions. */
+data class HiddenScene(val id: String, val asset: String, val name: String, val objects: List<HiddenObject>)
 
 /** One chapter of the Órbita campaign, presented as a "Reading Tablet". */
 data class ReadingTablet(
     val id: String,
     val level: String,
     val title: String,
+    val titleAr: String,
     val goal: String,
     val goalAr: String,
     val reward: String,
+    val rewardAr: String,
     val story: String,
     val storyAr: String,
     val opening: List<TabletField>,
@@ -93,14 +110,27 @@ data class ReadingTablet(
     val table: GrammarTable,
     val order: List<String>,
     val orderEn: String,
+    val orderAr: String,
     val mission: String,
     val missionAr: String,
     val fields: List<TabletField>,
     val ending: String,
     val gate: List<TabletField>,
     val expeditionGoal: String,
-    val expeditionPayoff: String
+    val expeditionGoalAr: String,
+    val expeditionPayoff: String,
+    val expeditionPayoffAr: String,
+    /** Hidden-object scene id (cabin, lab, archive) and the Spanish objects to find in it. */
+    val scene: String,
+    val targets: List<String>
 ) {
+    fun title(language: HelperLanguage) = language.pick(titleAr, title)
+    fun reward(language: HelperLanguage) = language.pick(rewardAr, reward)
+    fun goal(language: HelperLanguage) = language.pick(goalAr, goal)
+    fun orderTranslation(language: HelperLanguage) = language.pick(orderAr, orderEn)
+    fun expeditionGoal(language: HelperLanguage) = language.pick(expeditionGoalAr, expeditionGoal)
+    fun expeditionPayoff(language: HelperLanguage) = language.pick(expeditionPayoffAr, expeditionPayoff)
+
     val cefr: CefrLevel get() = CefrLevel.fromCode(level)
     val allQuestions: List<TabletField> get() = opening + fields + gate
 }
@@ -121,6 +151,9 @@ data class MeteorWord(
     val options: List<String>,
     val spanishToSpeak: String,
     val category: String,
+    /** Meaning of the prompt in the helper language (shown under synonym/antonym prompts). */
+    val hint: String,
+    /** English meaning, stored in the word-mastery table. */
     val englishMeaning: String
 )
 
