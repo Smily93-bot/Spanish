@@ -65,14 +65,14 @@ fun CommandBridgeScreen(viewModel: BlasterViewModel) {
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 20.dp, vertical = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(18.dp)
+        verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         // Lía and what she says
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(
                 painter = painterResource(if (mood == LiaMood.SAD) R.drawable.lia_sad else R.drawable.lia_happy),
                 contentDescription = "Lía",
-                modifier = Modifier.size(104.dp)
+                modifier = Modifier.size(84.dp)
             )
             Spacer(Modifier.width(8.dp))
             Surface(
@@ -85,13 +85,13 @@ fun CommandBridgeScreen(viewModel: BlasterViewModel) {
                     when {
                         next == null -> language.pick("أنجزتِ كل شيء اليوم! 🎉", "You finished today's path! 🎉")
                         mood == LiaMood.SAD -> language.pick("اشتقتُ إليكِ! لنبدأ من جديد.", "I missed you! Let's start again.")
-                        done.isEmpty() -> language.pick("هل أنتِ مستعدة؟ اضغطي «ابدئي».", "Ready? Tap START.")
+                        done.isEmpty() -> language.pick("هل أنتِ مستعدة؟ اضغطي على زر ابدئي.", "Ready? Tap START.")
                         else -> language.pick("أحسنتِ! لنكمل.", "Nice work! Let's keep going.")
                     },
                     color = TextPrimary,
-                    fontSize = 17.sp,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(14.dp)
+                    modifier = Modifier.padding(12.dp)
                 )
             }
         }
@@ -128,7 +128,7 @@ fun CommandBridgeScreen(viewModel: BlasterViewModel) {
             Box(
                 Modifier
                     .background(Brush.horizontalGradient(listOf(SolarAmber, Color(0xFFF59E2B))))
-                    .padding(vertical = 22.dp, horizontal = 20.dp),
+                    .padding(vertical = 16.dp, horizontal = 20.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -153,7 +153,7 @@ fun CommandBridgeScreen(viewModel: BlasterViewModel) {
                 subtitle = when (step) {
                     PathStep.WORDS -> language.pick("5 كلمات جديدة أو مراجعة سريعة", "5 new words or a quick review")
                     PathStep.STORY -> chapter?.let { it.title(language) } ?: language.pick("أعيدي أي فصل", "Replay any chapter")
-                    PathStep.GRAMMAR -> nextTopic?.let { "${it.titleEs} · ${it.title(language)}" }
+                    PathStep.GRAMMAR -> nextTopic?.title(language)
                         ?: language.pick("قاعدة واحدة وسبب كل إجابة", "One rule and the reason behind each answer")
                 },
                 emoji = stepEmoji(step),
@@ -194,7 +194,7 @@ private fun PathRow(
         border = BorderStroke(if (current) 2.dp else 1.dp, if (current) SolarAmber else AdventureCardBorder),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Row(Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(Modifier.padding(horizontal = 14.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
@@ -225,12 +225,12 @@ private fun WelcomeTour(language: HelperLanguage, onDismiss: () -> Unit) {
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text(language.pick("👋 أهلًا بكِ! هذا ما في التطبيق:", "👋 Welcome! Here's what's inside:"), color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp)
-            TourLine("▶", language.pick("زر «ابدئي» يختار لكِ درس اليوم خطوة بخطوة.", "START picks today's lesson for you, step by step."))
+            TourLine("▶", language.pick("زر ابدئي يختار لكِ درس اليوم خطوة بخطوة.", "START picks today's lesson for you, step by step."))
             TourLine("🌌", language.pick("الكلمات: تعلّمي أهم 5000 كلمة إسبانية.", "Words: learn the 5000 most-used Spanish words."))
             TourLine("🕵️", language.pick("القواعد: افهمي لماذا تكون الإجابة صحيحة.", "Grammar: understand why each answer is right."))
             TourLine("🗺️", language.pick("المغامرة: امشي مع ليا ونيلو وأنجزي المهمات.", "Adventure: walk with Lía and Nilo and finish missions."))
-            TourLine("🎮", language.pick("«تمارين» في الأسفل: كل الألعاب في مكان واحد.", "Practice (bottom bar): every game in one place."))
-            TourLine("👤", language.pick("«أنا»: تقدّمك وجوائزك والإعدادات.", "Me: your progress, trophies and settings."))
+            TourLine("🎮", language.pick("تمارين في الأسفل: كل الألعاب في مكان واحد.", "Practice (bottom bar): every game in one place."))
+            TourLine("👤", language.pick("أنا في الأسفل: تقدّمك وجوائزك والإعدادات.", "Me: your progress, trophies and settings."))
             Button(
                 onClick = onDismiss,
                 colors = ButtonDefaults.buttonColors(containerColor = NebulaPurple),

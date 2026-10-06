@@ -27,11 +27,11 @@ object ClozeWhy {
         val isInfinitive = word.partOfSpeech == "verb" && Regex("(ar|er|ir|ír)$").containsMatchIn(a) && a == word.shortSpanish.lowercase()
         return when {
             isInfinitive && previous in PREPOSITIONS -> language.pick(
-                "بعد حرف الجر «$previous» نستخدم الفعل في صيغة المصدر: $answer.",
+                "بعد حرف الجر $previous نستخدم الفعل في صيغة المصدر: $answer.",
                 "After the preposition «$previous», Spanish uses the infinitive: $answer."
             )
             isInfinitive && (previous in MODALS || previous == "que") -> language.pick(
-                "بعد «$previous» يأتي الفعل في صيغة المصدر: $answer.",
+                "بعد $previous يأتي الفعل في صيغة المصدر: $answer.",
                 "After «$previous», the next verb stays in the infinitive: $answer."
             )
             isInfinitive -> language.pick(
@@ -39,11 +39,11 @@ object ClozeWhy {
                 "$answer is a verb in the infinitive (the basic form ending in -${a.takeLast(2)})."
             )
             word.partOfSpeech == "noun" && previous in MASC && !a.endsWith("s") -> language.pick(
-                "«$previous» تدل على أن $answer اسم مذكر.",
+                "كلمة $previous تدل على أن $answer اسم مذكر.",
                 "«$previous» shows that $answer is a masculine noun."
             )
             word.partOfSpeech == "noun" && previous in FEM && !a.endsWith("s") -> language.pick(
-                "«$previous» تدل على أن $answer اسم مؤنث.",
+                "كلمة $previous تدل على أن $answer اسم مؤنث.",
                 "«$previous» shows that $answer is a feminine noun."
             )
             word.partOfSpeech == "noun" -> language.pick("$answer اسم: شيء أو شخص أو فكرة.", "$answer is a noun: a thing, person or idea.")
