@@ -332,7 +332,7 @@ private fun ConstellationDialog(
                             Text("$rank", color = TextSecondary, fontSize = 11.sp, modifier = Modifier.width(34.dp))
                             if (card?.introduced == true) {
                                 Column(Modifier.weight(1f)) {
-                                    Text(w.shortSpanish, color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 14.sp, modifier = Modifier.fillMaxWidth())
+                                    Text(w.shortSpanish, color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                                     Text(w.meaning(language), color = TextSecondary, fontSize = 11.sp, maxLines = 1)
                                 }
                                 BoxStars(card.box)
@@ -459,7 +459,7 @@ private fun IntroCard(
             AdventureCard(borderColor = NebulaPurple.copy(alpha = 0.5f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
-                        Text(word.exampleEs, color = TextPrimary, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.fillMaxWidth())
+                        Text(word.exampleEs, color = TextPrimary, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
                         Text(language.pick(word.exampleAr, word.exampleEn), color = TextSecondary, fontSize = 13.sp, modifier = Modifier.fillMaxWidth())
                     }
                     AudioButton(onClick = { viewModel.speakSpanish(word.exampleEs) }, size = 36.dp, tint = NebulaPurple)
@@ -699,7 +699,7 @@ private fun Feedback(
                 color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp
             )
             if (word.exampleEs.isNotBlank()) {
-                Text(word.exampleEs, color = TextPrimary, fontSize = 13.sp, modifier = Modifier.fillMaxWidth())
+                Text(word.exampleEs, color = TextPrimary, fontSize = 13.sp)
                 Text(language.pick(word.exampleAr, word.exampleEn), color = TextSecondary, fontSize = 12.sp, modifier = Modifier.fillMaxWidth())
             }
             Button(

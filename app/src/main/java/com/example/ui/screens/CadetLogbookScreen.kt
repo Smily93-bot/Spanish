@@ -90,7 +90,7 @@ fun CadetLogbookScreen(viewModel: BlasterViewModel) {
                     AdventureCard(onClick = { viewModel.speakSpanish(w.spanishWord) }) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Column(Modifier.weight(1f)) {
-                                Text(w.spanishWord, color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 15.sp, modifier = Modifier.fillMaxWidth())
+                                Text(w.spanishWord, color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 15.sp)
                                 Text(entry?.meaning(language) ?: language.pick("", w.englishWord), color = ExplorerBlue, fontSize = 12.sp)
                                 Text("✓ ${w.timesCorrect}/${w.timesEncountered}", color = TextSecondary, fontSize = 11.sp)
                             }
@@ -116,7 +116,7 @@ fun CadetLogbookScreen(viewModel: BlasterViewModel) {
                                     LevelChip(w.level)
                                 }
                                 Text(w.meaning(language), color = ExplorerBlue, fontSize = 12.sp)
-                                if (w.exampleEs.isNotBlank()) Text(w.exampleEs, color = TextSecondary, fontSize = 12.sp, modifier = Modifier.fillMaxWidth())
+                                if (w.exampleEs.isNotBlank()) Text(w.exampleEs, color = TextSecondary, fontSize = 12.sp)
                             }
                             Text("🔊", fontSize = 16.sp)
                         }
@@ -137,7 +137,7 @@ fun CadetLogbookScreen(viewModel: BlasterViewModel) {
                             Spacer(Modifier.height(6.dp))
                             Text(language.pick(g.arabic, g.english), color = TextPrimary, fontSize = 14.sp)
                             Spacer(Modifier.height(6.dp))
-                            Text(g.formula, color = NebulaPurple, fontWeight = FontWeight.Bold, fontSize = 13.sp, modifier = Modifier.fillMaxWidth())
+                            Text(g.formula, color = NebulaPurple, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                             g.examples.forEach { ex ->
                                 Text(
                                     "🔊 $ex",

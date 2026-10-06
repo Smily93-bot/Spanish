@@ -124,9 +124,9 @@ private fun CodexIndex(data: SpanishContent, viewModel: BlasterViewModel, langua
                                     .padding(8.dp)
                             ) {
                                 Column(Modifier.weight(1f)) {
-                                    Text(word.spanish, color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 14.sp, modifier = Modifier.fillMaxWidth())
+                                    Text(word.spanish, color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                                     Text(word.meaning(language), color = ExplorerBlue, fontSize = 12.sp)
-                                    if (word.exampleEs.isNotBlank()) Text(word.exampleEs, color = TextSecondary, fontSize = 11.sp, modifier = Modifier.fillMaxWidth())
+                                    if (word.exampleEs.isNotBlank()) Text(word.exampleEs, color = TextSecondary, fontSize = 11.sp)
                                 }
                                 Text("🔊", fontSize = 16.sp)
                             }
@@ -311,9 +311,8 @@ private fun QuestionCard(
         }
     }
     AdventureCard(borderColor = if (solved) SuccessGreen else if (mistakes > 0) MeteorRed.copy(alpha = 0.6f) else AdventureCardBorder) {
-        Text(field.label, color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 15.sp, modifier = Modifier.fillMaxWidth())
+        Text(field.label, color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 15.sp)
         Spacer(Modifier.height(8.dp))
-        SpanishLtr {
         OutlinedTextField(
             value = text,
             onValueChange = { if (!solved) text = it },
@@ -323,7 +322,6 @@ private fun QuestionCard(
             keyboardActions = KeyboardActions(onDone = { check() }),
             modifier = Modifier.fillMaxWidth()
         )
-        }
         Spacer(Modifier.height(8.dp))
         when {
             solved -> Text(
