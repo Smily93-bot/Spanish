@@ -8,22 +8,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawscope.withTransform
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.R
 import com.example.data.model.HelperLanguage
 import com.example.data.model.pick
 import com.example.ui.components.AudioButton
 import com.example.ui.theme.*
-import kotlin.math.sin
 
 /** Something Nilo says: Spanish line plus its meaning in each helper language. */
 data class NiloLine(val es: String, val ar: String, val en: String) {
@@ -56,86 +55,31 @@ object NiloLines {
     val searchHint = NiloLine("¡Mira dentro del círculo dorado!", "انظري داخل الدائرة الذهبية!", "Look inside the gold circle!")
 }
 
-private val OUTLINE = Color(0xFF1A2238)
-private val SUIT = Color(0xFFE07A10)
-private val SUIT_DARK = Color(0xFFB85F0A)
-private val WHITE = Color(0xFFF5F7FB)
-private val GREY = Color(0xFF9AA4B8)
-private val GLASS = Color(0xFFBFE9FA)
-private val SKIN = Color(0xFF8D5524)
-private val HAIR = Color(0xFF2B1B10)
-
-private fun DrawScope.part(color: Color, x: Float, y: Float, w: Float, h: Float, r: Float) {
-    drawRoundRect(color, topLeft = Offset(x, y), size = Size(w, h), cornerRadius = CornerRadius(r))
-    drawRoundRect(OUTLINE, topLeft = Offset(x, y), size = Size(w, h), cornerRadius = CornerRadius(r), style = Stroke(2.5f))
-}
-
-private fun DrawScope.ball(color: Color, x: Float, y: Float, r: Float, outline: Boolean = true) {
-    drawCircle(color, radius = r, center = Offset(x, y))
-    if (outline) drawCircle(OUTLINE, radius = r, center = Offset(x, y), style = Stroke(2.5f))
-}
-
 /**
- * Draws Nilo with his feet at the current origin, facing right, about 135 units tall
- * (Lía is 112 units, the helmet makes him look a little taller).
+ * Draws one frame of Nilo's walk cycle (nilo_walk.webp, built from Lía's sheet by tools/make_nilo.py)
+ * with his feet at the current origin, facing right, [height] units tall.
  */
-fun DrawScope.drawNilo(phase: Float, moving: Boolean, airborne: Boolean) {
-    val swing = if (moving) sin(phase) * 31f else 0f // degrees
-    val legs = if (airborne) 23f else swing
-
-    fun leg(angle: Float, color: Color) = withTransform({
-        translate(0f, -30f)
-        rotate(angle, pivot = Offset.Zero)
-    }) {
-        part(color, -7f, 0f, 14f, 22f, 6f)
-        part(WHITE, -9f, 18f, 20f, 12f, 5f)
-    }
-
-    fun arm(angle: Float, color: Color) = withTransform({
-        translate(0f, -58f)
-        rotate(angle, pivot = Offset.Zero)
-    }) {
-        part(color, -6f, 0f, 12f, 22f, 6f)
-        ball(WHITE, 0f, 24f, 7f)
-    }
-
-    part(GREY, -27f, -64f, 12f, 30f, 5f) // backpack
-    leg(-legs, SUIT_DARK)
-    arm(swing, SUIT_DARK)
-    part(SUIT, -19f, -66f, 38f, 38f, 12f) // body
-    part(WHITE, -10f, -58f, 20f, 14f, 4f) // chest panel
-    ball(DiamondCyan, -3f, -51f, 2.5f, outline = false)
-    ball(MeteorRed, 4f, -51f, 2.5f, outline = false)
-    part(Color(0xFF0A1633), -19f, -35f, 38f, 6f, 3f) // belt
-    leg(legs, SUIT)
-
-    // Helmet and face
-    ball(WHITE, 0f, -90f, 29f)
-    ball(GLASS, 4f, -89f, 22f)
-    ball(SKIN, 5f, -88f, 16f, outline = false)
-    drawArc(HAIR, startAngle = 180f, sweepAngle = 180f, useCenter = true, topLeft = Offset(-12f, -107f), size = Size(32f, 16f))
-    drawOval(Color.White, topLeft = Offset(-3.2f, -91.8f), size = Size(6.4f, 7.6f))
-    drawOval(Color.White, topLeft = Offset(7.8f, -91.8f), size = Size(6.4f, 7.6f))
-    ball(Color(0xFF111111), 0.8f, -87.5f, 2f, outline = false)
-    ball(Color(0xFF111111), 11.8f, -87.5f, 2f, outline = false)
-    drawArc(Color(0xFF111111), startAngle = 14f, sweepAngle = 152f, useCenter = false, topLeft = Offset(1.5f, -86.5f), size = Size(9f, 9f), style = Stroke(1.8f))
-    drawArc(Color.White.copy(alpha = 0.8f), startAngle = -143f, sweepAngle = 46f, useCenter = false, topLeft = Offset(-14f, -107f), size = Size(36f, 36f), style = Stroke(3f))
-    part(GREY, -2f, -128f, 4f, 12f, 2f) // antenna
-    ball(SolarGold, 0f, -130f, 5f)
-
-    arm(-swing, SUIT)
+fun DrawScope.drawNiloSprite(sprite: ImageBitmap, frame: Int, height: Float) {
+    val r = WALK_FRAMES[frame % WALK_FRAMES.size]
+    val w = r[2].toFloat() / r[3] * height
+    drawImage(
+        sprite,
+        srcOffset = IntOffset(r[0], r[1]),
+        srcSize = IntSize(r[2], r[3]),
+        dstOffset = IntOffset((-w / 2).toInt(), (-height).toInt()),
+        dstSize = IntSize(w.toInt(), height.toInt())
+    )
 }
 
 /** Nilo's portrait with what he says, shown above mission panels. */
 @Composable
 fun NiloSays(line: NiloLine, language: HelperLanguage, onSpeak: () -> Unit, size: Dp = 56.dp) {
     Row(verticalAlignment = Alignment.CenterVertically) {
+        val sprite = ImageBitmap.imageResource(R.drawable.nilo_walk)
         Canvas(Modifier.size(size)) {
-            val s = this.size.height / 140f
-            withTransform({
-                translate(this@Canvas.size.width / 2f, this@Canvas.size.height)
-                scale(s, s, pivot = Offset.Zero)
-            }) { drawNilo(phase = 0f, moving = false, airborne = false) }
+            translate(this.size.width / 2f, this.size.height) {
+                drawNiloSprite(sprite, frame = 0, height = this@Canvas.size.height)
+            }
         }
         Spacer(Modifier.width(8.dp))
         Surface(

@@ -83,7 +83,7 @@ private val PORTAL_X = stationX(Station.entries.lastIndex) + 230f
 private val WORLD_END = PORTAL_X + 220f
 
 /** Walk-cycle frames inside explorer_walk.webp (x, y, width, height). */
-private val WALK_FRAMES = listOf(
+internal val WALK_FRAMES = listOf(
     intArrayOf(164, 33, 387, 582),
     intArrayOf(727, 34, 375, 582),
     intArrayOf(144, 630, 420, 583),
@@ -120,6 +120,7 @@ private fun sceneDrawable(asset: String): Int = when (asset) {
 @Composable
 fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: BlasterViewModel, language: HelperLanguage) {
     val walkSprite = ImageBitmap.imageResource(R.drawable.explorer_walk)
+    val niloSprite = ImageBitmap.imageResource(R.drawable.nilo_walk)
     val wisp = ImageBitmap.imageResource(R.drawable.word_wisp)
     val background = ImageBitmap.imageResource(backgroundFor(tablet))
     val textMeasurer = rememberTextMeasurer()
@@ -318,6 +319,7 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
                     background = background,
                     wisp = wisp,
                     walkSprite = walkSprite,
+                    niloSprite = niloSprite,
                     camera = camera,
                     viewW = viewW,
                     clock = clock,
@@ -380,6 +382,7 @@ private fun DrawScope.drawWorld(
     background: ImageBitmap,
     wisp: ImageBitmap,
     walkSprite: ImageBitmap,
+    niloSprite: ImageBitmap,
     camera: Float,
     viewW: Float,
     clock: Float,
@@ -495,15 +498,21 @@ private fun DrawScope.drawWorld(
             }
         }
 
-        // Nilo (drawn behind Lía, scaled so his helmet top lines up with hers)
-        drawOval(Color(0x55000000), topLeft = Offset(niloX - 22f, GROUND - 4f), size = Size(44f, 8f))
-        withTransform({
-            translate(niloX, GROUND + niloY)
-            scale(niloFacing * 0.84f, 0.84f, pivot = Offset.Zero)
-        }) {
-            drawNilo(phase = clock * 11f, moving = niloMoving && niloY == 0f, airborne = niloY < 0f)
+        // Nilo (drawn behind Lía; his walk cycle runs half a step out of phase with hers)
+        val niloFrame = when {
+            niloY < 0f -> 1
+            niloMoving -> ((clock * 9f).toInt() + 2) % 4
+            else -> 0
         }
-        niloSays?.let { drawBubble(textMeasurer, unitScale, it, niloX, GROUND + niloY - 128f) }
+        val niloBob = if (niloMoving && niloY == 0f) sin(clock * 12f + 1.5f) * 1.5f else 0f
+        drawOval(Color(0x55000000), topLeft = Offset(niloX - 24f, GROUND - 5f), size = Size(48f, 10f))
+        withTransform({
+            translate(niloX, GROUND + niloY + niloBob)
+            scale(niloFacing, 1f, pivot = Offset.Zero)
+        }) {
+            drawNiloSprite(niloSprite, niloFrame, LIA_H * 0.98f)
+        }
+        niloSays?.let { drawBubble(textMeasurer, unitScale, it, niloX, GROUND + niloY - LIA_H - 10f) }
 
         // Lía
         val frame = when {
