@@ -47,11 +47,11 @@ fun TabletCodexScreen(viewModel: BlasterViewModel) {
     if (tablet == null) {
         CodexIndex(data, viewModel, language)
     } else {
-        key(tablet.id) { TabletReader(tablet, viewModel, language) }
+        key(tablet.id) { ExpeditionScreen(tablet, data, viewModel, language) }
     }
 
     reward?.let {
-        RewardDialog(it, isArabic, language.pick("📜 اكتملت صفحة الأطلس!", "📜 ¡Página del atlas recuperada!")) {
+        RewardDialog(it, isArabic, language.pick("📜 استعدتِ صفحة الأطلس!", "📜 ¡Página del atlas recuperada!")) {
             viewModel.dismissPracticeReward()
             viewModel.closeTablet()
         }
@@ -71,7 +71,7 @@ private fun CodexIndex(data: SpanishContent, viewModel: BlasterViewModel, langua
         verticalArrangement = Arrangement.spacedBy(10.dp),
         modifier = Modifier.fillMaxSize()
     ) {
-        item { SectionHeader(language.pick("ألواح القراءة", "TABLILLAS DE LECTURA"), language.pick("قصص قصيرة مع أسئلة وقواعد", "Short stories with questions and grammar")) }
+        item { SectionHeader(language.pick("بعثات ليا", "EXPEDICIONES DE LÍA"), language.pick("امشي مع ليا وأنجزي المهمات لاستعادة صفحات الأطلس", "Walk with Lía and complete missions to recover the atlas pages")) }
         items(data.tablets) { tablet ->
             val index = data.tablets.indexOf(tablet)
             val unlocked = index == 0 || done.containsKey(data.tablets[index - 1].id) || done.containsKey(tablet.id)
@@ -82,7 +82,7 @@ private fun CodexIndex(data: SpanishContent, viewModel: BlasterViewModel, langua
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     LevelChip(tablet.level)
                     Spacer(Modifier.width(8.dp))
-                    Text(tablet.title, color = TextPrimary, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                    Text(tablet.title(language), color = TextPrimary, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                     Text(
                         when {
                             done.containsKey(tablet.id) -> "⭐ ${done[tablet.id]?.bestScore}%"
@@ -92,7 +92,7 @@ private fun CodexIndex(data: SpanishContent, viewModel: BlasterViewModel, langua
                         color = SolarAmber, fontWeight = FontWeight.Bold
                     )
                 }
-                Text(language.pick(tablet.goalAr, tablet.goal), color = TextSecondary, fontSize = 12.sp)
+                Text(tablet.goal(language), color = TextSecondary, fontSize = 12.sp)
             }
         }
         item {
@@ -140,95 +140,8 @@ private fun CodexIndex(data: SpanishContent, viewModel: BlasterViewModel, langua
 
 // --------------------------------------------------------------------------- Reader
 
-private enum class TabletStep { STORY, OPENING, LESSON, ORDER, MISSION, ENDING }
-
 @Composable
-private fun TabletReader(tablet: ReadingTablet, viewModel: BlasterViewModel, language: HelperLanguage) {
-    var step by rememberSaveable { mutableStateOf(TabletStep.STORY) }
-    // key → solved on first try (true) / solved after mistakes or revealed (false)
-    val results = remember { mutableStateMapOf<String, Boolean>() }
-    val tableCells = remember(tablet.id) {
-        tablet.table.rows.indices.flatMap { r -> (1 until tablet.table.headers.size).map { c -> r to c } }
-            .shuffled().take(4).toSet()
-    }
-    val totalQuestions = tablet.allQuestions.size + tableCells.size + 1
-    val scroll = rememberScrollState()
-    LaunchedEffect(step) { scroll.scrollTo(0) }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(scroll)
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = { viewModel.closeTablet() }) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = TextPrimary)
-            }
-            Column(Modifier.weight(1f)) {
-                Text("${tablet.level} · ${tablet.title}", color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp)
-                Text(tablet.expeditionGoal, color = TextSecondary, fontSize = 11.sp)
-            }
-        }
-        ProgressBar((step.ordinal + 1) / TabletStep.entries.size.toFloat(), color = SolarAmber, height = 8.dp)
-
-        when (step) {
-            TabletStep.STORY -> {
-                StoryCard(language.pick("📡 رسالة واردة", "📡 Transmisión entrante"), tablet.story, tablet.storyAr, viewModel, language)
-                BlasterCyberButton(language.pick("ابدئي المهمة", "Empezar la misión"), { step = TabletStep.OPENING }, Modifier.fillMaxWidth())
-            }
-            TabletStep.OPENING -> {
-                QuestionGroup("opening", tablet.opening, results, viewModel, language)
-                NextButton(tablet.opening.indices.all { "opening-$it" in results }, language) { step = TabletStep.LESSON }
-            }
-            TabletStep.LESSON -> {
-                LessonCard(tablet, viewModel, language)
-                GrammarTableQuiz(tablet.table, tableCells, results, viewModel, language)
-                NextButton(tableCells.all { "table-${it.first}-${it.second}" in results }, language) { step = TabletStep.ORDER }
-            }
-            TabletStep.ORDER -> {
-                OrderPuzzle(tablet.order, tablet.orderEn, results, viewModel, language)
-                NextButton("order" in results, language) { step = TabletStep.MISSION }
-            }
-            TabletStep.MISSION -> {
-                AdventureCard(borderColor = NebulaPurple) {
-                    Text(language.pick("🛰️ المهمة", "🛰️ Misión"), color = NebulaPurple, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
-                    Text(language.pick(tablet.missionAr, tablet.mission), color = TextPrimary, fontSize = 14.sp)
-                }
-                QuestionGroup("fields", tablet.fields, results, viewModel, language)
-                NextButton(tablet.fields.indices.all { "fields-$it" in results }, language) { step = TabletStep.ENDING }
-            }
-            TabletStep.ENDING -> {
-                StoryCard(language.pick("📖 خاتمة الفصل", "📖 Final del capítulo"), tablet.ending, null, viewModel, language)
-                QuestionGroup("gate", tablet.gate, results, viewModel, language)
-                val allDone = tablet.gate.indices.all { "gate-$it" in results }
-                if (allDone) {
-                    AdventureCard(borderColor = SuccessGreen) {
-                        Text("🏁 " + tablet.expeditionPayoff, color = SuccessGreen, fontWeight = FontWeight.Bold)
-                        Text(language.pick("المكافأة: ", "Recompensa: ") + tablet.reward, color = TextSecondary, fontSize = 12.sp)
-                    }
-                }
-                BlasterCyberButton(
-                    text = language.pick("استلمي صفحة الأطلس", "Recoger la página del atlas"),
-                    onClick = { viewModel.completeTablet(tablet, results.values.count { it }, totalQuestions) },
-                    modifier = Modifier.fillMaxWidth(),
-                    color = SuccessGreen,
-                    enabled = allDone
-                )
-            }
-        }
-        Spacer(Modifier.height(24.dp))
-    }
-}
-
-@Composable
-private fun NextButton(enabled: Boolean, language: HelperLanguage, onClick: () -> Unit) {
-    BlasterCyberButton(language.pick("التالي ›", "Siguiente ›"), onClick, Modifier.fillMaxWidth(), enabled = enabled)
-}
-
-@Composable
-private fun StoryCard(title: String, story: String, translation: String?, viewModel: BlasterViewModel, language: HelperLanguage) {
+internal fun StoryCard(title: String, story: String, translation: String?, viewModel: BlasterViewModel, language: HelperLanguage) {
     var showTranslation by remember { mutableStateOf(false) }
     val sentences = remember(story) { story.split(Regex("(?<=[.!?])\\s+")).filter { it.isNotBlank() } }
     AdventureCard(borderColor = SolarGold) {
@@ -252,10 +165,11 @@ private fun StoryCard(title: String, story: String, translation: String?, viewMo
                     .padding(vertical = 3.dp, horizontal = 4.dp)
             )
         }
-        if (!translation.isNullOrBlank()) {
+        // Stories only have Arabic translations, so the toggle is shown in Arabic mode only.
+        if (!translation.isNullOrBlank() && language == HelperLanguage.ARABIC) {
             TextButton(onClick = { showTranslation = !showTranslation }) {
                 Text(
-                    if (showTranslation) language.pick("إخفاء الترجمة", "Ocultar traducción") else language.pick("عرض الترجمة العربية", "Ver traducción (árabe)"),
+                    if (showTranslation) "إخفاء الترجمة" else "عرض الترجمة",
                     color = ExplorerBlue
                 )
             }
@@ -267,9 +181,9 @@ private fun StoryCard(title: String, story: String, translation: String?, viewMo
 }
 
 @Composable
-private fun LessonCard(tablet: ReadingTablet, viewModel: BlasterViewModel, language: HelperLanguage) {
+internal fun LessonCard(tablet: ReadingTablet, viewModel: BlasterViewModel, language: HelperLanguage) {
     AdventureCard(borderColor = ExplorerBlue) {
-        Text("📘 " + tablet.lesson.title, color = ExplorerBlue, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
+        Text("📘 " + language.pick(tablet.lesson.titleAr, tablet.lesson.title), color = ExplorerBlue, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
         Spacer(Modifier.height(6.dp))
         Text(language.pick(tablet.lesson.arabic, tablet.lesson.english), color = TextPrimary, fontSize = 14.sp)
         Spacer(Modifier.height(8.dp))
@@ -281,7 +195,7 @@ private fun LessonCard(tablet: ReadingTablet, viewModel: BlasterViewModel, langu
 }
 
 @Composable
-private fun GrammarTableQuiz(
+internal fun GrammarTableQuiz(
     table: GrammarTable,
     hidden: Set<Pair<Int, Int>>,
     results: MutableMap<String, Boolean>,
@@ -358,7 +272,7 @@ private fun CellInput(answer: String, key: String, results: MutableMap<String, B
 }
 
 @Composable
-private fun QuestionGroup(
+internal fun QuestionGroup(
     prefix: String,
     fields: List<TabletField>,
     results: MutableMap<String, Boolean>,
@@ -428,7 +342,7 @@ private fun QuestionCard(
 }
 
 @Composable
-private fun OrderPuzzle(
+internal fun OrderPuzzle(
     fragments: List<String>,
     translation: String,
     results: MutableMap<String, Boolean>,

@@ -174,9 +174,9 @@ private fun PlanetNode(
             )
         }
         Spacer(Modifier.height(6.dp))
-        Text(tablet.title, color = TextPrimary, fontSize = 12.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, maxLines = 2)
+        Text(tablet.title(language), color = TextPrimary, fontSize = 12.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, maxLines = 2)
         Text(
-            if (done) "⭐ $bestScore%" else language.pick(tablet.goalAr, tablet.goal),
+            if (done) "⭐ $bestScore%" else tablet.goal(language),
             color = TextSecondary, fontSize = 10.sp, textAlign = TextAlign.Center, maxLines = 3
         )
     }

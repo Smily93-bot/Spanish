@@ -116,7 +116,7 @@ class BlasterRepository(private val dao: AppDao) {
             )
         }
 
-    suspend fun completeTablet(tablet: ReadingTablet, correct: Int, total: Int): RewardResult = writeLock.withLock {
+    suspend fun completeTablet(tablet: ReadingTablet, correct: Int, total: Int, bonusCredits: Int = 0): RewardResult = writeLock.withLock {
         val existing = dao.getTabletProgressById(tablet.id)
         val score = if (total == 0) 100 else correct * 100 / total
         val firstClear = existing?.isCompleted != true
@@ -133,7 +133,7 @@ class BlasterRepository(private val dao: AppDao) {
             )
         )
         val xp = (if (firstClear) 150 else 40) + correct * 15
-        val credits = if (firstClear) 120 else 25
+        val credits = (if (firstClear) 120 else 25) + bonusCredits
         val (p0, leveledUp) = grant(xp, credits)
         if (firstClear) dao.insertOrUpdateUserProgress(p0.copy(completedTabletsCount = p0.completedTabletsCount + 1))
         val unlocked = refreshMilestones()
@@ -238,6 +238,24 @@ class BlasterRepository(private val dao: AppDao) {
     companion object {
         val MODES = listOf("TRANSLATION", "SYNONYM", "ANTONYM", "CLOZE", "REACTOR")
 
+        /** Arabic descriptions for [MILESTONES] (the stored description is English). */
+        val MILESTONE_DESCRIPTIONS_AR = mapOf(
+            "games_1" to "العبي أول جولة في الألعاب",
+            "games_10" to "العبي 10 جولات",
+            "games_50" to "العبي 50 جولة",
+            "score_500" to "اجمعي 500 نقطة في جولة واحدة",
+            "score_2000" to "اجمعي 2000 نقطة في جولة واحدة",
+            "tablets_1" to "أكملي أول بعثة مع ليا",
+            "tablets_6" to "أكملي 6 بعثات",
+            "tablets_12" to "أكملي البعثات الاثنتي عشرة",
+            "words_25" to "أتقني 25 كلمة",
+            "words_100" to "أتقني 100 كلمة",
+            "words_300" to "أتقني 300 كلمة",
+            "level_5" to "بلغي المستوى 5",
+            "level_10" to "بلغي المستوى 10",
+            "ship_3" to "رقّي سفينتك إلى الفئة 3"
+        )
+
         fun xpForLevel(level: Int) = 300 + (level - 1) * 150
 
         fun rankGrade(score: Int) = when {
@@ -254,9 +272,9 @@ class BlasterRepository(private val dao: AppDao) {
             MilestoneGoalEntity("games_50", "Leyenda del arcade", "Play 50 arcade games", targetValue = 50, rewardCredits = 400),
             MilestoneGoalEntity("score_500", "Lluvia de meteoros", "Score 500 points in one run", targetValue = 500, rewardCredits = 80),
             MilestoneGoalEntity("score_2000", "Rango S+", "Score 2000 points in one run", targetValue = 2000, rewardCredits = 300),
-            MilestoneGoalEntity("tablets_1", "Primera señal", "Complete your first reading tablet", targetValue = 1, rewardCredits = 80),
-            MilestoneGoalEntity("tablets_6", "Mitad del atlas", "Complete 6 reading tablets", targetValue = 6, rewardCredits = 250),
-            MilestoneGoalEntity("tablets_12", "Vuelo a casa", "Complete all 12 reading tablets", targetValue = 12, rewardCredits = 600),
+            MilestoneGoalEntity("tablets_1", "Primera señal", "Complete your first expedition with Lía", targetValue = 1, rewardCredits = 80),
+            MilestoneGoalEntity("tablets_6", "Mitad del atlas", "Complete 6 expeditions", targetValue = 6, rewardCredits = 250),
+            MilestoneGoalEntity("tablets_12", "Vuelo a casa", "Complete all 12 expeditions", targetValue = 12, rewardCredits = 600),
             MilestoneGoalEntity("words_25", "Léxico en marcha", "Master 25 words", targetValue = 25, rewardCredits = 100),
             MilestoneGoalEntity("words_100", "Cien palabras", "Master 100 words", targetValue = 100, rewardCredits = 250),
             MilestoneGoalEntity("words_300", "Diccionario viviente", "Master 300 words", targetValue = 300, rewardCredits = 500),

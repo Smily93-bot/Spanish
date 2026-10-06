@@ -10,7 +10,7 @@ and stories ship inside the app.
 | --- | --- |
 | **Command Bridge** | Home: rank, XP, word of the day with audio, quick-launch missions |
 | **Adventure Map** | 6 galactic sectors (A1 → C2) with the 12 Órbita story chapters |
-| **Reading Tablets** | Read a story (tap any sentence to hear it), answer written questions, repair a conjugation table, rebuild a sentence, finish the mission |
+| **Lía's Expeditions** | Walk Lía (animated sprite) through each chapter world, jump for diamonds and stop at glowing word wisps for 7 missions: story, questions, a hidden-object search (tap "la llave" in the cabin), grammar console, sentence puzzle, mission report and the portal to the atlas page |
 | **Meteor Blaster** | Arcade: tap the falling meteor with the right answer. Modes: Meaning, Synonyms, Antonyms. Shield, combos, personal bests |
 | **Grammar Reactor** | Put shuffled words in order to rebuild real Spanish sentences |
 | **Quantum Cloze** | Fill the missing word in sentences from the Frequency 5000 list before time runs out |

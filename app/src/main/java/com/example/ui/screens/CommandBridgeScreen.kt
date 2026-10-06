@@ -133,8 +133,8 @@ fun CommandBridgeScreen(viewModel: BlasterViewModel) {
         if (nextTablet != null) {
             MissionCard(
                 emoji = "📜",
-                title = language.pick("تابعي القصة: ", "Continue: ") + nextTablet.title,
-                subtitle = "${nextTablet.level} · " + language.pick(nextTablet.goalAr, nextTablet.goal),
+                title = language.pick("تابعي البعثة: ", "Continue: ") + nextTablet.title(language),
+                subtitle = "${nextTablet.level} · " + nextTablet.goal(language),
                 color = SolarAmber
             ) { viewModel.openTablet(nextTablet.id) }
         } else {
@@ -142,7 +142,7 @@ fun CommandBridgeScreen(viewModel: BlasterViewModel) {
                 viewModel.navigateTo(Screen.AdventureMap)
             }
         }
-        MissionCard("☄️", "Meteor Blaster", language.pick("دمّري النيازك بالكلمة الصحيحة", "Blast meteors with the right word"), MeteorRed) {
+        MissionCard("☄️", language.pick("مدفع النيازك", "Meteor Blaster"), language.pick("دمّري النيازك بالكلمة الصحيحة", "Blast meteors with the right word"), MeteorRed) {
             viewModel.navigateTo(Screen.MeteorBlaster)
         }
         MissionCard("⚛️", "Reactor Gramatical", language.pick("رتّبي الكلمات لبناء الجملة", "Rebuild sentences word by word"), NebulaPurple) {

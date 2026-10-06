@@ -89,7 +89,7 @@ private fun ModeSelect(viewModel: BlasterViewModel, language: HelperLanguage) {
         ) {
             StarField(Modifier.matchParentSize())
             Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("☄️ METEOR BLASTER ☄️", color = SolarGold, fontWeight = FontWeight.ExtraBold, fontSize = 22.sp)
+                Text(language.pick("☄️ مدفع النيازك ☄️", "☄️ METEOR BLASTER ☄️"), color = SolarGold, fontWeight = FontWeight.ExtraBold, fontSize = 22.sp)
                 Text(
                     language.pick("اضغطي على النيزك الذي يحمل الإجابة الصحيحة قبل أن يصطدم بسفينتك!", "Tap the meteor with the right answer before it hits your ship!"),
                     color = StarWhite, fontSize = 12.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(horizontal = 20.dp)
@@ -177,7 +177,7 @@ private fun Arena(state: MeteorGameState, viewModel: BlasterViewModel, language:
                 Text(state.promptQuestion, color = DiamondCyan, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                 Text(word.prompt, color = StarWhite, fontSize = 28.sp, fontWeight = FontWeight.ExtraBold)
                 if (state.mode != BlasterMode.TRANSLATION) {
-                    Text("(${word.englishMeaning})", color = StarWhite.copy(alpha = 0.6f), fontSize = 12.sp)
+                    Text("(${word.hint})", color = StarWhite.copy(alpha = 0.6f), fontSize = 12.sp)
                 }
             }
             AudioButton(onClick = { viewModel.speakSpanish(word.spanishToSpeak) }, tint = DiamondCyan, size = 42.dp)

@@ -126,10 +126,12 @@ fun MainAppContent(viewModel: BlasterViewModel) {
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = if (isArabic) "عربي (AR)" else "English (EN)",
+                                text = if (isArabic) "عربي" else "English",
                                 color = TextPrimary,
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                softWrap = false
                             )
                         }
                     }

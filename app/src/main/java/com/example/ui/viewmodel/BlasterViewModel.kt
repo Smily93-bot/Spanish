@@ -217,9 +217,9 @@ class BlasterViewModel(
         repository.recordWordResult(spanish, english, category, correct)
     }
 
-    fun completeTablet(tablet: ReadingTablet, correct: Int, total: Int) = viewModelScope.launch {
+    fun completeTablet(tablet: ReadingTablet, correct: Int, total: Int, bonusCredits: Int = 0) = viewModelScope.launch {
         soundEngine.fanfare()
-        _practiceReward.value = repository.completeTablet(tablet, correct, total)
+        _practiceReward.value = repository.completeTablet(tablet, correct, total, bonusCredits)
     }
 
     /** Saves a Quantum Cloze or Grammar Reactor run to the arcade table. */

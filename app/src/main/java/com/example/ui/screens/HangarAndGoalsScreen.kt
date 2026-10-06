@@ -23,6 +23,7 @@ import com.example.data.model.HelperLanguage
 import com.example.data.model.SHIP_TIERS
 import com.example.data.model.pick
 import com.example.data.model.shipTier
+import com.example.data.repository.BlasterRepository
 import com.example.ui.components.*
 import com.example.ui.theme.*
 import com.example.ui.viewmodel.BlasterViewModel
@@ -130,7 +131,7 @@ fun HangarAndGoalsScreen(viewModel: BlasterViewModel) {
                         LevelChip(run.rankGrade, SolarAmber)
                         Spacer(Modifier.width(8.dp))
                         Column(Modifier.weight(1f)) {
-                            Text(run.gameMode, color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                            Text(gameModeLabel(run.gameMode, isArabic), color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                             Text(DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(Date(run.timestamp)), color = TextSecondary, fontSize = 11.sp)
                         }
                         Text("${run.score} pts", color = SolarAmber, fontWeight = FontWeight.ExtraBold)
@@ -153,7 +154,7 @@ fun HangarAndGoalsScreen(viewModel: BlasterViewModel) {
                     Spacer(Modifier.width(10.dp))
                     Column(Modifier.weight(1f)) {
                         Text(goal.title, color = TextPrimary, fontWeight = FontWeight.Bold)
-                        Text(goal.description, color = TextSecondary, fontSize = 12.sp)
+                        Text(if (isArabic) BlasterRepository.MILESTONE_DESCRIPTIONS_AR[goal.goalId] ?: goal.description else goal.description, color = TextSecondary, fontSize = 12.sp)
                     }
                     Text("⭐ ${goal.rewardCredits}", color = SolarAmber, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                 }
