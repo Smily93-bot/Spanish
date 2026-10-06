@@ -183,6 +183,11 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
     }
     val totalQuestions = tablet.allQuestions.size + tableCells.size + 1 + searchTargets.size
     val nextStation = Station.entries.indices.firstOrNull { it !in solved } // null once every station is solved
+    // The last sentence of the chapter, revealed word by word as missions are won.
+    val secretWords = remember(tablet.id) {
+        tablet.ending.split(Regex("(?<=[.!?])\\s+")).lastOrNull { it.isNotBlank() }.orEmpty().split(" ").filter { it.isNotBlank() }
+    }
+    val secretOrder = remember(tablet.id) { secretWords.indices.shuffled(kotlin.random.Random(tablet.id.hashCode())) }
 
     // Game loop: runs every frame while no mission panel is open.
     LaunchedEffect(tablet.id) {
@@ -287,7 +292,13 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
         solvedAt[i] = clock
         openStation = null
         viewModel.soundEngine.fanfare()
-        say(if (i == Station.entries.lastIndex) NiloLines.portalOpen else NiloLines.praise.random())
+        say(
+            when {
+                i == Station.entries.lastIndex -> NiloLines.portalOpen
+                solved.size >= Station.entries.size - 2 -> NiloLines.almost
+                else -> NiloLines.praise.random()
+            }
+        )
         if (i == Station.entries.lastIndex) targetX = PORTAL_X
     }
 
@@ -321,8 +332,12 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
                     tablet = tablet,
                     language = language,
                     progress = solved.size,
+                    picture = scene?.let { sceneDrawable(it.asset) } ?: backgroundFor(tablet),
+                    secret = secretWords,
+                    secretOrder = secretOrder,
+                    newPiece = solvedAt.values.any { clock - it < 4f },
                     niloLine = niloLine,
-                    onSpeakNilo = { viewModel.speakSpanish((niloLine ?: NiloLines.idle).es) }
+                    onSpeak = { viewModel.speakSpanish(it) }
                 )
             } else {
                 CompositionLocalProvider(LocalOnMistake provides onMistake) {
@@ -627,24 +642,66 @@ private fun WalkPanel(
     tablet: ReadingTablet,
     language: HelperLanguage,
     progress: Int,
+    picture: Int,
+    secret: List<String>,
+    secretOrder: List<Int>,
+    newPiece: Boolean,
     niloLine: NiloLine?,
-    onSpeakNilo: () -> Unit
+    onSpeak: (String) -> Unit
 ) {
+    val total = Station.entries.size
+    // Words of the secret sentence revealed so far, spread over the seven missions.
+    val shownWords = (secret.size * progress + total - 1) / total
+    val shown = secretOrder.take(shownWords).toSet()
     Column(
-        modifier = Modifier.fillMaxSize().background(AdventureBg).padding(14.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
+        modifier = Modifier.fillMaxSize().background(AdventureBg).padding(horizontal = 14.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         AdventureCard(borderColor = SolarGold) {
-            Text(
-                language.pick("المهمة ${progress + 1} من ${Station.entries.size}", "Misión ${minOf(progress + 1, Station.entries.size)} / ${Station.entries.size}"),
-                color = SolarAmber, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold
-            )
-            Spacer(Modifier.height(4.dp))
-            ProgressBar(progress / Station.entries.size.toFloat(), color = SolarGold, height = 8.dp)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("🎯 " + tablet.expeditionGoal(language), color = TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                Text("🧩 $progress/$total", color = SolarAmber, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp)
+            }
             Spacer(Modifier.height(6.dp))
-            Text("🎯 " + tablet.expeditionGoal(language), color = TextPrimary, fontSize = 14.sp, modifier = Modifier.fillMaxWidth())
+            // The chapter picture, uncovered one piece per finished mission.
+            val image = ImageBitmap.imageResource(picture)
+            Canvas(Modifier.fillMaxWidth().height(96.dp).clip(RoundedCornerShape(12.dp))) {
+                val pieceW = size.width / total
+                for (i in 0 until total) {
+                    val left = i * pieceW
+                    if (i < progress) {
+                        val srcLeft = (image.width * i / total)
+                        drawImage(
+                            image,
+                            srcOffset = IntOffset(srcLeft, image.height / 4),
+                            srcSize = IntSize(image.width / total, image.height / 2),
+                            dstOffset = IntOffset(left.toInt(), 0),
+                            dstSize = IntSize(pieceW.toInt() + 1, size.height.toInt())
+                        )
+                    } else {
+                        drawRect(SpaceNavy, topLeft = Offset(left, 0f), size = Size(pieceW - 2f, size.height))
+                        drawCircle(StarWhite.copy(alpha = 0.25f), radius = 6f, center = Offset(left + pieceW / 2, size.height / 2))
+                    }
+                }
+            }
+            Spacer(Modifier.height(8.dp))
+            // The secret sentence: hidden words are blanks the size of the word.
+            Text(language.pick("🔐 الرسالة السرية", "🔐 Secret message"), color = NebulaPurple, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    secret.mapIndexed { i, w -> if (i in shown) w else "▁".repeat(w.trim('.', ',', '¡', '!', '¿', '?').length.coerceIn(2, 8)) }.joinToString(" "),
+                    color = TextPrimary, fontSize = 17.sp, fontWeight = FontWeight.Bold, lineHeight = 24.sp, modifier = Modifier.weight(1f)
+                )
+                if (progress >= total) AudioButton(onClick = { onSpeak(secret.joinToString(" ")) }, size = 34.dp)
+            }
+            if (newPiece) {
+                Text(
+                    language.pick("✨ قطعة جديدة وكلمات جديدة!", "✨ A new piece and new words!"),
+                    color = SuccessGreen, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp
+                )
+            }
         }
-        NiloSays(niloLine ?: NiloLines.idle, language, onSpeak = onSpeakNilo)
+        NiloSays(niloLine ?: NiloLines.idle, language, onSpeak = { onSpeak((niloLine ?: NiloLines.idle).es) }, size = 44.dp)
     }
 }
 

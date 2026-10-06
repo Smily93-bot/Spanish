@@ -36,6 +36,7 @@ object NiloLines {
     val diamond = NiloLine("¡Un diamante!", "ماسة!", "A diamond!")
     val idle = NiloLine("Camina hacia la luz azul.", "امشي نحو الضوء الأزرق.", "Walk to the blue light.")
     val portalOpen = NiloLine("¡El portal está abierto!", "البوابة مفتوحة!", "The portal is open!")
+    val almost = NiloLine("¡Ya casi lo tenemos!", "اقتربنا كثيرًا!", "We're almost there!")
     val home = NiloLine("¡Lo logramos! ¡Una página más!", "نجحنا! صفحة أخرى!", "We did it! One more page!")
     val praise = listOf(
         NiloLine("¡Muy bien!", "أحسنتِ!", "Well done!"),
