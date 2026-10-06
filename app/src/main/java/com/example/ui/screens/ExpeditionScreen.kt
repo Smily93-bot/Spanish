@@ -279,9 +279,6 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
     Column(Modifier.fillMaxSize()) {
         // Header
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
-            IconButton(onClick = { viewModel.closeTablet() }) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = TextPrimary)
-            }
             Column(Modifier.weight(1f)) {
                 Text("${tablet.level} · ${tablet.title(language)}", color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp, maxLines = 1)
                 Text(tablet.expeditionGoal(language), color = TextSecondary, fontSize = 11.sp, maxLines = 2)

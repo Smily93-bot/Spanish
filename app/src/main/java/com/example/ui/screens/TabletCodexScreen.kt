@@ -53,7 +53,7 @@ fun TabletCodexScreen(viewModel: BlasterViewModel) {
     reward?.let {
         RewardDialog(it, isArabic, language.pick("📜 استعدتِ صفحة الأطلس!", "📜 ¡Página del atlas recuperada!")) {
             viewModel.dismissPracticeReward()
-            viewModel.closeTablet()
+            viewModel.navigateBack()
         }
     }
 }

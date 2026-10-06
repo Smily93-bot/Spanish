@@ -10,6 +10,7 @@ import com.example.data.content.GalaxyQuestion
 import com.example.data.content.SpanishContent
 import com.example.data.engagement.EngagementStore
 import com.example.data.engagement.Galaxy
+import com.example.data.engagement.PathStep
 import com.example.data.engagement.ReminderSettings
 import com.example.data.engagement.StreakEvent
 import com.example.data.engagement.StreakState
@@ -223,9 +224,15 @@ class BlasterViewModel(
         viewModelScope.launch { engagement.refreshDay() }
     }
 
+    /** Screens to return to with Back; tabs start a fresh stack. */
+    private val backStack = ArrayDeque<Screen>()
+
     fun navigateTo(screen: Screen) {
         if (screen != Screen.MeteorBlaster) pauseMeteorGame()
         soundEngine.click()
+        val current = _currentScreen.value
+        if (screen in Screen.TABS) backStack.clear()
+        else if (screen != current) backStack.addLast(current)
         _currentScreen.value = screen
     }
 
@@ -234,22 +241,72 @@ class BlasterViewModel(
         navigateTo(Screen.TabletCodex)
     }
 
-    fun closeTablet() {
-        _selectedTabletId.value = null
-    }
-
     /** Returns false when already on the home screen so the system can close the app. */
     fun navigateBack(): Boolean {
+        if (_galaxySession.value != null) {
+            quitGalaxySession()
+            return true
+        }
         if (_currentScreen.value == Screen.TabletCodex && _selectedTabletId.value != null) {
             _selectedTabletId.value = null
-            return true
         }
-        if (_currentScreen.value != Screen.CommandBridge) {
-            navigateTo(Screen.CommandBridge)
-            return true
-        }
-        return false
+        val previous = backStack.removeLastOrNull()
+            ?: if (_currentScreen.value != Screen.CommandBridge) Screen.CommandBridge else return false
+        pauseMeteorGame()
+        _currentScreen.value = previous
+        return true
     }
+
+    // ------------------------------------------------------------------ Onboarding & daily path
+
+    private val _onboarded = MutableStateFlow(prefs.getBoolean(KEY_ONBOARDED, false))
+    val onboarded: StateFlow<Boolean> = _onboarded.asStateFlow()
+
+    val pathDone: StateFlow<Set<PathStep>> = engagement.pathDone
+
+    fun setHelperLanguage(language: HelperLanguage) {
+        if (_helperLanguage.value != language) toggleHelperLanguage()
+    }
+
+    /** Finishes the welcome flow and starts the very first word lesson. */
+    fun finishOnboarding(dailyGoal: Int) {
+        prefs.edit().putBoolean(KEY_ONBOARDED, true).apply()
+        _onboarded.value = true
+        setDailyGoal(dailyGoal)
+        startFromHome(PathStep.WORDS)
+    }
+
+    /** The next step of today's path, or null when all three are done. */
+    fun nextStep(done: Set<PathStep>): PathStep? = PathStep.entries.firstOrNull { it !in done }
+
+    /** Opens a path step from the home screen. Word lessons return home when they end. */
+    fun startFromHome(step: PathStep) {
+        when (step) {
+            PathStep.WORDS -> {
+                navigateTo(Screen.WordGalaxy)
+                galaxyFromHome = true
+                val today = EngagementStore.today()
+                if (Galaxy.dueRanks(today, wordCards.value).size >= 5) startGalaxyReview()
+                else startGalaxyLesson(Galaxy.currentConstellation(wordCards.value))
+                if (_galaxySession.value == null) startGalaxyReview()
+                // Nothing to start (content still loading): just show the galaxy map.
+                if (_galaxySession.value == null) galaxyFromHome = false
+            }
+            PathStep.STORY -> {
+                val content = _content.value
+                val done = tabletProgress.value.filter { it.isCompleted }.map { it.tabletId }.toSet()
+                val next = content?.tablets?.firstOrNull { it.id !in done } ?: content?.tablets?.lastOrNull()
+                if (next != null) openTablet(next.id) else navigateTo(Screen.AdventureMap)
+            }
+            PathStep.GAME -> {
+                // Skip the mode menu: the home path always plays the classic word-meaning round.
+                navigateTo(Screen.MeteorBlaster)
+                startMeteorGame(BlasterMode.TRANSLATION)
+            }
+        }
+    }
+
+    private var galaxyFromHome = false
 
     fun speakSpanish(text: String) {
         speechEngine.speakSpanish(text)
@@ -276,12 +333,14 @@ class BlasterViewModel(
     fun completeTablet(tablet: ReadingTablet, correct: Int, total: Int, bonusCredits: Int = 0) = viewModelScope.launch {
         soundEngine.fanfare()
         _practiceReward.value = repository.completeTablet(tablet, correct, total, bonusCredits).also { earnXp(it.xpGained) }
+        engagement.completeStep(PathStep.STORY)
     }
 
     /** Saves a Quantum Cloze or Grammar Reactor run to the arcade table. */
     fun finishPracticeRun(gameMode: String, score: Int, correctCount: Int, bestStreak: Int) = viewModelScope.launch {
         soundEngine.fanfare()
         _practiceReward.value = repository.recordArcadeRun(gameMode, score, correctCount, bestStreak).also { earnXp(it.xpGained) }
+        engagement.completeStep(PathStep.GAME)
     }
 
     fun dismissPracticeReward() {
@@ -370,16 +429,25 @@ class BlasterViewModel(
         val reward = repository.rewardPractice(xp, correct * 2)
         soundEngine.fanfare()
         earnXp(reward.xpGained)
+        engagement.completeStep(PathStep.WORDS)
         _galaxySession.value = null
         _galaxySummary.value = GalaxySummary(session.isLesson, firstTry.size, correct, xp, newlyMemorized)
     }
 
     fun quitGalaxySession() {
         _galaxySession.value = null
+        if (galaxyFromHome) {
+            galaxyFromHome = false
+            navigateBack()
+        }
     }
 
     fun dismissGalaxySummary() {
         _galaxySummary.value = null
+        if (galaxyFromHome) {
+            galaxyFromHome = false
+            navigateBack()
+        }
     }
 
     /** Precomputes two weeks of "word of the day" for the home-screen widget. */
@@ -514,6 +582,7 @@ class BlasterViewModel(
         viewModelScope.launch {
             val reward = repository.recordArcadeRun(over.mode.name, over.score, over.wordsBlasted, over.maxStreak)
             earnXp(reward.xpGained)
+            engagement.completeStep(PathStep.GAME)
             if (reward.isNewPersonalBest) soundEngine.fanfare()
             _meteorState.value = _meteorState.value.copy(
                 isNewPersonalBest = reward.isNewPersonalBest,
@@ -533,5 +602,6 @@ class BlasterViewModel(
 
     private companion object {
         const val KEY_HELPER = "helper_language"
+        const val KEY_ONBOARDED = "onboarded"
     }
 }

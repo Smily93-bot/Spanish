@@ -29,8 +29,7 @@ import com.example.ui.viewmodel.BlasterViewModel
 private enum class LogTab(val es: String, val ar: String, val en: String) {
     LEXICON("Léxico", "معجمي", "My words"),
     DICTIONARY("Diccionario", "القاموس", "Dictionary"),
-    GRAMMAR("Gramática", "القواعد", "Grammar"),
-    SETTINGS("Ajustes", "الإعدادات", "Settings")
+    GRAMMAR("Gramática", "القواعد", "Grammar")
 }
 
 @Composable
@@ -53,28 +52,6 @@ fun CadetLogbookScreen(viewModel: BlasterViewModel) {
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         item {
-            AdventureCard(borderColor = NebulaPurple.copy(alpha = 0.5f)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(rank.emoji, fontSize = 36.sp)
-                    Spacer(Modifier.width(12.dp))
-                    Column(Modifier.weight(1f)) {
-                        Text(language.pick("سجل المستكشفة", "BITÁCORA DE CADETE"), color = NebulaPurple, fontSize = 11.sp, fontWeight = FontWeight.ExtraBold)
-                        Text("${rank.spanish} · ${rank.label(language)}", color = TextPrimary, fontSize = 18.sp, fontWeight = FontWeight.ExtraBold)
-                        Text(
-                            language.pick("المستوى $level · ${mastery.size} كلمة تمت مواجهتها", "Nivel $level · ${mastery.size} words encountered"),
-                            color = TextSecondary, fontSize = 12.sp
-                        )
-                    }
-                }
-                Spacer(Modifier.height(8.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.horizontalScroll(rememberScrollState())) {
-                    Rank.entries.forEach { r ->
-                        LevelChip("${r.emoji} ${r.spanish}", if (level >= r.minLevel) NebulaPurple else TextSecondary)
-                    }
-                }
-            }
-        }
-        item {
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.horizontalScroll(rememberScrollState())) {
                 LogTab.entries.forEach { t ->
                     val selected = t == tab
@@ -85,7 +62,7 @@ fun CadetLogbookScreen(viewModel: BlasterViewModel) {
                         border = BorderStroke(1.dp, if (selected) NebulaPurple else AdventureCardBorder)
                     ) {
                         Text(
-                            "${t.es} · ${language.pick(t.ar, t.en)}",
+                            language.pick(t.ar, t.en),
                             color = if (selected) Color.White else TextSecondary,
                             fontWeight = FontWeight.Bold,
                             fontSize = 12.sp,
@@ -172,50 +149,6 @@ fun CadetLogbookScreen(viewModel: BlasterViewModel) {
                             Spacer(Modifier.height(4.dp))
                             Text("⚠️ " + language.pick(g.mistakeAr, g.mistakeEn), color = SolarAmber, fontSize = 12.sp)
                         }
-                    }
-                }
-            }
-            LogTab.SETTINGS -> {
-                item {
-                    AdventureCard {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(language.pick("🔊 المؤثرات الصوتية", "🔊 Sound effects"), color = TextPrimary, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                            Switch(checked = progress?.soundEnabled ?: true, onCheckedChange = { viewModel.setSoundEnabled(it) })
-                        }
-                    }
-                }
-                item {
-                    AdventureCard {
-                        val speed = progress?.speechSpeed ?: 0.95f
-                        var sliderValue by remember(speed) { mutableFloatStateOf(speed) }
-                        Text(language.pick("🗣️ سرعة النطق", "🗣️ Speech speed") + "  ${"%.2f".format(sliderValue)}x", color = TextPrimary, fontWeight = FontWeight.Bold)
-                        Slider(
-                            value = sliderValue,
-                            onValueChange = { sliderValue = it },
-                            onValueChangeFinished = { viewModel.setSpeechSpeed(sliderValue) },
-                            valueRange = 0.5f..1.3f,
-                            steps = 7
-                        )
-                        BlasterCyberButton(language.pick("جرّبي الصوت", "Probar voz"), { viewModel.speakSpanish("¡Hola! Bienvenida a Spanish Blaster.") })
-                        if (viewModel.speechEngine.spanishVoiceMissing) {
-                            Spacer(Modifier.height(6.dp))
-                            Text(
-                                language.pick("لا يوجد صوت إسباني مثبت على الجهاز.", "No Spanish voice installed on this device."),
-                                color = MeteorRed, fontSize = 12.sp
-                            )
-                        }
-                    }
-                }
-                item {
-                    AdventureCard {
-                        Text(language.pick("ℹ️ عن التطبيق", "ℹ️ About"), color = TextPrimary, fontWeight = FontWeight.Bold)
-                        Text(
-                            language.pick(
-                                "يعمل التطبيق بالكامل دون إنترنت ودون أي مفتاح API. المحتوى: قصص أوربيتا (A1–C2)، بنك Parliva للمفردات، وقائمة أكثر 5000 كلمة استخدامًا.",
-                                "Works fully offline with no API key. Content: Órbita stories (A1–C2), the Parliva vocabulary bank and the Frequency 5000 list."
-                            ),
-                            color = TextSecondary, fontSize = 12.sp
-                        )
                     }
                 }
             }

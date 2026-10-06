@@ -67,16 +67,14 @@ fun StreakChip(viewModel: BlasterViewModel) {
     }
 }
 
-/** Bridge card: streak, this week's calendar, daily goal, freezes and reminder settings. */
+/** Streak card on the Me tab: Lía's mood, streak, this week's calendar and today's goal. */
 @Composable
 fun StreakCard(viewModel: BlasterViewModel, language: HelperLanguage) {
     val streak by viewModel.streak.collectAsStateWithLifecycle()
-    val reminder by viewModel.reminder.collectAsStateWithLifecycle()
     val today = EngagementStore.today()
     val xp = streak.xpOn(today)
     val live = streak.liveStreak(today)
     val done = streak.goalMetOn(today)
-    val context = LocalContext.current
 
     AdventureCard(borderColor = SolarAmber.copy(alpha = 0.6f)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -118,7 +116,16 @@ fun StreakCard(viewModel: BlasterViewModel, language: HelperLanguage) {
             language.pick("هدف اليوم: ${minOf(xp, streak.dailyGoal)} / ${streak.dailyGoal} نقطة", "Today: ${minOf(xp, streak.dailyGoal)} / ${streak.dailyGoal} XP"),
             color = TextSecondary, fontSize = 12.sp
         )
-        Spacer(Modifier.height(8.dp))
+    }
+}
+
+/** Daily goal, reminder and streak-freeze settings (shown on the Me tab). */
+@Composable
+fun StreakSettings(viewModel: BlasterViewModel, language: HelperLanguage) {
+    val streak by viewModel.streak.collectAsStateWithLifecycle()
+    val reminder by viewModel.reminder.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(language.pick("الهدف اليومي", "Daily goal"), color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 13.sp)
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             StreakState.GOAL_CHOICES.forEach { goal ->

@@ -13,6 +13,9 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.time.LocalDate
 
+/** The three steps of the daily path on the home screen, in the order they are suggested. */
+enum class PathStep { WORDS, STORY, GAME }
+
 /** Daily reminder preferences. */
 data class ReminderSettings(val enabled: Boolean = false, val hour: Int = 19)
 
@@ -40,7 +43,22 @@ class EngagementStore private constructor(context: Context) {
     )
     val reminder: StateFlow<ReminderSettings> = _reminder.asStateFlow()
 
+    private val _pathDone = MutableStateFlow(readPath())
+    /** Steps of today's path already completed. */
+    val pathDone: StateFlow<Set<PathStep>> = _pathDone.asStateFlow()
+
     private var cardsLoaded = false
+
+    private fun readPath(): Set<PathStep> =
+        if (prefs.getLong(K_PATH_DAY, -1) != today()) emptySet()
+        else prefs.getString(K_PATH_DONE, "").orEmpty().split(',')
+            .mapNotNull { name -> PathStep.entries.firstOrNull { it.name == name } }.toSet()
+
+    fun completeStep(step: PathStep) {
+        val next = readPath() + step
+        prefs.edit().putLong(K_PATH_DAY, today()).putString(K_PATH_DONE, next.joinToString(",") { it.name }).apply()
+        _pathDone.value = next
+    }
 
     suspend fun loadCards() = lock.withLock {
         if (cardsLoaded) return@withLock
@@ -50,6 +68,7 @@ class EngagementStore private constructor(context: Context) {
 
     /** Re-applies missed days, e.g. when the app opens on a new day. */
     suspend fun refreshDay() = lock.withLock {
+        _pathDone.value = readPath()
         val rolled = _streak.value.rollTo(today())
         if (rolled != _streak.value) saveStreak(rolled)
     }
@@ -139,6 +158,8 @@ class EngagementStore private constructor(context: Context) {
         private const val K_LEARNED = "words_learned"
         private const val K_MEMORIZED = "words_memorized"
         private const val K_WORD_OF_DAY = "word_of_day"
+        private const val K_PATH_DAY = "path_day"
+        private const val K_PATH_DONE = "path_done"
         private const val K_HELPER_ARABIC = "helper_arabic"
 
         @Volatile private var instance: EngagementStore? = null
