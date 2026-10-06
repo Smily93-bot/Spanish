@@ -130,6 +130,23 @@ class EngagementStore private constructor(context: Context) {
         StreakWidget.requestUpdate(appContext)
     }
 
+    /** Wipes the streak, memory cards, daily path and grammar stars; keeps language and reminder settings. */
+    suspend fun resetAll() = lock.withLock {
+        val arabic = helperArabic(prefs)
+        val reminder = reminderSettings(prefs)
+        prefs.edit().clear()
+            .putBoolean(K_HELPER_ARABIC, arabic)
+            .putBoolean(K_REMIND_ON, reminder.enabled)
+            .putInt(K_REMIND_HOUR, reminder.hour)
+            .commit()
+        withContext(Dispatchers.IO) { cardsFile.delete() }
+        _streak.value = readStreak(prefs)
+        _cards.value = emptyMap()
+        _pathDone.value = emptySet()
+        _grammarStars.value = emptyMap()
+        StreakWidget.requestUpdate(appContext)
+    }
+
     /** The widget and reminder show their text in the player's helper language. */
     fun setHelperArabic(arabic: Boolean) {
         prefs.edit().putBoolean(K_HELPER_ARABIC, arabic).apply()
