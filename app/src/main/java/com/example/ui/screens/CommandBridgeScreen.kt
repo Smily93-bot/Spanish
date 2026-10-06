@@ -12,6 +12,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,6 +54,8 @@ fun CommandBridgeScreen(viewModel: BlasterViewModel) {
     val next = viewModel.nextStep(done)
     val completedIds = tablets.filter { it.isCompleted }.map { it.tabletId }.toSet()
     val chapter = data.tablets.firstOrNull { it.id !in completedIds }
+    val grammarStars by viewModel.grammarStars.collectAsStateWithLifecycle()
+    val nextTopic = remember(data, grammarStars) { viewModel.nextGrammarTopic() }
 
     Column(
         modifier = Modifier
@@ -110,7 +113,7 @@ fun CommandBridgeScreen(viewModel: BlasterViewModel) {
         }
 
         // The one big button
-        val startStep = next ?: PathStep.GAME
+        val startStep = next ?: PathStep.WORDS
         Surface(
             onClick = { if (next == null) viewModel.navigateTo(Screen.Practice) else viewModel.startFromHome(startStep) },
             shape = RoundedCornerShape(24.dp),
@@ -145,7 +148,8 @@ fun CommandBridgeScreen(viewModel: BlasterViewModel) {
                 subtitle = when (step) {
                     PathStep.WORDS -> language.pick("5 كلمات جديدة أو مراجعة سريعة", "5 new words or a quick review")
                     PathStep.STORY -> chapter?.let { it.title(language) } ?: language.pick("أعيدي أي فصل", "Replay any chapter")
-                    PathStep.GAME -> language.pick("دمّري النيازك بالكلمة الصحيحة", "Blast meteors with the right word")
+                    PathStep.GRAMMAR -> nextTopic?.let { "${it.titleEs} · ${it.title(language)}" }
+                        ?: language.pick("قاعدة واحدة وسبب كل إجابة", "One rule and the reason behind each answer")
                 },
                 emoji = stepEmoji(step),
                 done = step in done,
@@ -159,13 +163,13 @@ fun CommandBridgeScreen(viewModel: BlasterViewModel) {
 fun stepTitle(step: PathStep, language: HelperLanguage) = when (step) {
     PathStep.WORDS -> language.pick("تعلّمي كلمات", "Learn words")
     PathStep.STORY -> language.pick("مغامرة ليا", "Lía's adventure")
-    PathStep.GAME -> language.pick("لعبة النيازك", "Meteor game")
+    PathStep.GRAMMAR -> language.pick("القواعد: لماذا؟", "Grammar: why?")
 }
 
 private fun stepEmoji(step: PathStep) = when (step) {
     PathStep.WORDS -> "🌌"
     PathStep.STORY -> "🗺️"
-    PathStep.GAME -> "☄️"
+    PathStep.GRAMMAR -> "🕵️"
 }
 
 @Composable

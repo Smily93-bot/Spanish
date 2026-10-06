@@ -166,6 +166,9 @@ private fun ClozeRun(
                             color = TextPrimary, fontWeight = FontWeight.Bold
                         )
                         Text("${question.answer} = ${question.meaning}", color = TextSecondary, fontSize = 13.sp)
+                        if (question.why.isNotBlank()) {
+                            Text("💡 " + question.why, color = NebulaPurple, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                        }
                     }
                     AudioButton(onClick = { viewModel.speakSpanish(question.fullSentence) })
                 }

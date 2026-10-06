@@ -171,8 +171,67 @@ data class ClozeQuestion(
     val answer: String,
     val options: List<String>,
     val meaning: String,
-    val level: String
+    val level: String,
+    /** Short grammar reason for the answer, in the helper language. */
+    val why: String = ""
 )
+
+// ------------------------------------------------------------------ Grammar ¿Por qué?
+
+data class GrammarPattern(val label: String, val formula: String, val english: String, val arabic: String) {
+    fun note(language: HelperLanguage) = language.pick(arabic, english)
+}
+
+data class GrammarExample(val spanish: String, val english: String, val arabic: String) {
+    fun translation(language: HelperLanguage) = language.pick(arabic, english)
+}
+
+/** A fill-the-gap grammar question; [question] contains ___ once (or twice, with "a / b" options). */
+data class GrammarQuestion(
+    val question: String,
+    val english: String,
+    val arabic: String,
+    val options: List<String>,
+    val answer: Int,
+    val whyEn: String,
+    val whyAr: String
+) {
+    val correct: String get() = options[answer]
+    fun translation(language: HelperLanguage) = language.pick(arabic, english)
+    fun why(language: HelperLanguage) = language.pick(whyAr, whyEn)
+
+    /** The sentence with [option] written into the gap(s). */
+    fun filled(option: String = correct): String {
+        val parts = option.split(" / ")
+        var i = 0
+        return GAP.replace(question) { parts.getOrElse(i++) { parts.last() } }
+    }
+
+    companion object {
+        val GAP = Regex("_{3,}")
+    }
+}
+
+/** One grammar rule with its explanation card and practice questions. */
+data class GrammarTopic(
+    val id: String,
+    val level: String,
+    val kind: String,
+    val titleEs: String,
+    val titleEn: String,
+    val titleAr: String,
+    val introEn: String,
+    val introAr: String,
+    val tipEn: String,
+    val tipAr: String,
+    val patterns: List<GrammarPattern>,
+    val examples: List<GrammarExample>,
+    val questions: List<GrammarQuestion>
+) {
+    fun title(language: HelperLanguage) = language.pick(titleAr, titleEn)
+    fun intro(language: HelperLanguage) = language.pick(introAr, introEn)
+    fun tip(language: HelperLanguage) = language.pick(tipAr, tipEn)
+}
 
 /** Explorer ranks unlocked by player level. */
 enum class Rank(val minLevel: Int, val spanish: String, val english: String, val arabic: String, val emoji: String) {

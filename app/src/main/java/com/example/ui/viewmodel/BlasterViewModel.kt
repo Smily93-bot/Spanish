@@ -62,6 +62,11 @@ data class GalaxySession(
     val questions: List<GalaxyQuestion>
 )
 
+/** A Grammar ¿Por qué? round: the rule card, then questions with their options shuffled. */
+data class GrammarRound(val topic: GrammarTopic, val questions: List<GrammarQuestion>)
+
+data class GrammarResult(val topic: GrammarTopic, val correct: Int, val total: Int, val stars: Int, val xp: Int, val newBest: Boolean)
+
 /** Result screen after a Word Galaxy session. */
 data class GalaxySummary(
     val isLesson: Boolean,
@@ -247,6 +252,10 @@ class BlasterViewModel(
             quitGalaxySession()
             return true
         }
+        if (_grammarRound.value != null) {
+            quitGrammarRound()
+            return true
+        }
         if (_currentScreen.value == Screen.TabletCodex && _selectedTabletId.value != null) {
             _selectedTabletId.value = null
         }
@@ -298,15 +307,86 @@ class BlasterViewModel(
                 val next = content?.tablets?.firstOrNull { it.id !in done } ?: content?.tablets?.lastOrNull()
                 if (next != null) openTablet(next.id) else navigateTo(Screen.AdventureMap)
             }
-            PathStep.GAME -> {
-                // Skip the mode menu: the home path always plays the classic word-meaning round.
-                navigateTo(Screen.MeteorBlaster)
-                startMeteorGame(BlasterMode.TRANSLATION)
+            PathStep.GRAMMAR -> {
+                navigateTo(Screen.GrammarLab)
+                grammarFromHome = true
+                nextGrammarTopic()?.let { startGrammarRound(it) }
+                if (_grammarRound.value == null) grammarFromHome = false
             }
         }
     }
 
     private var galaxyFromHome = false
+
+    // ------------------------------------------------------------------ Grammar ¿Por qué?
+
+    val grammarStars: StateFlow<Map<String, Int>> = engagement.grammarStars
+
+    private val _grammarRound = MutableStateFlow<GrammarRound?>(null)
+    val grammarRound: StateFlow<GrammarRound?> = _grammarRound.asStateFlow()
+
+    private val _grammarResult = MutableStateFlow<GrammarResult?>(null)
+    val grammarResult: StateFlow<GrammarResult?> = _grammarResult.asStateFlow()
+
+    private var grammarFromHome = false
+
+    /** First topic not yet passed, then the first without 3 stars, in course order (A1 → C2). */
+    fun nextGrammarTopic(): GrammarTopic? {
+        val topics = _content.value?.grammarTopics.orEmpty()
+        val stars = grammarStars.value
+        return topics.firstOrNull { (stars[it.id] ?: 0) == 0 }
+            ?: topics.firstOrNull { (stars[it.id] ?: 0) < 3 }
+            ?: topics.randomOrNull()
+    }
+
+    fun startGrammarRound(topic: GrammarTopic) {
+        soundEngine.click()
+        _grammarResult.value = null
+        val picked = topic.questions.shuffled().take(GRAMMAR_QUESTIONS).map { q ->
+            val order = q.options.indices.shuffled()
+            q.copy(options = order.map { q.options[it] }, answer = order.indexOf(q.answer))
+        }
+        _grammarRound.value = GrammarRound(topic, picked)
+    }
+
+    fun grammarAnswered(correct: Boolean) {
+        if (correct) soundEngine.hit() else soundEngine.error()
+    }
+
+    fun finishGrammarRound(correct: Int) = viewModelScope.launch {
+        val round = _grammarRound.value ?: return@launch
+        val total = round.questions.size
+        val stars = when {
+            correct >= total -> 3
+            correct * 3 >= total * 2 -> 2
+            correct * 3 >= total -> 1
+            else -> 0
+        }
+        val newBest = engagement.saveGrammarStars(round.topic.id, stars)
+        val xp = correct * 4 + 10
+        val reward = repository.rewardPractice(xp, correct * 3)
+        soundEngine.fanfare()
+        earnXp(reward.xpGained)
+        engagement.completeStep(PathStep.GRAMMAR)
+        _grammarRound.value = null
+        _grammarResult.value = GrammarResult(round.topic, correct, total, stars, xp, newBest)
+    }
+
+    fun quitGrammarRound() {
+        _grammarRound.value = null
+        if (grammarFromHome) {
+            grammarFromHome = false
+            navigateBack()
+        }
+    }
+
+    fun dismissGrammarResult() {
+        _grammarResult.value = null
+        if (grammarFromHome) {
+            grammarFromHome = false
+            navigateBack()
+        }
+    }
 
     fun speakSpanish(text: String) {
         speechEngine.speakSpanish(text)
@@ -340,7 +420,6 @@ class BlasterViewModel(
     fun finishPracticeRun(gameMode: String, score: Int, correctCount: Int, bestStreak: Int) = viewModelScope.launch {
         soundEngine.fanfare()
         _practiceReward.value = repository.recordArcadeRun(gameMode, score, correctCount, bestStreak).also { earnXp(it.xpGained) }
-        engagement.completeStep(PathStep.GAME)
     }
 
     fun dismissPracticeReward() {
@@ -582,8 +661,7 @@ class BlasterViewModel(
         viewModelScope.launch {
             val reward = repository.recordArcadeRun(over.mode.name, over.score, over.wordsBlasted, over.maxStreak)
             earnXp(reward.xpGained)
-            engagement.completeStep(PathStep.GAME)
-            if (reward.isNewPersonalBest) soundEngine.fanfare()
+                if (reward.isNewPersonalBest) soundEngine.fanfare()
             _meteorState.value = _meteorState.value.copy(
                 isNewPersonalBest = reward.isNewPersonalBest,
                 personalBest = maxOf(over.personalBest, over.score),
@@ -603,5 +681,6 @@ class BlasterViewModel(
     private companion object {
         const val KEY_HELPER = "helper_language"
         const val KEY_ONBOARDED = "onboarded"
+        const val GRAMMAR_QUESTIONS = 6
     }
 }

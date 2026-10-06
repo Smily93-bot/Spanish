@@ -14,7 +14,7 @@ import java.io.File
 import java.time.LocalDate
 
 /** The three steps of the daily path on the home screen, in the order they are suggested. */
-enum class PathStep { WORDS, STORY, GAME }
+enum class PathStep { WORDS, GRAMMAR, STORY }
 
 /** Daily reminder preferences. */
 data class ReminderSettings(val enabled: Boolean = false, val hour: Int = 19)
@@ -46,6 +46,26 @@ class EngagementStore private constructor(context: Context) {
     private val _pathDone = MutableStateFlow(readPath())
     /** Steps of today's path already completed. */
     val pathDone: StateFlow<Set<PathStep>> = _pathDone.asStateFlow()
+
+    private val _grammarStars = MutableStateFlow(readGrammarStars())
+    /** Best stars (0–3) per grammar topic id. */
+    val grammarStars: StateFlow<Map<String, Int>> = _grammarStars.asStateFlow()
+
+    private fun readGrammarStars(): Map<String, Int> =
+        prefs.getString(K_GRAMMAR_STARS, "").orEmpty().split(',').mapNotNull { entry ->
+            val i = entry.lastIndexOf(':')
+            if (i <= 0) null else entry.substring(0, i) to (entry.substring(i + 1).toIntOrNull() ?: 0)
+        }.toMap()
+
+    /** Keeps the best result; returns true when [stars] beats the previous best. */
+    fun saveGrammarStars(topicId: String, stars: Int): Boolean {
+        val old = _grammarStars.value[topicId] ?: 0
+        if (stars <= old) return false
+        val next = _grammarStars.value + (topicId to stars)
+        prefs.edit().putString(K_GRAMMAR_STARS, next.entries.joinToString(",") { "${it.key}:${it.value}" }).apply()
+        _grammarStars.value = next
+        return true
+    }
 
     private var cardsLoaded = false
 
@@ -160,6 +180,7 @@ class EngagementStore private constructor(context: Context) {
         private const val K_WORD_OF_DAY = "word_of_day"
         private const val K_PATH_DAY = "path_day"
         private const val K_PATH_DONE = "path_done"
+        private const val K_GRAMMAR_STARS = "grammar_stars"
         private const val K_HELPER_ARABIC = "helper_arabic"
 
         @Volatile private var instance: EngagementStore? = null

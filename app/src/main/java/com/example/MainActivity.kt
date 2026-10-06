@@ -180,6 +180,7 @@ fun MainAppContent(viewModel: BlasterViewModel) {
                 Screen.CadetLogbook -> CadetLogbookScreen(viewModel = viewModel)
                 Screen.WordGalaxy -> WordGalaxyScreen(viewModel = viewModel)
                 Screen.Practice -> PracticeScreen(viewModel = viewModel)
+                Screen.GrammarLab -> GrammarLabScreen(viewModel = viewModel)
                 Screen.Profile -> ProfileScreen(viewModel = viewModel)
             }
             StreakCelebration(viewModel = viewModel, language = helperLanguage)
