@@ -17,13 +17,26 @@ android {
         versionName = "1.0.0"
     }
 
+    signingConfigs {
+        // One fixed key committed to the repo, so every CI build can update the app already
+        // installed on a phone (the default debug key is regenerated on each CI runner).
+        // It is public, so create a private key (kept out of git) before publishing to Google Play.
+        create("shared") {
+            storeFile = file("signing.keystore")
+            storePassword = "spanishblaster"
+            keyAlias = "spanishblaster"
+            keyPassword = "spanishblaster"
+        }
+    }
+
     buildTypes {
+        debug {
+            signingConfig = signingConfigs.getByName("shared")
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            // Signed with the debug key so the release APK installs straight from CI.
-            // Replace with your own keystore before publishing to Google Play.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("shared")
         }
     }
 
