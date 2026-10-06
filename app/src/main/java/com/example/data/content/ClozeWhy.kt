@@ -52,8 +52,8 @@ object ClozeWhy {
                 "$answer is an adjective: it describes a noun and agrees with it."
             )
             word.partOfSpeech == "adverb" -> language.pick(
-                "$answer ظرف: يخبرنا كيف أو متى أو أين.",
-                "$answer is an adverb: it tells how, when or where."
+                "$answer ظرف: يضيف معنى إلى الفعل أو الصفة أو الجملة كلها، ولا يتغيّر.",
+                "$answer is an adverb: it adds meaning to a verb, an adjective or the whole sentence, and never changes form."
             )
             word.partOfSpeech == "verb" -> language.pick("$answer فعل في هذه الجملة.", "$answer is the verb in this sentence.")
             else -> ""
