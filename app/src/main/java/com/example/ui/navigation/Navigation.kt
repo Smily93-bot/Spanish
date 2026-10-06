@@ -14,6 +14,15 @@ sealed class Screen(val route: String) {
     data object QuantumCloze : Screen("cloze")
     data object HangarAndGoals : Screen("hangar")
     data object CadetLogbook : Screen("logbook")
+    data object WordGalaxy : Screen("galaxy")
+    data object Practice : Screen("practice")
+    data object GrammarLab : Screen("grammar")
+    data object Profile : Screen("profile")
+
+    companion object {
+        /** Bottom-bar destinations; opening one clears the back stack. */
+        val TABS: Set<Screen> by lazy { setOf(CommandBridge, Practice, Profile) }
+    }
 }
 
 data class BottomNavItem(
@@ -24,9 +33,7 @@ data class BottomNavItem(
 )
 
 val BottomNavItems = listOf(
-    BottomNavItem(Screen.CommandBridge, "Bridge", "القيادة", Icons.Default.RocketLaunch),
-    BottomNavItem(Screen.AdventureMap, "Map", "الخريطة", Icons.Default.Public),
-    BottomNavItem(Screen.MeteorBlaster, "Arcade", "الألعاب", Icons.Default.SportsEsports),
-    BottomNavItem(Screen.HangarAndGoals, "Hangar", "الحظيرة", Icons.Default.EmojiEvents),
-    BottomNavItem(Screen.CadetLogbook, "Logbook", "السجل", Icons.Default.MenuBook)
+    BottomNavItem(Screen.CommandBridge, "Home", "الرئيسية", Icons.Default.Home),
+    BottomNavItem(Screen.Practice, "Practice", "تمارين", Icons.Default.SportsEsports),
+    BottomNavItem(Screen.Profile, "Me", "أنا", Icons.Default.Person)
 )

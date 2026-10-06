@@ -132,7 +132,7 @@ private fun ClozeRun(
                 color = TextPrimary, fontSize = 21.sp, fontWeight = FontWeight.Bold, lineHeight = 28.sp
             )
             Spacer(Modifier.height(6.dp))
-            Text(question.translation, color = TextSecondary, fontSize = 14.sp)
+            Text(question.translation, color = TextSecondary, fontSize = 14.sp, modifier = Modifier.fillMaxWidth())
         }
 
         question.options.forEach { option ->
@@ -167,6 +167,9 @@ private fun ClozeRun(
                             color = TextPrimary, fontWeight = FontWeight.Bold
                         )
                         Text("${question.answer} = ${question.meaning}", color = TextSecondary, fontSize = 13.sp)
+                        if (question.why.isNotBlank()) {
+                            Text("💡 " + question.why, color = NebulaPurple, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                        }
                     }
                     AudioButton(onClick = { viewModel.speakSpanish(question.fullSentence) })
                 }

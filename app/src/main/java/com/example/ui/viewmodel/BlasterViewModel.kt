@@ -7,7 +7,16 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.audio.SoundEffectsEngine
 import com.example.audio.SpeechSynthesizer
+import com.example.data.content.GalaxyQuestion
 import com.example.data.content.SpanishContent
+import com.example.data.engagement.EngagementStore
+import com.example.data.engagement.Galaxy
+import com.example.data.engagement.PathStep
+import com.example.data.engagement.ReminderSettings
+import com.example.data.engagement.StreakEvent
+import com.example.data.engagement.StreakState
+import com.example.data.engagement.WordCard
+import com.example.reminder.Reminders
 import com.example.data.database.*
 import com.example.data.model.*
 import com.example.data.repository.BlasterRepository
@@ -43,6 +52,29 @@ data class MeteorGameState(
     /** Index of the meteor that was just destroyed, for the explosion animation. */
     val blastedIndex: Int? = null,
     val reward: RewardResult? = null
+)
+
+/** A Word Galaxy lesson (new words) or review (due words) in progress. */
+data class GalaxySession(
+    val isLesson: Boolean,
+    val constellation: Int,
+    /** Words introduced with flash cards before the questions (lessons only). */
+    val intro: List<VocabWord>,
+    val questions: List<GalaxyQuestion>
+)
+
+/** A Grammar ¿Por qué? round: the rule card, then questions with their options shuffled. */
+data class GrammarRound(val topic: GrammarTopic, val questions: List<GrammarQuestion>)
+
+data class GrammarResult(val topic: GrammarTopic, val correct: Int, val total: Int, val stars: Int, val xp: Int, val newBest: Boolean)
+
+/** Result screen after a Word Galaxy session. */
+data class GalaxySummary(
+    val isLesson: Boolean,
+    val wordsPracticed: Int,
+    val firstTryCorrect: Int,
+    val xp: Int,
+    val newlyMemorized: Int
 )
 
 class BlasterViewModel(
@@ -115,11 +147,34 @@ class BlasterViewModel(
 
     private var impactJob: Job? = null
 
+    // ------------------------------------------------------------------ Streak & Word Galaxy state
+
+    private val engagement = EngagementStore.get(application)
+    val streak: StateFlow<StreakState> = engagement.streak
+    val wordCards: StateFlow<Map<Int, WordCard>> = engagement.cards
+    val reminder: StateFlow<ReminderSettings> = engagement.reminder
+
+    /** Shown as a celebration when today's goal is reached. */
+    private val _streakEvent = MutableStateFlow<StreakEvent.GoalReached?>(null)
+    val streakEvent: StateFlow<StreakEvent.GoalReached?> = _streakEvent.asStateFlow()
+
+    private val _galaxySession = MutableStateFlow<GalaxySession?>(null)
+    val galaxySession: StateFlow<GalaxySession?> = _galaxySession.asStateFlow()
+
+    private val _galaxySummary = MutableStateFlow<GalaxySummary?>(null)
+    val galaxySummary: StateFlow<GalaxySummary?> = _galaxySummary.asStateFlow()
+
     init {
         viewModelScope.launch {
             repository.ensureInitialized()
             _content.value = repository.loadContent(application)
+            saveWordOfDay()
         }
+        viewModelScope.launch {
+            engagement.loadCards()
+            engagement.refreshDay()
+        }
+        engagement.setHelperArabic(_helperLanguage.value == HelperLanguage.ARABIC)
         viewModelScope.launch {
             userProgress.filterNotNull().collect {
                 soundEngine.enabled = it.soundEnabled
@@ -166,11 +221,24 @@ class BlasterViewModel(
             HelperLanguage.ARABIC
         }
         prefs.edit().putString(KEY_HELPER, _helperLanguage.value.name).apply()
+        engagement.setHelperArabic(_helperLanguage.value == HelperLanguage.ARABIC)
+        saveWordOfDay()
     }
+
+    /** Called when the app comes to the foreground: a new day may have started. */
+    fun onAppResumed() {
+        viewModelScope.launch { engagement.refreshDay() }
+    }
+
+    /** Screens to return to with Back; tabs start a fresh stack. */
+    private val backStack = ArrayDeque<Screen>()
 
     fun navigateTo(screen: Screen) {
         if (screen != Screen.MeteorBlaster) pauseMeteorGame()
         soundEngine.click()
+        val current = _currentScreen.value
+        if (screen in Screen.TABS) backStack.clear()
+        else if (screen != current) backStack.addLast(current)
         _currentScreen.value = screen
     }
 
@@ -179,21 +247,156 @@ class BlasterViewModel(
         navigateTo(Screen.TabletCodex)
     }
 
-    fun closeTablet() {
-        _selectedTabletId.value = null
-    }
-
     /** Returns false when already on the home screen so the system can close the app. */
     fun navigateBack(): Boolean {
+        if (_galaxySession.value != null) {
+            quitGalaxySession()
+            return true
+        }
+        if (_grammarRound.value != null) {
+            quitGrammarRound()
+            return true
+        }
         if (_currentScreen.value == Screen.TabletCodex && _selectedTabletId.value != null) {
             _selectedTabletId.value = null
-            return true
         }
-        if (_currentScreen.value != Screen.CommandBridge) {
-            navigateTo(Screen.CommandBridge)
-            return true
+        val previous = backStack.removeLastOrNull()
+            ?: if (_currentScreen.value != Screen.CommandBridge) Screen.CommandBridge else return false
+        pauseMeteorGame()
+        _currentScreen.value = previous
+        return true
+    }
+
+    // ------------------------------------------------------------------ Onboarding & daily path
+
+    private val _onboarded = MutableStateFlow(prefs.getBoolean(KEY_ONBOARDED, false))
+    val onboarded: StateFlow<Boolean> = _onboarded.asStateFlow()
+
+    val pathDone: StateFlow<Set<PathStep>> = engagement.pathDone
+
+    fun setHelperLanguage(language: HelperLanguage) {
+        if (_helperLanguage.value != language) toggleHelperLanguage()
+    }
+
+    /** Finishes the welcome flow on Home, where a one-time tour card shows what the app contains. */
+    fun finishOnboarding(dailyGoal: Int) {
+        prefs.edit().putBoolean(KEY_ONBOARDED, true).apply()
+        _onboarded.value = true
+        setDailyGoal(dailyGoal)
+        backStack.clear()
+        _currentScreen.value = Screen.CommandBridge
+    }
+
+    private val _showTour = MutableStateFlow(!prefs.getBoolean(KEY_TOUR_SEEN, false))
+    /** True until the player closes the welcome tour card on Home. */
+    val showTour: StateFlow<Boolean> = _showTour.asStateFlow()
+
+    fun dismissTour() {
+        prefs.edit().putBoolean(KEY_TOUR_SEEN, true).apply()
+        _showTour.value = false
+    }
+
+    /** The next step of today's path, or null when all three are done. */
+    fun nextStep(done: Set<PathStep>): PathStep? = PathStep.entries.firstOrNull { it !in done }
+
+    /** Opens a path step from the home screen. Word lessons return home when they end. */
+    fun startFromHome(step: PathStep) {
+        when (step) {
+            PathStep.WORDS -> {
+                navigateTo(Screen.WordGalaxy)
+                galaxyFromHome = true
+                val today = EngagementStore.today()
+                if (Galaxy.dueRanks(today, wordCards.value).size >= 5) startGalaxyReview()
+                else startGalaxyLesson(Galaxy.currentConstellation(wordCards.value))
+                if (_galaxySession.value == null) startGalaxyReview()
+                // Nothing to start (content still loading): just show the galaxy map.
+                if (_galaxySession.value == null) galaxyFromHome = false
+            }
+            PathStep.STORY -> {
+                val content = _content.value
+                val done = tabletProgress.value.filter { it.isCompleted }.map { it.tabletId }.toSet()
+                val next = content?.tablets?.firstOrNull { it.id !in done } ?: content?.tablets?.lastOrNull()
+                if (next != null) openTablet(next.id) else navigateTo(Screen.AdventureMap)
+            }
+            PathStep.GRAMMAR -> {
+                navigateTo(Screen.GrammarLab)
+                grammarFromHome = true
+                nextGrammarTopic()?.let { startGrammarRound(it) }
+                if (_grammarRound.value == null) grammarFromHome = false
+            }
         }
-        return false
+    }
+
+    private var galaxyFromHome = false
+
+    // ------------------------------------------------------------------ Grammar ¿Por qué?
+
+    val grammarStars: StateFlow<Map<String, Int>> = engagement.grammarStars
+
+    private val _grammarRound = MutableStateFlow<GrammarRound?>(null)
+    val grammarRound: StateFlow<GrammarRound?> = _grammarRound.asStateFlow()
+
+    private val _grammarResult = MutableStateFlow<GrammarResult?>(null)
+    val grammarResult: StateFlow<GrammarResult?> = _grammarResult.asStateFlow()
+
+    private var grammarFromHome = false
+
+    /** First topic not yet passed, then the first without 3 stars, in course order (A1 → C2). */
+    fun nextGrammarTopic(): GrammarTopic? {
+        val topics = _content.value?.grammarTopics.orEmpty()
+        val stars = grammarStars.value
+        return topics.firstOrNull { (stars[it.id] ?: 0) == 0 }
+            ?: topics.firstOrNull { (stars[it.id] ?: 0) < 3 }
+            ?: topics.randomOrNull()
+    }
+
+    fun startGrammarRound(topic: GrammarTopic) {
+        soundEngine.click()
+        _grammarResult.value = null
+        val picked = topic.questions.shuffled().take(GRAMMAR_QUESTIONS).map { q ->
+            val order = q.options.indices.shuffled()
+            q.copy(options = order.map { q.options[it] }, answer = order.indexOf(q.answer))
+        }
+        _grammarRound.value = GrammarRound(topic, picked)
+    }
+
+    fun grammarAnswered(correct: Boolean) {
+        if (correct) soundEngine.hit() else soundEngine.error()
+    }
+
+    fun finishGrammarRound(correct: Int) = viewModelScope.launch {
+        val round = _grammarRound.value ?: return@launch
+        val total = round.questions.size
+        val stars = when {
+            correct >= total -> 3
+            correct * 3 >= total * 2 -> 2
+            correct * 3 >= total -> 1
+            else -> 0
+        }
+        val newBest = engagement.saveGrammarStars(round.topic.id, stars)
+        val xp = correct * 4 + 10
+        val reward = repository.rewardPractice(xp, correct * 3)
+        soundEngine.fanfare()
+        earnXp(reward.xpGained)
+        engagement.completeStep(PathStep.GRAMMAR)
+        _grammarRound.value = null
+        _grammarResult.value = GrammarResult(round.topic, correct, total, stars, xp, newBest)
+    }
+
+    fun quitGrammarRound() {
+        _grammarRound.value = null
+        if (grammarFromHome) {
+            grammarFromHome = false
+            navigateBack()
+        }
+    }
+
+    fun dismissGrammarResult() {
+        _grammarResult.value = null
+        if (grammarFromHome) {
+            grammarFromHome = false
+            navigateBack()
+        }
     }
 
     fun speakSpanish(text: String) {
@@ -220,17 +423,133 @@ class BlasterViewModel(
 
     fun completeTablet(tablet: ReadingTablet, correct: Int, total: Int, bonusCredits: Int = 0) = viewModelScope.launch {
         soundEngine.fanfare()
-        _practiceReward.value = repository.completeTablet(tablet, correct, total, bonusCredits)
+        _practiceReward.value = repository.completeTablet(tablet, correct, total, bonusCredits).also { earnXp(it.xpGained) }
+        engagement.completeStep(PathStep.STORY)
     }
 
     /** Saves a Quantum Cloze or Grammar Reactor run to the arcade table. */
     fun finishPracticeRun(gameMode: String, score: Int, correctCount: Int, bestStreak: Int) = viewModelScope.launch {
         soundEngine.fanfare()
-        _practiceReward.value = repository.recordArcadeRun(gameMode, score, correctCount, bestStreak)
+        _practiceReward.value = repository.recordArcadeRun(gameMode, score, correctCount, bestStreak).also { earnXp(it.xpGained) }
     }
 
     fun dismissPracticeReward() {
         _practiceReward.value = null
+    }
+
+    // ------------------------------------------------------------------ Streak
+
+    /** Counts XP toward today's goal; celebrates when the goal is reached. */
+    private suspend fun earnXp(xp: Int) {
+        val event = engagement.addXp(xp)
+        if (event is StreakEvent.GoalReached) {
+            soundEngine.powerUp()
+            _streakEvent.value = event
+        }
+    }
+
+    fun dismissStreakEvent() {
+        _streakEvent.value = null
+    }
+
+    fun setDailyGoal(goal: Int) = viewModelScope.launch { engagement.setDailyGoal(goal) }
+
+    fun setReminder(settings: ReminderSettings) = viewModelScope.launch {
+        engagement.setReminder(settings)
+        Reminders.schedule(getApplication())
+    }
+
+    // ------------------------------------------------------------------ Word Galaxy
+
+    fun startGalaxyLesson(constellation: Int) {
+        val content = _content.value ?: return
+        val cards = wordCards.value
+        if (!Galaxy.isUnlocked(constellation, cards)) return
+        val ranks = Galaxy.nextNew(constellation, cards)
+        if (ranks.isEmpty()) return
+        soundEngine.click()
+        _galaxySummary.value = null
+        _galaxySession.value = GalaxySession(
+            isLesson = true,
+            constellation = constellation,
+            intro = ranks.mapNotNull { content.galaxy.word(it) },
+            questions = content.galaxy.lesson(ranks, _helperLanguage.value)
+        )
+    }
+
+    fun startGalaxyReview() {
+        val content = _content.value ?: return
+        val cards = wordCards.value
+        val ranks = Galaxy.dueRanks(EngagementStore.today(), cards)
+        if (ranks.isEmpty()) return
+        soundEngine.click()
+        _galaxySummary.value = null
+        _galaxySession.value = GalaxySession(
+            isLesson = false,
+            constellation = Galaxy.constellationOf(ranks.first()),
+            intro = emptyList(),
+            questions = content.galaxy.review(ranks, ranks.associateWith { cards[it]?.box ?: 1 }, _helperLanguage.value)
+        )
+    }
+
+    /** A replacement question after a miss, so the word comes back in a different form. */
+    fun galaxyRetry(question: GalaxyQuestion): GalaxyQuestion? =
+        _content.value?.galaxy?.retry(question, _helperLanguage.value)
+
+    fun galaxyAnswered(correct: Boolean) {
+        if (correct) soundEngine.hit() else soundEngine.error()
+    }
+
+    /** [firstTry] maps each practised rank to whether it was answered right the first time. */
+    fun finishGalaxySession(firstTry: Map<Int, Boolean>) = viewModelScope.launch {
+        val session = _galaxySession.value ?: return@launch
+        val today = EngagementStore.today()
+        val before = wordCards.value
+        val updated = firstTry.map { (rank, ok) ->
+            val card = before[rank] ?: WordCard(rank)
+            if (session.isLesson || !card.introduced) card.learn(today, ok) else card.review(today, ok)
+        }
+        engagement.updateCards(updated)
+        firstTry.forEach { (rank, ok) ->
+            _content.value?.galaxy?.word(rank)?.let { recordWord(it, ok) }
+        }
+        val correct = firstTry.values.count { it }
+        val newlyMemorized = updated.count { it.memorized && before[it.rank]?.memorized != true }
+        val xp = correct * 3 + if (session.isLesson) 10 else 5
+        val reward = repository.rewardPractice(xp, correct * 2)
+        soundEngine.fanfare()
+        earnXp(reward.xpGained)
+        engagement.completeStep(PathStep.WORDS)
+        _galaxySession.value = null
+        _galaxySummary.value = GalaxySummary(session.isLesson, firstTry.size, correct, xp, newlyMemorized)
+    }
+
+    fun quitGalaxySession() {
+        _galaxySession.value = null
+        if (galaxyFromHome) {
+            galaxyFromHome = false
+            navigateBack()
+        }
+    }
+
+    fun dismissGalaxySummary() {
+        _galaxySummary.value = null
+        if (galaxyFromHome) {
+            galaxyFromHome = false
+            navigateBack()
+        }
+    }
+
+    /** Precomputes two weeks of "word of the day" for the home-screen widget. */
+    private fun saveWordOfDay() {
+        val content = _content.value ?: return
+        val lang = _helperLanguage.value
+        val today = EngagementStore.today()
+        val entries = (0L until 14L).associate { offset ->
+            val w = content.galaxy.word(Galaxy.wordOfDay(today + offset))
+            (today + offset) to ((w?.shortSpanish ?: "") to (w?.shortMeaning(lang) ?: ""))
+        }.filterValues { it.first.isNotEmpty() }
+        engagement.saveWordOfDay(entries)
     }
 
     // ------------------------------------------------------------------ Meteor Blaster
@@ -352,7 +671,8 @@ class BlasterViewModel(
         _meteorState.value = over
         viewModelScope.launch {
             val reward = repository.recordArcadeRun(over.mode.name, over.score, over.wordsBlasted, over.maxStreak)
-            if (reward.isNewPersonalBest) soundEngine.fanfare()
+            earnXp(reward.xpGained)
+                if (reward.isNewPersonalBest) soundEngine.fanfare()
             _meteorState.value = _meteorState.value.copy(
                 isNewPersonalBest = reward.isNewPersonalBest,
                 personalBest = maxOf(over.personalBest, over.score),
@@ -371,5 +691,8 @@ class BlasterViewModel(
 
     private companion object {
         const val KEY_HELPER = "helper_language"
+        const val KEY_ONBOARDED = "onboarded"
+        const val KEY_TOUR_SEEN = "tour_seen"
+        const val GRAMMAR_QUESTIONS = 6
     }
 }

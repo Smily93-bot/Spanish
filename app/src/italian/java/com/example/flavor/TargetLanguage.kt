@@ -275,5 +275,61 @@ private val ITALIAN = mapOf(
     "Comprobar" to "Verifica",
     "Ver respuesta" to "Vedi la risposta",
     "📡 Reconstruye la transmisión" to "📡 Ricostruisci la trasmissione",
-    "Ver el orden correcto" to "Vedi l'ordine corretto"
+    "Ver el orden correcto" to "Vedi l'ordine corretto",
+
+    // App name, onboarding, home tour, widget hint
+    "Spanish Blaster" to "Italian Blaster",
+    "¡Hola! Soy Lía" to "Ciao! Sono Lía",
+    "مرحبًا! أنا ليا. سنتعلم الإسبانية معًا.\nHi! I'm Lía. Let's learn Spanish together." to
+        "مرحبًا! أنا ليا. سنتعلم الإيطالية معًا.\nHi! I'm Lía. Let's learn Italian together.",
+    "Words: learn the 5000 most-used Spanish words." to "Words: learn the 5000 most-used Italian words.",
+    "الكلمات: تعلّمي أهم 5000 كلمة إسبانية." to "الكلمات: تعلّمي أهم 5000 كلمة إيطالية.",
+    "📱 Add the widget: long-press your home screen → Widgets → Spanish Blaster." to
+        "📱 Add the widget: long-press your home screen → Widgets → Italian Blaster.",
+    "📱 أضيفي الأداة إلى الشاشة الرئيسية: اضغطي مطولًا على الشاشة ← الأدوات ← Spanish Blaster." to
+        "📱 أضيفي الأداة إلى الشاشة الرئيسية: اضغطي مطولًا على الشاشة ← الأدوات ← Italian Blaster.",
+    "📡 La historia" to "📡 La storia",
+
+    // Nilo, Lía's co-pilot
+    "¡Hola! Soy Nilo, el piloto de la nave." to "Ciao! Sono Nilo, il pilota della nave.",
+    "¡Vamos, Lía!" to "Andiamo, Lía!",
+    "¡Mira, una señal!" to "Guarda, un segnale!",
+    "¡Un diamante!" to "Un diamante!",
+    "Camina hacia la luz azul." to "Cammina verso la luce blu.",
+    "¡El portal está abierto!" to "Il portale è aperto!",
+    "¡Lo logramos! ¡Una página más!" to "Ce l'abbiamo fatta! Un'altra pagina!",
+    "¡Muy bien!" to "Molto bene!",
+    "¡Genial!" to "Fantastico!",
+    "¡Excelente, Lía!" to "Eccellente, Lía!",
+    "¡Lo lograste!" to "Ce l'hai fatta!",
+    "Lía, llega un mensaje. ¡Escucha!" to "Lía, arriva un messaggio. Ascolta!",
+    "Responde para abrir el camino." to "Rispondi per aprire la strada.",
+    "Necesito estas cosas. ¿Me ayudas a buscarlas?" to "Mi servono queste cose. Mi aiuti a cercarle?",
+    "La consola está rota. ¡Repárala!" to "La console è rotta. Riparala!",
+    "El mensaje está desordenado. ¡Ordénalo!" to "Il messaggio è in disordine. Riordinalo!",
+    "¡Es hora de la misión!" to "È l'ora della missione!",
+    "Última prueba antes del portal." to "Ultima prova prima del portale.",
+    "¡Mira dentro del círculo dorado!" to "Guarda dentro il cerchio dorato!",
+
+    // Grammar: why?
+    "🕵️ ¿Por qué?" to "🕵️ Perché?",
+    "La regla de hoy:" to "La regola di oggi:",
+    "¡Caso resuelto! Eres una detective." to "Caso risolto! Sei una vera detective.",
+    "¡Muy bien! Casi perfecto." to "Molto bene! Quasi perfetto.",
+    "Repasamos la regla y lo intentamos otra vez." to "Ripassiamo la regola e riproviamo.",
+    "¡Caso resuelto!" to "Caso risolto!",
+
+    // Word Galaxy
+    "CONSTELACIONES" to "COSTELLAZIONI",
+    "¡Casi! Lo repetimos luego." to "Quasi! Lo ripetiamo dopo.",
+    "¡Repasa primero, así no olvidas!" to "Prima ripassa, così non dimentichi!",
+    "Cada día, cinco palabras nuevas." to "Ogni giorno, cinque parole nuove.",
+    "How do you say this in Spanish?" to "How do you say this in Italian?",
+    "كيف نقول هذا بالإسبانية؟" to "كيف نقول هذا بالإيطالية؟",
+    "Aurora" to "Aurora", "Brújula" to "Bussola", "Cometa" to "Cometa", "Delfín" to "Delfino",
+    "Estrella" to "Stella", "Faro" to "Faro", "Galaxia" to "Galassia", "Isla" to "Isola",
+    "Jaguar" to "Giaguaro", "Lince" to "Lince", "Luna" to "Luna", "Marea" to "Marea", "Nube" to "Nuvola",
+    "Órbita" to "Orbita", "Pegaso" to "Pegaso", "Río" to "Fiume", "Sol" to "Sole", "Trueno" to "Tuono",
+    "Unicornio" to "Unicorno", "Volcán" to "Vulcano", "Zafiro" to "Zaffiro", "Ancla" to "Ancora",
+    "Búho" to "Gufo", "Dragón" to "Drago", "Eclipse" to "Eclissi", "Fénix" to "Fenice", "Girasol" to "Girasole"
 )

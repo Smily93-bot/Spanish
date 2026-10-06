@@ -1,5 +1,6 @@
 package com.example
 
+import com.example.data.model.GrammarQuestion
 import com.example.data.model.Rank
 import com.example.data.model.normalizeAnswer
 import com.example.data.repository.BlasterRepository
@@ -30,5 +31,14 @@ class GameLogicTest {
         assertEquals(Rank.PILOT, Rank.forLevel(7))
         assertEquals(Rank.ADMIRAL, Rank.forLevel(40))
         assertEquals(Rank.EXPLORER, Rank.next(1))
+    }
+
+    @Test
+    fun grammarQuestionFillsOneOrTwoGaps() {
+        val one = GrammarQuestion("Ayer yo ___ paella.", "", "", listOf("como", "comí", "comeré"), 1, "", "")
+        assertEquals("Ayer yo comí paella.", one.filled())
+        val two = GrammarQuestion("Marta ___ médica, pero hoy ___ enferma.", "", "", listOf("es / está", "está / es", "es / es"), 0, "", "")
+        assertEquals("Marta es médica, pero hoy está enferma.", two.filled())
+        assertEquals("Marta está médica, pero hoy es enferma.", two.filled("está / es"))
     }
 }

@@ -7,7 +7,21 @@ enum class HelperLanguage { ARABIC, ENGLISH }
 
 /** Picks the Arabic or English variant of a helper string. */
 fun HelperLanguage.pick(arabic: String, english: String): String =
-    if (this == HelperLanguage.ARABIC) arabic else english
+    if (this == HelperLanguage.ARABIC) isolateLatin(arabic) else english
+
+private val LATIN_RUN = Regex(
+    "[¿¡]?[A-Za-zÀ-ÖØ-öø-ÿ][A-Za-zÀ-ÖØ-öø-ÿ0-9'’\\-]*" +
+        "(?:[ ,/·:+]+[¿¡]?[A-Za-zÀ-ÖØ-öø-ÿ][A-Za-zÀ-ÖØ-öø-ÿ0-9'’\\-]*)*"
+)
+
+/**
+ * Wraps each run of Spanish/English words inside Arabic text in Unicode isolates (LRI…PDI) so
+ * mixed sentences such as "يشترك ir وser في fui، fuiste، fue" keep the Spanish in reading order.
+ */
+fun isolateLatin(text: String): String {
+    if (text.none { it in '\u0600'..'\u06FF' }) return text
+    return LATIN_RUN.replace(text) { "\u2066${it.value}\u2069" }
+}
 
 /** CEFR levels covered by the bundled content. */
 enum class CefrLevel(val code: String) {
@@ -35,6 +49,9 @@ data class VocabWord(
     /** The first form of entries such as "profesor / profesora". */
     val shortSpanish: String get() = spanish.split("/").first().trim()
     fun meaning(language: HelperLanguage) = language.pick(arabic, english)
+    /** The main sense only, e.g. "of" from "of; from" — used for quiz options. */
+    fun shortMeaning(language: HelperLanguage): String =
+        meaning(language).split(';', '/', '؛').first().trim().ifEmpty { meaning(language) }
 }
 
 data class VocabCategory(
@@ -90,6 +107,9 @@ data class HiddenObject(
     val boxes: List<List<Float>>
 ) {
     fun meaning(language: HelperLanguage) = language.pick(arabic, english)
+    /** The main sense only, e.g. "of" from "of; from" — used for quiz options. */
+    fun shortMeaning(language: HelperLanguage): String =
+        meaning(language).split(';', '/', '؛').first().trim().ifEmpty { meaning(language) }
 }
 
 /** A detailed room illustration (cabin, lab, archive) used by the expedition search missions. */
@@ -167,8 +187,67 @@ data class ClozeQuestion(
     val answer: String,
     val options: List<String>,
     val meaning: String,
-    val level: String
+    val level: String,
+    /** Short grammar reason for the answer, in the helper language. */
+    val why: String = ""
 )
+
+// ------------------------------------------------------------------ Grammar ¿Por qué?
+
+data class GrammarPattern(val label: String, val formula: String, val english: String, val arabic: String) {
+    fun note(language: HelperLanguage) = language.pick(arabic, english)
+}
+
+data class GrammarExample(val spanish: String, val english: String, val arabic: String) {
+    fun translation(language: HelperLanguage) = language.pick(arabic, english)
+}
+
+/** A fill-the-gap grammar question; [question] contains ___ once (or twice, with "a / b" options). */
+data class GrammarQuestion(
+    val question: String,
+    val english: String,
+    val arabic: String,
+    val options: List<String>,
+    val answer: Int,
+    val whyEn: String,
+    val whyAr: String
+) {
+    val correct: String get() = options[answer]
+    fun translation(language: HelperLanguage) = language.pick(arabic, english)
+    fun why(language: HelperLanguage) = language.pick(whyAr, whyEn)
+
+    /** The sentence with [option] written into the gap(s). */
+    fun filled(option: String = correct): String {
+        val parts = option.split(" / ")
+        var i = 0
+        return GAP.replace(question) { parts.getOrElse(i++) { parts.last() } }
+    }
+
+    companion object {
+        val GAP = Regex("_{3,}")
+    }
+}
+
+/** One grammar rule with its explanation card and practice questions. */
+data class GrammarTopic(
+    val id: String,
+    val level: String,
+    val kind: String,
+    val titleEs: String,
+    val titleEn: String,
+    val titleAr: String,
+    val introEn: String,
+    val introAr: String,
+    val tipEn: String,
+    val tipAr: String,
+    val patterns: List<GrammarPattern>,
+    val examples: List<GrammarExample>,
+    val questions: List<GrammarQuestion>
+) {
+    fun title(language: HelperLanguage) = language.pick(titleAr, titleEn)
+    fun intro(language: HelperLanguage) = language.pick(introAr, introEn)
+    fun tip(language: HelperLanguage) = language.pick(tipAr, tipEn)
+}
 
 /** Explorer ranks unlocked by player level. */
 enum class Rank(val minLevel: Int, val spanish: String, val english: String, val arabic: String, val emoji: String) {

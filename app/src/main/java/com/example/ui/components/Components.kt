@@ -57,16 +57,16 @@ fun BlasterCyberButton(
 
 /** Speaker button that reads Spanish text aloud with the device's TTS voice. */
 @Composable
-fun AudioButton(onClick: () -> Unit, modifier: Modifier = Modifier, tint: Color = ExplorerBlue, size: Dp = 36.dp) {
+fun AudioButton(onClick: () -> Unit, modifier: Modifier = Modifier, size: Dp = 36.dp) {
+    // Every sound button looks the same: a solid cyan circle with a white speaker.
     Surface(
         onClick = onClick,
         shape = CircleShape,
-        color = tint.copy(alpha = 0.12f),
-        border = BorderStroke(1.dp, tint.copy(alpha = 0.4f)),
+        color = DiamondCyan,
         modifier = modifier.size(size)
     ) {
         Box(contentAlignment = Alignment.Center) {
-            Icon(Icons.Default.VolumeUp, contentDescription = tl("Escuchar"), tint = tint, modifier = Modifier.size(size * 0.55f))
+            Icon(Icons.Default.VolumeUp, contentDescription = tl("Escuchar"), tint = Color.White, modifier = Modifier.size(size * 0.55f))
         }
     }
 }

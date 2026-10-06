@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Italian Blaster</string>
+    <string name="widget_description">La tua serie, l\'obiettivo del giorno e le parole da ripassare</string>
 </resources>

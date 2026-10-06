@@ -21,13 +21,17 @@ class SpanishContent(
     val phrases: List<Phrase>,
     val grammar: List<GrammarGuide>,
     val tablets: List<ReadingTablet>,
-    val scenes: Map<String, HiddenScene>
+    val scenes: Map<String, HiddenScene>,
+    val grammarTopics: List<GrammarTopic> = emptyList()
 ) {
     val topicWords: List<VocabWord> = categories.flatMap { it.words }
     private val bySpanish: Map<String, VocabWord> =
         (topicWords + frequency).associateBy { normalizeAnswer(it.shortSpanish) }
 
     fun lookup(spanish: String): VocabWord? = bySpanish[normalizeAnswer(spanish)]
+
+    /** Word Galaxy lessons over the 5000 frequency words. */
+    val galaxy: GalaxyQuiz by lazy { GalaxyQuiz(frequency) }
 
     private val singleTopicWords = topicWords.filter { !it.spanish.contains(' ') || it.spanish.contains('/') }
     private val poolCache = HashMap<Int, List<VocabWord>>()
@@ -61,10 +65,10 @@ class SpanishContent(
     private fun translationMeteor(language: HelperLanguage, playerLevel: Int, random: Random): MeteorWord {
         val pool = wordPool(playerLevel)
         val target = pool.random(random)
-        val answer = target.meaning(language).split("/").first().trim()
+        val answer = target.shortMeaning(language)
         val distractors = generateSequence { pool.random(random) }
             .take(60)
-            .map { it.meaning(language).split("/").first().trim() }
+            .map { it.shortMeaning(language) }
             .filter { normalizeAnswer(it) != normalizeAnswer(answer) && it.isNotBlank() }
             .distinct()
             .take(3)
@@ -139,7 +143,8 @@ class SpanishContent(
             answer = answer,
             options = (distractors + answer).shuffled(random),
             meaning = word.meaning(language),
-            level = word.level
+            level = word.level,
+            why = ClozeWhy.explain(word, word.exampleEs.substring(0, source.range.first), answer, language)
         )
     }
 
@@ -165,10 +170,43 @@ class SpanishContent(
 
         fun load(context: Context): SpanishContent = parse(
             vocabJson = context.assets.open("vocab.json").bufferedReader().use { it.readText() },
-            campaignJson = context.assets.open("campaign.json").bufferedReader().use { it.readText() }
+            campaignJson = context.assets.open("campaign.json").bufferedReader().use { it.readText() },
+            grammarJson = runCatching { context.assets.open("grammar_lab.json").bufferedReader().use { it.readText() } }.getOrNull()
         )
 
-        fun parse(vocabJson: String, campaignJson: String): SpanishContent {
+        fun parseGrammar(json: String): List<GrammarTopic> = JSONArray(json).objects().map { t ->
+            GrammarTopic(
+                id = t.getString("id"),
+                level = t.getString("level"),
+                kind = t.optString("kind"),
+                titleEs = t.optString("titleEs"),
+                titleEn = t.optString("titleEn"),
+                titleAr = t.optString("titleAr"),
+                introEn = t.optString("introEn"),
+                introAr = t.optString("introAr"),
+                tipEn = t.optString("tipEn"),
+                tipAr = t.optString("tipAr"),
+                patterns = t.getJSONArray("patterns").objects().map {
+                    GrammarPattern(it.optString("label"), it.optString("formula"), it.optString("en"), it.optString("ar"))
+                },
+                examples = t.getJSONArray("examples").objects().map {
+                    GrammarExample(it.optString("es"), it.optString("en"), it.optString("ar"))
+                },
+                questions = t.getJSONArray("questions").objects().map {
+                    GrammarQuestion(
+                        question = it.getString("q"),
+                        english = it.optString("en"),
+                        arabic = it.optString("ar"),
+                        options = it.getJSONArray("options").strings(),
+                        answer = it.getInt("answer"),
+                        whyEn = it.optString("whyEn"),
+                        whyAr = it.optString("whyAr")
+                    )
+                }
+            )
+        }
+
+        fun parse(vocabJson: String, campaignJson: String, grammarJson: String? = null): SpanishContent {
             val vocab = JSONObject(vocabJson)
             val campaign = JSONObject(campaignJson)
 
@@ -293,7 +331,7 @@ class SpanishContent(
                     }
                 )
             }
-            return SpanishContent(categories, frequency, phrases, grammar, tablets, scenes)
+            return SpanishContent(categories, frequency, phrases, grammar, tablets, scenes, grammarJson?.let { parseGrammar(it) }.orEmpty())
         }
 
         private fun JSONArray.objects(): List<JSONObject> = (0 until length()).map { getJSONObject(it) }

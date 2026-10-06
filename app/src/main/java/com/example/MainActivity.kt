@@ -1,6 +1,7 @@
 package com.example
 
 import com.example.flavor.tl
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -46,10 +47,29 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        handleOpenIntent(intent)
         setContent {
             SpanishBlasterTheme {
                 MainAppContent(viewModel = viewModel)
             }
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleOpenIntent(intent)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.onAppResumed()
+    }
+
+    /** The widget and reminder open the Word Galaxy directly. */
+    private fun handleOpenIntent(intent: Intent?) {
+        if (intent?.getStringExtra(EXTRA_OPEN) == OPEN_GALAXY) {
+            intent.removeExtra(EXTRA_OPEN)
+            viewModel.navigateTo(Screen.WordGalaxy)
         }
     }
 
@@ -58,85 +78,57 @@ class MainActivity : ComponentActivity() {
         viewModel.pauseMeteorGame()
         super.onPause()
     }
+
+    companion object {
+        const val EXTRA_OPEN = "open"
+        const val OPEN_GALAXY = "galaxy"
+    }
 }
 
 /** Which bottom-bar tab is highlighted for screens that aren't in the bar themselves. */
 private fun Screen.tabOwner(): Screen = when (this) {
-    Screen.TabletCodex -> Screen.AdventureMap
-    Screen.GrammarReactor, Screen.QuantumCloze -> Screen.MeteorBlaster
-    else -> this
+    Screen.CommandBridge, Screen.Practice, Screen.Profile -> this
+    Screen.HangarAndGoals, Screen.CadetLogbook -> Screen.Profile
+    else -> Screen.Practice
 }
 
 @Composable
 fun MainAppContent(viewModel: BlasterViewModel) {
     val currentScreen by viewModel.currentScreen.collectAsStateWithLifecycle()
-    val selectedTablet by viewModel.selectedTabletId.collectAsStateWithLifecycle()
-    val userProgress by viewModel.userProgress.collectAsStateWithLifecycle()
     val helperLanguage by viewModel.helperLanguage.collectAsStateWithLifecycle()
     val isArabic = helperLanguage == com.example.data.model.HelperLanguage.ARABIC
 
-    BackHandler(enabled = currentScreen != Screen.CommandBridge || selectedTablet != null) {
-        viewModel.navigateBack()
+    val onboarded by viewModel.onboarded.collectAsStateWithLifecycle()
+    val activity = androidx.compose.ui.platform.LocalContext.current as? ComponentActivity
+
+    BackHandler {
+        if (!viewModel.navigateBack()) activity?.finish()
+    }
+
+    if (!onboarded) {
+        OnboardingScreen(viewModel = viewModel)
+        return
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = if (isArabic) tl("مستكشف الإسبانية") else tl("SPANISH BLASTER"),
-                            color = SolarAmber,
-                            fontSize = 17.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            letterSpacing = 0.5.sp
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Surface(
-                            shape = androidx.compose.foundation.shape.RoundedCornerShape(6.dp),
-                            color = AdventureSurfaceVariant
-                        ) {
-                            Text(
-                                text = "${tl("NIVEL")} ${userProgress?.level ?: 1}",
-                                color = ExplorerBlue,
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                            )
+                    Text(
+                        text = if (isArabic) tl("مستكشف الإسبانية") else tl("Spanish Blaster"),
+                        color = SolarAmber,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.ExtraBold
+                    )
+                },
+                navigationIcon = {
+                    if (currentScreen !in Screen.TABS) {
+                        IconButton(onClick = { viewModel.navigateBack() }) {
+                            Icon(Icons.Default.ArrowBack, contentDescription = if (isArabic) "رجوع" else "Back", tint = TextPrimary)
                         }
                     }
                 },
-                actions = {
-                    // Trilingual Helper Language Switcher
-                    Surface(
-                        onClick = { viewModel.toggleHelperLanguage() },
-                        shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
-                        color = AdventureSurfaceVariant,
-                        border = androidx.compose.foundation.BorderStroke(1.dp, AdventureCardBorder),
-                        modifier = Modifier.padding(end = 8.dp)
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Translate,
-                                contentDescription = "Language",
-                                tint = ExplorerBlue,
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = if (isArabic) "عربي" else "English",
-                                color = TextPrimary,
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Bold,
-                                maxLines = 1,
-                                softWrap = false
-                            )
-                        }
-                    }
-                },
+                actions = { StreakChip(viewModel = viewModel) },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = AdventureSurface)
             )
         },
@@ -187,7 +179,12 @@ fun MainAppContent(viewModel: BlasterViewModel) {
                 Screen.QuantumCloze -> QuantumClozeScreen(viewModel = viewModel)
                 Screen.HangarAndGoals -> HangarAndGoalsScreen(viewModel = viewModel)
                 Screen.CadetLogbook -> CadetLogbookScreen(viewModel = viewModel)
+                Screen.WordGalaxy -> WordGalaxyScreen(viewModel = viewModel)
+                Screen.Practice -> PracticeScreen(viewModel = viewModel)
+                Screen.GrammarLab -> GrammarLabScreen(viewModel = viewModel)
+                Screen.Profile -> ProfileScreen(viewModel = viewModel)
             }
+            StreakCelebration(viewModel = viewModel, language = helperLanguage)
         }
     }
 }
