@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Spanish Blaster</string>
+    <string name="widget_description">Your streak, daily goal and words to review</string>
 </resources>

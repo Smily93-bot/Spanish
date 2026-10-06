@@ -1,5 +1,6 @@
 package com.example
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -45,6 +46,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        handleOpenIntent(intent)
         setContent {
             SpanishBlasterTheme {
                 MainAppContent(viewModel = viewModel)
@@ -52,10 +54,33 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleOpenIntent(intent)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.onAppResumed()
+    }
+
+    /** The widget and reminder open the Word Galaxy directly. */
+    private fun handleOpenIntent(intent: Intent?) {
+        if (intent?.getStringExtra(EXTRA_OPEN) == OPEN_GALAXY) {
+            intent.removeExtra(EXTRA_OPEN)
+            viewModel.navigateTo(Screen.WordGalaxy)
+        }
+    }
+
     override fun onPause() {
         // Stop the meteor timer when the app goes to the background so the shield isn't drained.
         viewModel.pauseMeteorGame()
         super.onPause()
+    }
+
+    companion object {
+        const val EXTRA_OPEN = "open"
+        const val OPEN_GALAXY = "galaxy"
     }
 }
 
@@ -106,7 +131,8 @@ fun MainAppContent(viewModel: BlasterViewModel) {
                     }
                 },
                 actions = {
-                    // Trilingual Helper Language Switcher
+                    StreakChip(viewModel = viewModel)
+                    // Helper language switcher
                     Surface(
                         onClick = { viewModel.toggleHelperLanguage() },
                         shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp),
@@ -186,7 +212,9 @@ fun MainAppContent(viewModel: BlasterViewModel) {
                 Screen.QuantumCloze -> QuantumClozeScreen(viewModel = viewModel)
                 Screen.HangarAndGoals -> HangarAndGoalsScreen(viewModel = viewModel)
                 Screen.CadetLogbook -> CadetLogbookScreen(viewModel = viewModel)
+                Screen.WordGalaxy -> WordGalaxyScreen(viewModel = viewModel)
             }
+            StreakCelebration(viewModel = viewModel, language = helperLanguage)
         }
     }
 }

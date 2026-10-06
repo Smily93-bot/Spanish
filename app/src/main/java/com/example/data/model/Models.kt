@@ -33,6 +33,9 @@ data class VocabWord(
     /** The first form of entries such as "profesor / profesora". */
     val shortSpanish: String get() = spanish.split("/").first().trim()
     fun meaning(language: HelperLanguage) = language.pick(arabic, english)
+    /** The main sense only, e.g. "of" from "of; from" — used for quiz options. */
+    fun shortMeaning(language: HelperLanguage): String =
+        meaning(language).split(';', '/', '؛').first().trim().ifEmpty { meaning(language) }
 }
 
 data class VocabCategory(
@@ -88,6 +91,9 @@ data class HiddenObject(
     val boxes: List<List<Float>>
 ) {
     fun meaning(language: HelperLanguage) = language.pick(arabic, english)
+    /** The main sense only, e.g. "of" from "of; from" — used for quiz options. */
+    fun shortMeaning(language: HelperLanguage): String =
+        meaning(language).split(';', '/', '؛').first().trim().ifEmpty { meaning(language) }
 }
 
 /** A detailed room illustration (cabin, lab, archive) used by the expedition search missions. */

@@ -25,7 +25,8 @@ import com.example.ui.components.*
 import com.example.ui.navigation.Screen
 import com.example.ui.theme.*
 import com.example.ui.viewmodel.BlasterViewModel
-import java.util.Calendar
+import com.example.data.engagement.EngagementStore
+import com.example.data.engagement.Galaxy
 
 @Composable
 fun CommandBridgeScreen(viewModel: BlasterViewModel) {
@@ -42,10 +43,11 @@ fun CommandBridgeScreen(viewModel: BlasterViewModel) {
     val nextRank = Rank.next(level)
     val completedIds = tablets.filter { it.isCompleted }.map { it.tabletId }.toSet()
     val nextTablet = data.tablets.firstOrNull { it.id !in completedIds }
-    val wordOfDay = remember(data) {
-        val pool = data.frequency.filter { it.rank <= 1500 && it.partOfSpeech in setOf("noun", "verb", "adjective") }
-        pool[Calendar.getInstance().get(Calendar.DAY_OF_YEAR) % pool.size]
-    }
+    val cards by viewModel.wordCards.collectAsStateWithLifecycle()
+    val today = EngagementStore.today()
+    // Same word as the home-screen widget.
+    val wordOfDay = remember(data, today) { data.galaxy.word(Galaxy.wordOfDay(today)) ?: data.frequency.first() }
+    val due = remember(cards, today) { Galaxy.dueRanks(today, cards, limit = Int.MAX_VALUE).size }
 
     Column(
         modifier = Modifier
@@ -93,6 +95,16 @@ fun CommandBridgeScreen(viewModel: BlasterViewModel) {
             HudStatCard(language.pick("كلمات", "Palabras"), "${progress?.totalWordsMastered ?: 0}", "🧠", Modifier.weight(1f), SuccessGreen)
             HudStatCard(language.pick("رقم قياسي", "Récord"), "$personalBest", "🏆", Modifier.weight(1f), NebulaPurple)
         }
+
+        StreakCard(viewModel, language)
+
+        MissionCard(
+            emoji = "🌌",
+            title = language.pick("مجرة الكلمات · 5000 كلمة", "Word Galaxy · 5000 words"),
+            subtitle = if (due > 0) language.pick("$due كلمة تنتظر المراجعة", "$due words waiting for review")
+            else language.pick("تعلّمي 5 كلمات جديدة واحفظيها للأبد", "Learn 5 new words and keep them for good"),
+            color = NebulaPurple
+        ) { viewModel.navigateTo(Screen.WordGalaxy) }
 
         if (viewModel.speechEngine.spanishVoiceMissing) {
             AdventureCard(borderColor = MeteorRed) {

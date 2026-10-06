@@ -14,6 +14,7 @@ sealed class Screen(val route: String) {
     data object QuantumCloze : Screen("cloze")
     data object HangarAndGoals : Screen("hangar")
     data object CadetLogbook : Screen("logbook")
+    data object WordGalaxy : Screen("galaxy")
 }
 
 data class BottomNavItem(
@@ -26,6 +27,7 @@ data class BottomNavItem(
 val BottomNavItems = listOf(
     BottomNavItem(Screen.CommandBridge, "Bridge", "القيادة", Icons.Default.RocketLaunch),
     BottomNavItem(Screen.AdventureMap, "Map", "الخريطة", Icons.Default.Public),
+    BottomNavItem(Screen.WordGalaxy, "Words", "الكلمات", Icons.Default.AutoAwesome),
     BottomNavItem(Screen.MeteorBlaster, "Arcade", "الألعاب", Icons.Default.SportsEsports),
     BottomNavItem(Screen.HangarAndGoals, "Hangar", "الحظيرة", Icons.Default.EmojiEvents),
     BottomNavItem(Screen.CadetLogbook, "Logbook", "السجل", Icons.Default.MenuBook)

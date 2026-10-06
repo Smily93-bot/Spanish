@@ -28,6 +28,9 @@ class SpanishContent(
 
     fun lookup(spanish: String): VocabWord? = bySpanish[normalizeAnswer(spanish)]
 
+    /** Word Galaxy lessons over the 5000 frequency words. */
+    val galaxy: GalaxyQuiz by lazy { GalaxyQuiz(frequency) }
+
     private val singleTopicWords = topicWords.filter { !it.spanish.contains(' ') || it.spanish.contains('/') }
     private val poolCache = HashMap<Int, List<VocabWord>>()
 
@@ -60,10 +63,10 @@ class SpanishContent(
     private fun translationMeteor(language: HelperLanguage, playerLevel: Int, random: Random): MeteorWord {
         val pool = wordPool(playerLevel)
         val target = pool.random(random)
-        val answer = target.meaning(language).split("/").first().trim()
+        val answer = target.shortMeaning(language)
         val distractors = generateSequence { pool.random(random) }
             .take(60)
-            .map { it.meaning(language).split("/").first().trim() }
+            .map { it.shortMeaning(language) }
             .filter { normalizeAnswer(it) != normalizeAnswer(answer) && it.isNotBlank() }
             .distinct()
             .take(3)
