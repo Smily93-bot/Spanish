@@ -18,10 +18,23 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
-      - name: Build debug and release APKs (Spanish and Italian)
+      - name: Decode Google Play upload key (if configured)
+        env:
+          PLAY_KEYSTORE_BASE64: ${{ secrets.PLAY_KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$PLAY_KEYSTORE_BASE64" ]; then
+            echo "$PLAY_KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/play.keystore"
+            echo "PLAY_KEYSTORE_FILE=$RUNNER_TEMP/play.keystore" >> "$GITHUB_ENV"
+          fi
+
+      - name: Build APKs and Play bundles (Spanish and Italian)
+        env:
+          PLAY_KEYSTORE_PASSWORD: ${{ secrets.PLAY_KEYSTORE_PASSWORD }}
+          PLAY_KEY_ALIAS: ${{ secrets.PLAY_KEY_ALIAS }}
+          PLAY_KEY_PASSWORD: ${{ secrets.PLAY_KEY_PASSWORD }}
         run: |
           chmod +x gradlew
-          ./gradlew --no-daemon testSpanishDebugUnitTest testItalianDebugUnitTest assembleDebug assembleRelease
+          ./gradlew --no-daemon testSpanishDebugUnitTest testItalianDebugUnitTest assembleDebug assembleRelease bundleRelease
 
       - name: Verify APK signatures
         run: |
@@ -38,6 +51,7 @@ jobs:
           path: |
             app/build/outputs/apk/spanish/debug/*.apk
             app/build/outputs/apk/spanish/release/*.apk
+            app/build/outputs/bundle/spanishRelease/*.aab
 
       - name: Upload Italian APKs
         uses: actions/upload-artifact@v4
@@ -46,3 +60,4 @@ jobs:
           path: |
             app/build/outputs/apk/italian/debug/*.apk
             app/build/outputs/apk/italian/release/*.apk
+            app/build/outputs/bundle/italianRelease/*.aab

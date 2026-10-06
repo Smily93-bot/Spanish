@@ -27,6 +27,17 @@ android {
             keyAlias = "spanishblaster"
             keyPassword = "spanishblaster"
         }
+        // Private Google Play upload key, used for release builds when CI provides it
+        // (GitHub secrets PLAY_KEYSTORE_BASE64, PLAY_KEYSTORE_PASSWORD, PLAY_KEY_ALIAS, PLAY_KEY_PASSWORD).
+        val playKeystore = System.getenv("PLAY_KEYSTORE_FILE")
+        if (!playKeystore.isNullOrBlank()) {
+            create("play") {
+                storeFile = file(playKeystore)
+                storePassword = System.getenv("PLAY_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("PLAY_KEY_ALIAS")
+                keyPassword = System.getenv("PLAY_KEY_PASSWORD")
+            }
+        }
     }
 
     // One app per target language. They share all game code; each flavor brings its own content
@@ -52,7 +63,7 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            signingConfig = signingConfigs.getByName("shared")
+            signingConfig = signingConfigs.findByName("play") ?: signingConfigs.getByName("shared")
         }
     }
 

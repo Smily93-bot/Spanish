@@ -1,6 +1,17 @@
-# Spanish Blaster 🚀🇪🇸
+# Spanish Blaster 🚀🇪🇸 · Italian Blaster 🚀🇮🇹
 
-A space-adventure Android game for learning Spanish, with Arabic or English as the helper language.
+Space-adventure Android games for learning **Spanish** or **Italian**, with Arabic or English as the helper language.
+
+This one project builds **two separate apps** (Gradle product flavors), each with its own name, icon label,
+install ID and Google Play listing:
+
+| App | Flavor | Application ID | Content |
+| --- | --- | --- | --- |
+| Spanish Blaster | `spanish` | `com.bluediamond.spanishblaster.app` | `app/src/spanish/assets/` |
+| Italian Blaster | `italian` | `com.bluediamond.italianblaster.app` | `app/src/italian/assets/` |
+
+Both apps share all the game code in `app/src/main/`. Each flavor adds its own content, app name and a
+`TargetLanguage.kt` (text-to-speech voice, synonym/antonym pairs and the on-screen target-language text).
 **It runs fully offline. No Gemini key, no API key and no account are needed.** All lessons, words
 and stories ship inside the app.
 
@@ -17,7 +28,11 @@ and stories ship inside the app.
 | **Hangar & Goals** | Spend star credits on ship upgrades (more shield), 14 milestones, Hall of Fame |
 | **Cadet Logbook** | Words you've practised with mastery stars, a searchable Spanish/English/Arabic dictionary, 20 grammar guides, settings |
 
-### Content (from the Órbita + Parliva source package)
+### Italian content
+- `vocab.json`: 13 topic collections, the **Italian Frequency 5000** list (ranked from film-subtitle word counts, reduced to dictionary forms, each word with English and Arabic meanings and an Italian/English/Arabic example), 136 course phrases and 20 Italian grammar guides
+- `campaign.json`: the same 12 Órbita chapters, rewritten in Italian with Italian grammar (essere, passato prossimo, imperfetto, congiuntivo, periodo ipotetico…)
+
+### Spanish content (from the Órbita + Parliva source package)
 - `app/src/main/assets/vocab.json`: 13 topic collections, the **Frequency 5000** list (with Spanish, English and Arabic examples), 136 course phrases and 20 grammar guides
 - `app/src/main/assets/campaign.json`: the 12 Órbita chapters (A1.1 → C2.2), with stories, questions, grammar tables and sentence puzzles
 
@@ -30,18 +45,38 @@ and stories ship inside the app.
 ## Getting the APK
 
 Every push runs **GitHub Actions → "Build Android APK"**. Open the latest run and download the
-`spanish-blaster-apk` artifact. It contains a debug APK and a release APK. Unzip it and install the APK on
-your phone (allow "install unknown apps").
+`spanish-blaster-apk` or `italian-blaster-apk` artifact. Each contains a debug APK, a release APK and a release
+`.aab` bundle (for Google Play). Unzip it and install the APK on your phone (allow "install unknown apps").
 
-> The release APK is signed with the debug key so it installs directly. Before publishing on Google Play,
-> create your own keystore and replace `signingConfig` in `app/build.gradle.kts`.
+### Publishing on Google Play
+The two apps are separate Play listings: create one app in the Play Console for each application ID and
+upload that flavor's `.aab`.
+
+Out of the box, release builds are signed with the public test key in the repo. Before publishing, create a
+private upload key and add it as repository secrets (Settings → Secrets and variables → Actions):
+
+```bash
+keytool -genkeypair -v -keystore play.keystore -alias upload -keyalg RSA -keysize 2048 -validity 10000
+base64 -w0 play.keystore   # paste the output into PLAY_KEYSTORE_BASE64
+```
+
+| Secret | Value |
+| --- | --- |
+| `PLAY_KEYSTORE_BASE64` | the base64 text of `play.keystore` |
+| `PLAY_KEYSTORE_PASSWORD` | keystore password |
+| `PLAY_KEY_ALIAS` | `upload` (or the alias you chose) |
+| `PLAY_KEY_PASSWORD` | key password |
+
+When these secrets exist, CI signs both apps' release APKs and bundles with your key. Keep `play.keystore` safe
+and out of git; Google Play needs the same upload key for every update.
 
 ## Building locally
 Requirements: Android Studio (Ladybug or newer) or JDK 17 plus the Android SDK (API 35).
 
 ```bash
-./gradlew assembleDebug          # app/build/outputs/apk/debug/app-debug.apk
-./gradlew testDebugUnitTest      # unit tests
+./gradlew assembleSpanishDebug assembleItalianDebug   # app/build/outputs/apk/<flavor>/debug/
+./gradlew bundleItalianRelease                          # Play bundle for Italian Blaster
+./gradlew testSpanishDebugUnitTest testItalianDebugUnitTest
 ```
 
 ## Project structure
