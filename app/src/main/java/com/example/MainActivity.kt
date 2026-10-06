@@ -13,6 +13,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -93,6 +97,16 @@ private fun Screen.tabOwner(): Screen = when (this) {
 
 @Composable
 fun MainAppContent(viewModel: BlasterViewModel) {
+    val language by viewModel.helperLanguage.collectAsStateWithLifecycle()
+    // Arabic reads right-to-left, so the whole interface is mirrored for Arabic speakers.
+    val direction = if (language == com.example.data.model.HelperLanguage.ARABIC) LayoutDirection.Rtl else LayoutDirection.Ltr
+    CompositionLocalProvider(LocalLayoutDirection provides direction) {
+        AppScaffold(viewModel)
+    }
+}
+
+@Composable
+private fun AppScaffold(viewModel: BlasterViewModel) {
     val currentScreen by viewModel.currentScreen.collectAsStateWithLifecycle()
     val helperLanguage by viewModel.helperLanguage.collectAsStateWithLifecycle()
     val isArabic = helperLanguage == com.example.data.model.HelperLanguage.ARABIC
@@ -123,7 +137,7 @@ fun MainAppContent(viewModel: BlasterViewModel) {
                 navigationIcon = {
                     if (currentScreen !in Screen.TABS) {
                         IconButton(onClick = { viewModel.navigateBack() }) {
-                            Icon(Icons.Default.ArrowBack, contentDescription = if (isArabic) "رجوع" else "Back", tint = TextPrimary)
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = if (isArabic) "رجوع" else "Back", tint = TextPrimary)
                         }
                     }
                 },

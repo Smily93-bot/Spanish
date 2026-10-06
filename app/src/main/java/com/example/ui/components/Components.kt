@@ -408,3 +408,15 @@ fun ArcadeHighScoresDialog(
         }
     )
 }
+
+/**
+ * Keeps Spanish word order left-to-right (sentence tiles, spelling slots, conjugation tables)
+ * even when the Arabic helper language mirrors the rest of the screen.
+ */
+@Composable
+fun SpanishLtr(content: @Composable () -> Unit) {
+    androidx.compose.runtime.CompositionLocalProvider(
+        androidx.compose.ui.platform.LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Ltr,
+        content = content
+    )
+}

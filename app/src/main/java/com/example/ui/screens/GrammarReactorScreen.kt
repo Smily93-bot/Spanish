@@ -174,6 +174,8 @@ private fun ReactorRun(
             Text(sentence.translation, color = TextPrimary, fontSize = 17.sp, fontWeight = FontWeight.Bold)
         }
 
+        SpanishLtr {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         // Reactor core: placed words
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -198,6 +200,9 @@ private fun ReactorRun(
                     placed.add(w)
                 }
             }
+        }
+
+        }
         }
 
         if (!solved && placed.size == sentence.words.size) {

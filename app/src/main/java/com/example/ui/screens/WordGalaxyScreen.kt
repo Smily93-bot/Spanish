@@ -615,6 +615,8 @@ private fun SpellBoard(
 ) {
     val target = question.answer
     val typed = spelled.joinToString("") { question.options[it] }
+    SpanishLtr {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
         modifier = Modifier.fillMaxWidth()
@@ -663,6 +665,8 @@ private fun SpellBoard(
                 Icon(Icons.Default.Backspace, contentDescription = null, tint = TextSecondary)
             }
         }
+    }
+    }
     }
 }
 
