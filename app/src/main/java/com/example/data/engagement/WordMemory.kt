@@ -1,5 +1,7 @@
 package com.example.data.engagement
 
+import com.example.flavor.tl
+
 /**
  * Leitner spaced repetition for the 5000-word Galaxy. Pure Kotlin so it can be unit-tested.
  *
