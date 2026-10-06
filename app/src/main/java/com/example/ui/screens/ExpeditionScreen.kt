@@ -325,10 +325,7 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
                     language = language,
                     progress = solved.size,
                     niloLine = niloLine,
-                    onSpeakNilo = { viewModel.speakSpanish((niloLine ?: NiloLines.idle).es) },
-                    onLeft = { holdLeft = it },
-                    onRight = { holdRight = it },
-                    onJump = { jump() }
+                    onSpeakNilo = { viewModel.speakSpanish((niloLine ?: NiloLines.idle).es) }
                 )
             } else {
                 CompositionLocalProvider(LocalOnMistake provides onMistake) {
@@ -405,6 +402,10 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
                     )
                 }
             }
+        }
+        // Walking controls at the very bottom, under Lía, so you can watch her walk.
+        if (station == null) {
+            WalkControls(language, onLeft = { holdLeft = it }, onRight = { holdRight = it }, onJump = { jump() })
         }
     }
 
@@ -629,10 +630,7 @@ private fun WalkPanel(
     language: HelperLanguage,
     progress: Int,
     niloLine: NiloLine?,
-    onSpeakNilo: () -> Unit,
-    onLeft: (Boolean) -> Unit,
-    onRight: (Boolean) -> Unit,
-    onJump: () -> Unit
+    onSpeakNilo: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxSize().background(AdventureBg).padding(14.dp),
@@ -647,7 +645,12 @@ private fun WalkPanel(
             ProgressBar(progress / Station.entries.size.toFloat(), color = SolarGold, height = 8.dp)
         }
         NiloSays(niloLine ?: NiloLines.idle, language, onSpeak = onSpeakNilo)
-        Spacer(Modifier.weight(1f))
+    }
+}
+
+@Composable
+private fun WalkControls(language: HelperLanguage, onLeft: (Boolean) -> Unit, onRight: (Boolean) -> Unit, onJump: () -> Unit) {
+    Column(Modifier.fillMaxWidth().background(AdventureBg).padding(horizontal = 14.dp, vertical = 8.dp)) {
         // Controls stay left-to-right even in Arabic so ◀ and ▶ point the way Lía walks.
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
             Row(horizontalArrangement = Arrangement.spacedBy(14.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -657,7 +660,7 @@ private fun WalkPanel(
                 Surface(
                     shape = CircleShape,
                     color = SolarAmber,
-                    modifier = Modifier.size(78.dp).pointerInput(Unit) { detectTapGestures(onPress = { onJump() }) }
+                    modifier = Modifier.size(72.dp).pointerInput(Unit) { detectTapGestures(onPress = { onJump() }) }
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Text(language.pick("قفز", "SALTO"), color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp)
@@ -665,10 +668,6 @@ private fun WalkPanel(
                 }
             }
         }
-        Text(
-            language.pick("يمكنك أيضًا لمس المشهد لتمشي ليا إلى هناك.", "Tip: tap the scene to walk there, or tap above Lía to jump."),
-            color = TextSecondary, fontSize = 11.sp
-        )
     }
 }
 
