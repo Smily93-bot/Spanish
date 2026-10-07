@@ -97,7 +97,7 @@ class EngagementTest {
         }
         val quiz = GalaxyQuiz(words)
         val lesson = quiz.lesson(listOf(1, 2, 3, 4, 5), HelperLanguage.ENGLISH, Random(3))
-        assertEquals(15, lesson.size)
+        assertEquals(10, lesson.size)
         lesson.filter { it.type != GalaxyExercise.SPELL }.forEach { q ->
             assertEquals(4, q.options.size)
             assertEquals(4, q.options.distinct().size)

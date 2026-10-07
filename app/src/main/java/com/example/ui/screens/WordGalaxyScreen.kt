@@ -525,7 +525,8 @@ private fun QuestionView(
         if (ok) viewModel.speakSpanish(word.shortSpanish)
     }
 
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    // Compact so the question, the answers and the feedback all fit on one screen.
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
             when (question.type) {
                 GalaxyExercise.MEANING -> language.pick("ما معنى هذه الكلمة؟", "What does this word mean?")
@@ -542,26 +543,26 @@ private fun QuestionView(
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(22.dp))
                 .background(SpaceNavy)
-                .padding(vertical = 22.dp, horizontal = 16.dp),
+                .padding(vertical = 12.dp, horizontal = 14.dp),
             contentAlignment = Alignment.Center
         ) {
             when (question.type) {
                 GalaxyExercise.MEANING -> Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(word.shortSpanish, color = StarWhite, fontSize = 34.sp, fontWeight = FontWeight.ExtraBold)
+                    Text(word.shortSpanish, color = StarWhite, fontSize = 28.sp, fontWeight = FontWeight.ExtraBold)
                     Spacer(Modifier.width(10.dp))
-                    AudioButton(onClick = { viewModel.speakSpanish(word.shortSpanish) }, size = 40.dp)
+                    AudioButton(onClick = { viewModel.speakSpanish(word.shortSpanish) }, size = 34.dp)
                 }
                 GalaxyExercise.REVERSE, GalaxyExercise.SPELL -> Text(
-                    word.meaning(language), color = SolarGold, fontSize = 26.sp, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center
+                    word.meaning(language), color = SolarGold, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center
                 )
                 GalaxyExercise.LISTEN -> Surface(
                     onClick = { viewModel.speakSpanish(word.shortSpanish) },
                     shape = CircleShape,
                     color = DiamondCyan,
-                    modifier = Modifier.size(84.dp)
+                    modifier = Modifier.size(52.dp)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        Icon(Icons.Default.VolumeUp, contentDescription = null, tint = SpaceNavy, modifier = Modifier.size(44.dp))
+                        Icon(Icons.Default.VolumeUp, contentDescription = null, tint = SpaceNavy, modifier = Modifier.size(30.dp))
                     }
                 }
             }
@@ -570,7 +571,10 @@ private fun QuestionView(
         if (question.type == GalaxyExercise.SPELL) {
             SpellBoard(question, spelled, enabled = !answered, onComplete = { answer(it) })
         } else {
-            question.options.forEach { option ->
+            // Answers in a 2 × 2 grid.
+            question.options.chunked(2).forEach { pair ->
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Min)) {
+            pair.forEach { option ->
                 val isAnswer = normalizeAnswer(option) == normalizeAnswer(question.answer)
                 val color = when {
                     !answered -> AdventureSurface
@@ -589,17 +593,21 @@ private fun QuestionView(
                     shape = RoundedCornerShape(16.dp),
                     color = color,
                     border = BorderStroke(2.dp, border),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.weight(1f).fillMaxHeight()
                 ) {
-                    Text(
-                        option,
-                        color = TextPrimary,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(vertical = 14.dp, horizontal = 12.dp)
-                    )
+                    Box(contentAlignment = Alignment.Center) {
+                        Text(
+                            option,
+                            color = TextPrimary,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(vertical = 12.dp, horizontal = 8.dp)
+                        )
+                    }
                 }
+            }
+            }
             }
         }
 
@@ -685,7 +693,7 @@ private fun Feedback(
         border = BorderStroke(1.5.dp, if (correct) SuccessGreen else MeteorRed),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(Modifier.padding(10.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             // Short and to the point: no cheering after every right answer, just the meaning.
             Text(
                 (if (correct) "✅ " else "❌ ") + "${word.shortSpanish} = ${word.meaning(language)}",
@@ -693,15 +701,14 @@ private fun Feedback(
             )
             if (!correct) Text("💡 " + miss.meaning(language), color = MeteorRed, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
             if (word.exampleEs.isNotBlank()) {
-                Text(language.pick("💬 مثال", "💬 Example"), color = NebulaPurple, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
-                Text(word.exampleEs, color = TextPrimary, fontSize = 13.sp)
+                Text("💬 " + word.exampleEs, color = NebulaPurple, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                 Text(language.pick(word.exampleAr, word.exampleEn), color = TextSecondary, fontSize = 12.sp, modifier = Modifier.fillMaxWidth())
             }
             Button(
                 onClick = onContinue,
                 colors = ButtonDefaults.buttonColors(containerColor = if (correct) SuccessGreen else MeteorRed),
                 shape = RoundedCornerShape(14.dp),
-                modifier = Modifier.fillMaxWidth().height(50.dp)
+                modifier = Modifier.fillMaxWidth().height(44.dp)
             ) { Text(language.pick("متابعة", "Continue"), fontWeight = FontWeight.ExtraBold, fontSize = 16.sp) }
         }
     }

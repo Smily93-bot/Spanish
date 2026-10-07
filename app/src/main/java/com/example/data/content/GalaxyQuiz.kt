@@ -23,16 +23,19 @@ class GalaxyQuiz(private val frequency: List<VocabWord>) {
 
     fun word(rank: Int): VocabWord? = byRank[rank]
 
-    /** New-word lesson: every word is met as meaning, then recall, then by ear or spelling. */
+    /**
+     * New-word lesson, kept short so it doesn't get boring: every word is met once by its meaning,
+     * then once more in just one other way (recall, by ear or spelling), taking turns between words.
+     */
     fun lesson(ranks: List<Int>, language: HelperLanguage, random: Random = Random): List<GalaxyQuestion> {
         val words = ranks.mapNotNull { byRank[it] }
         val round1 = words.shuffled(random).map { question(it, GalaxyExercise.MEANING, language, random) }
-        val round2 = words.shuffled(random).map { question(it, GalaxyExercise.REVERSE, language, random) }
-        val round3 = words.shuffled(random).map {
-            val type = if (canSpell(it) && random.nextBoolean()) GalaxyExercise.SPELL else GalaxyExercise.LISTEN
-            question(it, type, language, random)
+        val second = listOf(GalaxyExercise.REVERSE, GalaxyExercise.LISTEN, GalaxyExercise.SPELL).shuffled(random)
+        val round2 = words.shuffled(random).mapIndexed { i, w ->
+            val type = second[i % second.size].let { if (it == GalaxyExercise.SPELL && !canSpell(w)) GalaxyExercise.REVERSE else it }
+            question(w, type, language, random)
         }
-        return round1 + round2 + round3
+        return round1 + round2
     }
 
     /** Review: one question per due word; harder types for words that have climbed higher. */
