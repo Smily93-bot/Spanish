@@ -344,7 +344,9 @@ private val ITALIAN = mapOf(
     "Lluvia de palabras" to "Pioggia di parole",
     "SALIDA" to "USCITA",
     "¡A por la llave! 🔑" to "Alla chiave! 🔑",
-    "¡Primero la sala que brilla!" to "Prima la stanza che brilla!",
+    "¡Esta puerta está cerrada!" to "Questa porta è chiusa!",
+    "¡Necesitamos la llave!" to "Ci serve la chiave!",
+    "¡La puerta se abrió!" to "La porta si è aperta!",
     "¡Mira, la llave!" to "Guarda, la chiave!",
     "¡Tenemos la llave! ¡A la salida!" to "Abbiamo la chiave! All'uscita!",
 )

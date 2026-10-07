@@ -13,6 +13,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -28,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -45,7 +48,8 @@ import kotlinx.coroutines.launch
 fun BoxScope.ScrollMoreHint(scroll: ScrollState, language: HelperLanguage, fadeColor: Color) {
     val scope = rememberCoroutineScope()
     AnimatedVisibility(
-        visible = scroll.canScrollForward,
+        // Hidden while typing: the keyboard already covers the bottom of the panel.
+        visible = scroll.canScrollForward && WindowInsets.ime.getBottom(LocalDensity.current) == 0,
         enter = fadeIn(),
         exit = fadeOut(),
         modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth()

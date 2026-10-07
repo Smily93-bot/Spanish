@@ -2,6 +2,10 @@ package com.example.ui.screens
 
 import com.example.flavor.tl
 import androidx.compose.foundation.BorderStroke
+import kotlinx.coroutines.delay
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -49,6 +53,8 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.TextMeasurer
@@ -82,35 +88,71 @@ private enum class Station(val emoji: String, val es: String, val ar: String, va
     fun label(language: HelperLanguage) = language.pick(ar, en)
 }
 
-// World units: the ship deck is seen from above and always fits the screen.
-private const val DECK_W = 360f
-private const val DECK_H = 600f
-private const val ROOM_W = 128f
-private const val ROOM_H = 96f
-private const val LIA_H = 62f
-private const val WALK_SPEED = 150f
-private const val REACH = 22f
+// --------------------------------------------------------------------------- Ship floor plan
 
-private val ROOMS = listOf(
-    Offset(92f, 478f), Offset(268f, 478f),
-    Offset(268f, 342f), Offset(92f, 342f),
-    Offset(92f, 206f), Offset(268f, 206f),
-    Offset(92f, 74f)
+/**
+ * The ship seen from above, one character per tile:
+ * `#` wall, `.` floor, `P` start, `0`–`6` the pad of each room, `a`–`g` the door into room 0–6
+ * (it opens when the room before is solved), `X` the exit door (needs the key), `K` where the key
+ * appears, `E` the exit hatch, `*` a diamond and `+` a star.
+ *
+ * Rooms snake upwards: start → 0 → 1 along the bottom, 2 → 3 → 4 back along the middle,
+ * 5 → 6 → exit along the top.
+ */
+private val SHIP = listOf(
+    "#############",
+    "#*.+#*..#..E#",
+    "#.5.g.6.X...#",
+    "#...#.K.#...#",
+    "#+.*#*.+#...#",
+    "##f##########",
+    "#*.+#+.*#*.+#",
+    "#.4.e.3.d.2.#",
+    "#...#...#...#",
+    "#+.*#*.+#+.*#",
+    "##########c##",
+    "#...#*.+#*.+#",
+    "#.P.a.0.b.1.#",
+    "#...#...#...#",
+    "#...#+.*#+.*#",
+    "#############"
 )
-private val START = Offset(180f, 566f)
-private val KEY_SPOT = Offset(180f, 140f)
-private val EXIT = Offset(268f, 72f)
+private const val MAP_W = 13
+private const val MAP_H = 16
+private const val START_ROOM = -1
+private const val EXIT_ROOM = 7
+private const val STEP_TIME = 0.17f   // seconds to walk one tile
 
-/** The corridor Lía follows: start → every room in order → the key → the exit hatch. */
-private val CORRIDOR = listOf(START) + ROOMS + listOf(KEY_SPOT, EXIT)
+/** Which room a tile is in, from its 3×3 block on the plan (walls and doors belong to none). */
+private fun roomAt(x: Int, y: Int): Int? {
+    if (x % 4 == 0 || y % 5 == 0) return null
+    return when (x / 4 to y / 5) {
+        0 to 2 -> START_ROOM
+        1 to 2 -> 0
+        2 to 2 -> 1
+        2 to 1 -> 2
+        1 to 1 -> 3
+        0 to 1 -> 4
+        0 to 0 -> 5
+        1 to 0 -> 6
+        else -> EXIT_ROOM
+    }
+}
 
-/** Two diamonds along every stretch of corridor. */
-private val DIAMONDS: List<Offset> = CORRIDOR.zipWithNext().flatMap { (a, b) -> listOf(lerp(a, b, 0.4f), lerp(a, b, 0.62f)) }
-
-/** Fixed star field (fractions of the view), so it doesn't flicker between frames. */
-internal val STARS: List<Offset> = List(70) { i ->
-    val r = kotlin.random.Random(i * 7919 + 13)
-    Offset(r.nextFloat(), r.nextFloat())
+/** Every other chapter uses the mirrored ship, so the levels don't all look the same. */
+private class ShipMap(mirrored: Boolean) {
+    private val rows = if (mirrored) SHIP.map { it.reversed() } else SHIP
+    fun at(p: IntOffset): Char = rows.getOrNull(p.y)?.getOrNull(p.x) ?: '#'
+    fun find(c: Char): IntOffset {
+        rows.forEachIndexed { y, row -> val x = row.indexOf(c); if (x >= 0) return IntOffset(x, y) }
+        return IntOffset(1, 1)
+    }
+    val pads = (0..6).map { find('0' + it) }
+    val start = find('P')
+    val key = find('K')
+    val tiles: List<Pair<IntOffset, Char>> = rows.flatMapIndexed { y, row -> row.mapIndexed { x, c -> IntOffset(x, y) to c } }
+    val mirror = mirrored
+    fun room(p: IntOffset): Int? = roomAt(if (mirror) MAP_W - 1 - p.x else p.x, p.y)
 }
 
 /** Walk-cycle frames inside explorer_walk.webp (x, y, width, height). */
@@ -120,16 +162,6 @@ internal val WALK_FRAMES = listOf(
     intArrayOf(144, 630, 420, 583),
     intArrayOf(729, 630, 390, 580)
 )
-
-private fun clampDeck(p: Offset) = Offset(p.x.coerceIn(26f, DECK_W - 26f), p.y.coerceIn(34f, DECK_H - 18f))
-
-private fun deckScale(w: Float, h: Float) = minOf(w / DECK_W, h / DECK_H)
-
-/** Screen position → deck position (the deck is centred and scaled to fit). */
-private fun toDeck(p: Offset, w: Float, h: Float): Offset {
-    val s = deckScale(w, h)
-    return Offset((p.x - (w - DECK_W * s) / 2f) / s, (p.y - (h - DECK_H * s) / 2f) / s)
-}
 
 private fun sceneDrawable(asset: String): Int = when (asset) {
     "hidden_laboratory" -> R.drawable.hidden_laboratory
@@ -142,19 +174,23 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
     val walkSprite = ImageBitmap.imageResource(R.drawable.explorer_walk)
     val niloSprite = ImageBitmap.imageResource(R.drawable.nilo_walk)
     val textMeasurer = rememberTextMeasurer()
+    val chapterNumber = tablet.id.substringAfter('-').toIntOrNull() ?: 1
+    val ship = remember(tablet.id) { ShipMap(mirrored = chapterNumber % 2 == 0) }
 
-    // Lía (deck units).
-    var lia by remember { mutableStateOf(START) }
+    // Lía walks tile by tile: from → to, progress 0..1.
+    var liaFrom by remember { mutableStateOf(ship.start) }
+    var liaTo by remember { mutableStateOf(ship.start) }
+    var niloFrom by remember { mutableStateOf(ship.start - IntOffset(1, 0)) }
+    var niloTo by remember { mutableStateOf(ship.start - IntOffset(1, 0)) }
+    var progress by remember { mutableFloatStateOf(1f) }
     var facing by remember { mutableFloatStateOf(1f) }
-    var moving by remember { mutableStateOf(false) }
-    var target by remember { mutableStateOf<Offset?>(null) }
-    var walkedOnce by remember { mutableStateOf(false) }
+    var held by remember { mutableStateOf<IntOffset?>(null) }
     var clock by remember { mutableFloatStateOf(0f) }
 
     // Mission state.
     val solved = remember { mutableStateListOf<Int>() }
     val solvedAt = remember { mutableStateMapOf<Int, Float>() }
-    val collected = remember { mutableStateListOf<Int>() }
+    val collected = remember { mutableStateListOf<IntOffset>() }
     // Each wrong answer costs one collected diamond, so diamonds are worth protecting.
     var lostDiamonds by remember { mutableIntStateOf(0) }
     var lostAt by remember { mutableFloatStateOf(-10f) }
@@ -164,14 +200,11 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
     var hasKey by remember { mutableStateOf(false) }
     var finished by remember { mutableStateOf(false) }
 
-    // Nilo, Lía's co-pilot: follows her around the ship and comments in the target language.
-    var nilo by remember { mutableStateOf(START + Offset(-30f, 12f)) }
-    var niloFacing by remember { mutableFloatStateOf(1f) }
-    var niloMoving by remember { mutableStateOf(false) }
+    // Nilo, Lía's co-pilot: walks one step behind her and comments in the target language.
     var niloLine by remember { mutableStateOf<NiloLine?>(null) }
     var niloLineUntil by remember { mutableFloatStateOf(0f) }
     var lastMoveAt by remember { mutableFloatStateOf(0f) }
-    var lastLockedAt by remember { mutableFloatStateOf(-10f) }
+    var lastBumpAt by remember { mutableFloatStateOf(-10f) }
 
     fun say(line: NiloLine, speak: Boolean = true) {
         niloLine = line
@@ -193,7 +226,44 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
     }
     val secretOrder = remember(tablet.id) { secretWords.indices.shuffled(kotlin.random.Random(tablet.id.hashCode())) }
 
-    // Game loop: runs every frame while no mission panel is open.
+    fun doorOpen(c: Char): Boolean = when (c) {
+        in 'a'..'g' -> c == 'a' || (c - 'a' - 1) in solved
+        'X' -> hasKey
+        else -> true
+    }
+
+    /** Lía has just stepped onto [p]: pick things up, open the room's game, take the key, leave. */
+    fun arrive(p: IntOffset) {
+        when (val c = ship.at(p)) {
+            '*', '+' -> if (p !in collected) {
+                collected += p
+                viewModel.soundEngine.click()
+                if (collected.size == 1) say(NiloLines.diamond)
+            }
+            in '0'..'6' -> {
+                val i = c - '0'
+                if (i == Station.entries.indices.firstOrNull { it !in solved }) {
+                    openStation = i
+                    held = null
+                    viewModel.soundEngine.powerUp()
+                }
+            }
+            'K' -> if (solved.size == Station.entries.size && !hasKey) {
+                hasKey = true
+                viewModel.soundEngine.powerUp()
+                say(NiloLines.gotKey)
+            }
+            'E' -> if (hasKey && !finished) {
+                finished = true
+                held = null
+                say(NiloLines.home)
+                val kept = (collected.size - lostDiamonds).coerceAtLeast(0)
+                viewModel.completeTablet(tablet, results.values.count { it }, totalQuestions, bonusCredits = kept * 5)
+            }
+        }
+    }
+
+    // Game loop: walks Lía one tile at a time while an arrow is held.
     LaunchedEffect(tablet.id) {
         var last = withFrameNanos { it }
         while (true) {
@@ -203,76 +273,38 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
             clock += dt
             if (niloLine != null && clock > niloLineUntil && openStation == null) niloLine = null
             if (clock in 0.6f..0.7f && niloLine == null) say(NiloLines.start)
-            if (openStation != null || finished) {
-                moving = false
-                niloMoving = false
+            if (progress < 1f) {
+                progress = (progress + dt / STEP_TIME).coerceAtMost(1f)
+                if (progress >= 1f) arrive(liaTo)
                 continue
             }
-            // Walk towards the finger.
-            val goal = target
-            if (goal != null) {
-                val d = goal - lia
-                val dist = d.getDistance()
-                if (dist < 2f) {
-                    target = null
-                    moving = false
-                } else {
-                    lia = clampDeck(lia + d / dist * minOf(dist, WALK_SPEED * dt))
-                    if (abs(d.x) > 1f) facing = if (d.x > 0) 1f else -1f
-                    moving = true
+            if (openStation != null || finished) continue
+            val dir = held
+            if (dir == null) {
+                if (clock - lastMoveAt > 9f && niloLine == null) {
+                    say(NiloLines.idle, speak = false)
                     lastMoveAt = clock
                 }
-            } else {
-                moving = false
+                continue
             }
-            if (!moving && clock - lastMoveAt > 8f && niloLine == null) {
-                say(NiloLines.idle, speak = false)
-                lastMoveAt = clock
-            }
-            // Nilo keeps a step behind Lía and catches up when she runs ahead.
-            val gap = lia + Offset(-26f * facing, 14f) - nilo
-            val gapDist = gap.getDistance()
-            niloMoving = gapDist > 3f
-            if (niloMoving) {
-                nilo += gap / gapDist * minOf(gapDist * 4f, WALK_SPEED * 1.3f) * dt
-                if (abs(gap.x) > 1f) niloFacing = if (gap.x > 0) 1f else -1f
-            } else {
-                niloFacing = facing
-            }
-            // Collect diamonds.
-            DIAMONDS.forEachIndexed { i, d ->
-                if (i !in collected && (d - lia).getDistance() < 18f) {
-                    collected += i
-                    viewModel.soundEngine.click()
-                    if (collected.size == 1) say(NiloLines.diamond)
+            if (dir.x != 0) facing = dir.x.toFloat()
+            val next = liaTo + dir
+            val c = ship.at(next)
+            when {
+                c == '#' -> Unit
+                !doorOpen(c) -> if (clock - lastBumpAt > 3f) {
+                    lastBumpAt = clock
+                    viewModel.soundEngine.error()
+                    say(if (c == 'X') NiloLines.needKey else NiloLines.locked)
                 }
-            }
-            // Read the next room fresh each frame (the composition-time value would be stale here).
-            val next = Station.entries.indices.firstOrNull { it !in solved }
-            ROOMS.forEachIndexed { i, room ->
-                if ((room - lia).getDistance() < REACH) {
-                    if (i == next) {
-                        openStation = i
-                        target = null
-                        viewModel.soundEngine.powerUp()
-                    } else if (i !in solved && clock - lastLockedAt > 4f) {
-                        // A locked room: Nilo points to the one that glows.
-                        lastLockedAt = clock
-                        say(NiloLines.locked)
-                    }
+                else -> {
+                    niloFrom = niloTo
+                    niloTo = liaTo
+                    liaFrom = liaTo
+                    liaTo = next
+                    progress = 0f
+                    lastMoveAt = clock
                 }
-            }
-            // Every room solved: pick up the key, then walk out through the hatch.
-            if (next == null && !hasKey && (KEY_SPOT - lia).getDistance() < REACH) {
-                hasKey = true
-                viewModel.soundEngine.powerUp()
-                say(NiloLines.gotKey)
-            }
-            if (hasKey && !finished && (EXIT - lia).getDistance() < REACH + 6f) {
-                finished = true
-                say(NiloLines.home)
-                val kept = (collected.size - lostDiamonds).coerceAtLeast(0)
-                viewModel.completeTablet(tablet, results.values.count { it }, totalQuestions, bonusCredits = kept * 5)
             }
         }
     }
@@ -283,13 +315,7 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
         solvedAt[i] = clock
         openStation = null
         viewModel.soundEngine.fanfare()
-        say(
-            when {
-                i == Station.entries.lastIndex -> NiloLines.findKey
-                solved.size >= Station.entries.size - 2 -> NiloLines.almost
-                else -> NiloLines.praise.random()
-            }
-        )
+        say(if (i == Station.entries.lastIndex) NiloLines.findKey else NiloLines.doorOpen)
     }
 
     val diamonds = (collected.size - lostDiamonds).coerceAtLeast(0)
@@ -302,15 +328,15 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
 
     Column(Modifier.fillMaxSize().background(AdventureBg)) {
         // Header: chapter, a button to reread the story, and the diamonds still held.
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
-            Text("${tablet.level} · ${tablet.title(language)}", color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp, maxLines = 1, modifier = Modifier.weight(1f))
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)) {
+            Text("${tablet.level} · ${tablet.title(language)}", color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp, maxLines = 1, modifier = Modifier.weight(1f))
             TextButton(onClick = { showStory = true }) {
-                Text(language.pick("📖 القصة", "📖 Story"), color = ExplorerBlue, fontWeight = FontWeight.Bold)
+                Text(language.pick("📖 القصة", "📖 Story"), color = ExplorerBlue, fontWeight = FontWeight.Bold, fontSize = 14.sp)
             }
-            if (hasKey) Text("🔑", fontSize = 20.sp, modifier = Modifier.padding(end = 6.dp))
+            if (hasKey) Text("🔑", fontSize = 18.sp, modifier = Modifier.padding(end = 6.dp))
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(end = 6.dp)) {
-                Text("💎 $diamonds", color = SolarAmber, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp)
-                if (clock - lostAt < 1.5f) Text("−1", color = MeteorRed, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp)
+                Text("💎 $diamonds", color = SolarAmber, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
+                if (clock - lostAt < 1.5f) Text("−1", color = MeteorRed, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
             }
         }
 
@@ -326,76 +352,43 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
                 onSpeak = { viewModel.speakSpanish(it) }
             )
             Box(Modifier.weight(1f).fillMaxWidth()) {
-                Canvas(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .pointerInput(Unit) {
-                            // Tap to walk somewhere, or keep the finger down and Lía follows it.
-                            awaitEachGesture {
-                                val down = awaitFirstDown()
-                                val w = size.width.toFloat()
-                                val h = size.height.toFloat()
-                                val first = toDeck(down.position, w, h)
-                                if ((first - (nilo - Offset(0f, LIA_H / 2))).getDistance() < 24f) {
-                                    say(NiloLines.greeting)
-                                    return@awaitEachGesture
-                                }
-                                target = clampDeck(first)
-                                walkedOnce = true
-                                do {
-                                    val event = awaitPointerEvent()
-                                    event.changes.forEach { change ->
-                                        if (change.pressed) {
-                                            target = clampDeck(toDeck(change.position, w, h))
-                                            change.consume()
-                                        }
-                                    }
-                                } while (event.changes.any { it.pressed })
-                            }
-                        }
-                ) {
-                    drawRect(Brush.verticalGradient(listOf(SpaceDeep, SpaceNavy)))
-                    STARS.forEach { drawCircle(StarWhite.copy(alpha = 0.55f), radius = 2f, center = Offset(it.x * size.width, it.y * size.height)) }
-                    val s = deckScale(size.width, size.height)
-                    withTransform({
-                        translate((size.width - DECK_W * s) / 2f, (size.height - DECK_H * s) / 2f)
-                        scale(s, s, pivot = Offset.Zero)
-                    }) {
-                        drawDeck(
-                            walkSprite = walkSprite,
-                            niloSprite = niloSprite,
-                            textMeasurer = textMeasurer,
-                            unitScale = s,
-                            clock = clock,
-                            lia = lia,
-                            facing = facing,
-                            moving = moving,
-                            nilo = nilo,
-                            niloFacing = niloFacing,
-                            niloMoving = niloMoving,
-                            niloSays = niloLine?.es,
-                            solved = solved,
-                            solvedAt = solvedAt,
-                            next = nextStation,
-                            collected = collected,
-                            hasKey = hasKey,
-                            exitLabel = language.pick("المخرج", tl("SALIDA"))
-                        )
-                    }
-                }
-                if (!walkedOnce) {
-                    Text(
-                        language.pick("👆 اضغطي حيث تريدين أن تمشي ليا", "👆 Tap where Lía should walk"),
-                        color = Color.White, fontWeight = FontWeight.Bold, fontSize = 14.sp,
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .padding(bottom = 10.dp)
-                            .clip(RoundedCornerShape(50))
-                            .background(Color.Black.copy(alpha = 0.55f))
-                            .padding(horizontal = 14.dp, vertical = 6.dp)
+                Canvas(Modifier.fillMaxSize()) {
+                    drawShip(
+                        ship = ship,
+                        walkSprite = walkSprite,
+                        niloSprite = niloSprite,
+                        textMeasurer = textMeasurer,
+                        clock = clock,
+                        lia = lerpTile(liaFrom, liaTo, progress),
+                        facing = facing,
+                        walking = progress < 1f,
+                        nilo = lerpTile(niloFrom, niloTo, progress),
+                        niloFacing = if (niloTo.x != niloFrom.x) (niloTo.x - niloFrom.x).toFloat() else facing,
+                        niloSays = niloLine?.es,
+                        solved = solved,
+                        solvedAt = solvedAt,
+                        next = nextStation,
+                        collected = collected,
+                        hasKey = hasKey,
+                        isOpen = ::doorOpen
                     )
                 }
+                // A short title card when a level starts.
+                if (clock < 2.6f) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(SpaceNavy.copy(alpha = 0.88f))
+                            .padding(horizontal = 22.dp, vertical = 14.dp)
+                    ) {
+                        Text("🚀 ${language.pick("المستوى", tl("Nivel"))} $chapterNumber", color = SolarGold, fontWeight = FontWeight.ExtraBold, fontSize = 24.sp)
+                        Text("${tablet.level} · ${tablet.title(language)}", color = StarWhite, fontWeight = FontWeight.Bold, fontSize = 15.sp, textAlign = TextAlign.Center)
+                    }
+                }
             }
+            ArrowPad(onHold = { held = it })
         } else {
             Box(Modifier.weight(1f).fillMaxWidth()) {
                 CompositionLocalProvider(LocalOnMistake provides onMistake) {
@@ -409,12 +402,7 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
                         results = results,
                         viewModel = viewModel,
                         language = language,
-                        onClose = {
-                            openStation = null
-                            // Step back towards the corridor so the room doesn't open again straight away.
-                            val back = CORRIDOR[station] - ROOMS[station]
-                            lia = clampDeck(ROOMS[station] + back / back.getDistance() * (REACH + 18f))
-                        },
+                        onClose = { openStation = null },
                         onSolved = { solve(station) }
                     )
                 }
@@ -436,182 +424,199 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
     }
 }
 
+private fun lerpTile(from: IntOffset, to: IntOffset, t: Float) =
+    Offset(from.x + (to.x - from.x) * t, from.y + (to.y - from.y) * t)
+
+/** ▲ ◀ ▼ ▶ arrows; hold one to keep walking that way. */
+@Composable
+private fun ArrowPad(onHold: (IntOffset?) -> Unit) {
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            modifier = Modifier.fillMaxWidth().background(AdventureBg).padding(vertical = 6.dp)
+        ) {
+            PadButton("▲", ExplorerBlue, size = 54.dp, onPress = { onHold(IntOffset(0, -1)) }, onRelease = { onHold(null) })
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                PadButton("◀", ExplorerBlue, size = 54.dp, onPress = { onHold(IntOffset(-1, 0)) }, onRelease = { onHold(null) })
+                PadButton("▼", ExplorerBlue, size = 54.dp, onPress = { onHold(IntOffset(0, 1)) }, onRelease = { onHold(null) })
+                PadButton("▶", ExplorerBlue, size = 54.dp, onPress = { onHold(IntOffset(1, 0)) }, onRelease = { onHold(null) })
+            }
+        }
+    }
+}
+
 // --------------------------------------------------------------------------- Drawing
 
-private fun DrawScope.drawDeck(
+private val WALL = Color(0xFF7D879E)
+private val WALL_LIGHT = Color(0xFFA9B2C6)
+private val WALL_DARK = Color(0xFF545D73)
+private val FLOOR = Color(0xFFE4E8F0)
+
+private fun DrawScope.drawShip(
+    ship: ShipMap,
     walkSprite: ImageBitmap,
     niloSprite: ImageBitmap,
     textMeasurer: TextMeasurer,
-    unitScale: Float,
     clock: Float,
     lia: Offset,
     facing: Float,
-    moving: Boolean,
+    walking: Boolean,
     nilo: Offset,
     niloFacing: Float,
-    niloMoving: Boolean,
     niloSays: String?,
     solved: List<Int>,
     solvedAt: Map<Int, Float>,
     next: Int?,
-    collected: List<Int>,
+    collected: List<IntOffset>,
     hasKey: Boolean,
-    exitLabel: String
+    isOpen: (Char) -> Boolean
 ) {
-    // Hull and floor plates.
-    val hullTopLeft = Offset(8f, 8f)
-    val hullSize = Size(DECK_W - 16f, DECK_H - 16f)
-    drawRoundRect(Color(0xFF1B2540), topLeft = hullTopLeft, size = hullSize, cornerRadius = CornerRadius(42f))
-    var plate = 38f
-    while (plate < DECK_W - 10f) {
-        drawLine(Color.White.copy(alpha = 0.05f), Offset(plate, 16f), Offset(plate, DECK_H - 16f), strokeWidth = 1f)
-        plate += 30f
+    drawRect(SpaceDeep)
+    val ts = minOf(size.width / MAP_W, size.height / MAP_H)
+    val ox = (size.width - ts * MAP_W) / 2f
+    val oy = (size.height - ts * MAP_H) / 2f
+    fun topLeft(x: Number, y: Number) = Offset(ox + x.toFloat() * ts, oy + y.toFloat() * ts)
+    fun center(p: IntOffset) = topLeft(p.x + 0.5f, p.y + 0.5f)
+    fun text(s: String, c: Offset, scale: Float, color: Color = Color.White, maxWidth: Float? = null) {
+        val layout = textMeasurer.measure(
+            s,
+            TextStyle(color = color, fontSize = (ts * scale).toSp(), fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center),
+            constraints = maxWidth?.let { Constraints(maxWidth = it.toInt()) } ?: Constraints()
+        )
+        drawText(layout, topLeft = Offset(c.x - layout.size.width / 2f, c.y - layout.size.height / 2f))
     }
-    plate = 38f
-    while (plate < DECK_H - 10f) {
-        drawLine(Color.White.copy(alpha = 0.05f), Offset(14f, plate), Offset(DECK_W - 14f, plate), strokeWidth = 1f)
-        plate += 30f
+    // Rooms you can reach are lit; rooms still behind locked doors stay dark.
+    val reached = next ?: EXIT_ROOM
+    fun roomColor(room: Int): Color = when (room) {
+        START_ROOM -> DiamondCyan
+        EXIT_ROOM -> SolarGold
+        else -> Station.entries[room].color
     }
-    drawRoundRect(DiamondCyan.copy(alpha = 0.45f), topLeft = hullTopLeft, size = hullSize, cornerRadius = CornerRadius(42f), style = Stroke(4f))
 
-    // Corridor, and a moving guide line along the stretch that leads to the next goal.
-    val corridor = Path().apply {
-        moveTo(CORRIDOR[0].x, CORRIDOR[0].y)
-        CORRIDOR.drop(1).forEach { lineTo(it.x, it.y) }
+    ship.tiles.forEach { (p, c) ->
+        val tl = topLeft(p.x, p.y)
+        val tile = Size(ts, ts)
+        if (c == '#') {
+            // Bevelled block, like the walls of an old arcade maze.
+            drawRect(WALL, tl, tile)
+            drawRect(WALL_LIGHT, tl, Size(ts, ts * 0.14f))
+            drawRect(WALL_LIGHT, tl, Size(ts * 0.14f, ts))
+            drawRect(WALL_DARK, tl + Offset(0f, ts * 0.86f), Size(ts, ts * 0.14f))
+            drawRect(WALL_DARK, tl + Offset(ts * 0.86f, 0f), Size(ts * 0.14f, ts))
+            return@forEach
+        }
+        drawRect(FLOOR, tl, tile)
+        drawRect(Color(0xFFC9CFDB), tl, tile, style = Stroke(1f))
+        val room = ship.room(p)
+        if (room != null) {
+            drawRect(roomColor(room).copy(alpha = 0.22f), tl, tile)
+            if (room > reached || (room == EXIT_ROOM && next != null)) drawRect(SpaceNavy.copy(alpha = 0.55f), tl, tile)
+        }
+        when (c) {
+            in 'a'..'g', 'X' -> {
+                val color = if (c == 'X') SolarGold else Station.entries[c - 'a'].color
+                if (isOpen(c)) {
+                    // Open door: just the frame.
+                    drawRect(color, tl, Size(ts, ts * 0.12f))
+                    drawRect(color, tl + Offset(0f, ts * 0.88f), Size(ts, ts * 0.12f))
+                } else {
+                    drawRoundRect(color, tl + Offset(ts * 0.06f, ts * 0.06f), Size(ts * 0.88f, ts * 0.88f), CornerRadius(ts * 0.15f))
+                    text(if (c == 'X') "🔑" else "🔒", center(p), 0.42f)
+                }
+            }
+            in '0'..'6' -> {
+                val i = c - '0'
+                val st = Station.entries[i]
+                val done = i in solved
+                val active = i == next
+                if (active) {
+                    val pulse = 0.5f + 0.5f * sin(clock * 4f)
+                    drawCircle(st.color.copy(alpha = 0.25f + 0.25f * pulse), radius = ts * (0.55f + 0.12f * pulse), center = center(p))
+                }
+                val age = clock - (solvedAt[i] ?: -10f)
+                if (done && age < 1.2f) {
+                    drawCircle(SolarGold.copy(alpha = (1.2f - age) / 1.2f), radius = ts * (0.5f + age * 2.5f), center = center(p), style = Stroke(ts * 0.08f))
+                }
+                drawCircle(st.color.copy(alpha = if (done || active) 1f else 0.4f), radius = ts * 0.42f, center = center(p))
+                drawCircle(Color.White, radius = ts * 0.42f, center = center(p), style = Stroke(ts * 0.06f))
+                text(if (done) "✓" else st.emoji, center(p), 0.38f)
+            }
+            '*' -> if (p !in collected) {
+                val bob = sin(clock * 3f + p.x + p.y) * ts * 0.05f
+                val cc = center(p) + Offset(0f, bob)
+                drawCircle(SolarGold.copy(alpha = 0.3f), radius = ts * 0.3f, center = cc)
+                rotate(45f, pivot = cc) { drawRect(SolarGold, cc - Offset(ts * 0.15f, ts * 0.15f), Size(ts * 0.3f, ts * 0.3f)) }
+                rotate(45f, pivot = cc) { drawRect(Color.White.copy(alpha = 0.7f), cc - Offset(ts * 0.15f, ts * 0.15f), Size(ts * 0.3f, ts * 0.3f), style = Stroke(ts * 0.04f)) }
+            }
+            '+' -> if (p !in collected) {
+                val bob = sin(clock * 3f + p.x * 2 + p.y) * ts * 0.05f
+                text("⭐", center(p) + Offset(0f, bob), 0.45f)
+            }
+            'K' -> if (next == null && !hasKey) {
+                val pulse = 0.5f + 0.5f * sin(clock * 5f)
+                drawCircle(SolarGold.copy(alpha = 0.3f + 0.3f * pulse), radius = ts * (0.45f + 0.1f * pulse), center = center(p))
+                text("🔑", center(p), 0.55f)
+            }
+            'E' -> {
+                drawRoundRect(if (hasKey) SolarGold else Color(0xFF8B93A6), tl + Offset(ts * 0.08f, ts * 0.08f), Size(ts * 0.84f, ts * 0.84f), CornerRadius(ts * 0.2f))
+                text("🚪", center(p), 0.5f)
+            }
+        }
     }
-    drawPath(corridor, Color(0xFF2C3A63), style = Stroke(width = 30f, cap = StrokeCap.Round, join = StrokeJoin.Round))
-    val goal = when {
-        next != null -> next + 1
-        !hasKey -> CORRIDOR.size - 2
-        else -> CORRIDOR.lastIndex
-    }
-    drawLine(
-        DiamondCyan.copy(alpha = 0.8f), CORRIDOR[goal - 1], CORRIDOR[goal], strokeWidth = 4f, cap = StrokeCap.Round,
-        pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), -clock * 30f)
-    )
 
-    // Rooms: lit when solved or next, dim and locked otherwise.
+    // Room names next to the pads of the rooms you can reach.
     Station.entries.forEachIndexed { i, st ->
-        val c = ROOMS[i]
-        val topLeft = Offset(c.x - ROOM_W / 2, c.y - ROOM_H / 2)
-        val done = i in solved
-        val active = i == next
-        val lit = done || active
-        drawRoundRect(st.color.copy(alpha = if (done) 0.38f else if (active) 0.28f else 0.10f), topLeft = topLeft, size = Size(ROOM_W, ROOM_H), cornerRadius = CornerRadius(16f))
-        drawRoundRect(st.color.copy(alpha = if (lit) 0.95f else 0.35f), topLeft = topLeft, size = Size(ROOM_W, ROOM_H), cornerRadius = CornerRadius(16f), style = Stroke(if (active) 4f else 2.5f))
-        if (active) {
-            val pulse = 0.5f + 0.5f * sin(clock * 4f)
-            drawCircle(st.color.copy(alpha = 0.2f + 0.25f * pulse), radius = 24f + 8f * pulse, center = c)
-        }
-        val age = clock - (solvedAt[i] ?: -10f)
-        if (done && age < 1.2f) {
-            drawCircle(SolarGold.copy(alpha = (1.2f - age) / 1.2f), radius = 20f + age * 90f, center = c, style = Stroke(4f))
-        }
-        drawCircle(st.color.copy(alpha = if (lit) 1f else 0.35f), radius = 13f, center = c)
-        drawCircle(Color.White.copy(alpha = 0.6f), radius = 13f, center = c, style = Stroke(2f))
-        drawLabel(textMeasurer, unitScale, if (done) "✓" else if (active) st.emoji else "🔒", c.x, c.y - 16f, Color.White, 18)
-        drawLabel(textMeasurer, unitScale, st.es, c.x, topLeft.y + ROOM_H - 4f, Color.White.copy(alpha = if (lit) 1f else 0.5f), 10, maxWidth = ROOM_W - 8f)
+        if (i > reached) return@forEachIndexed
+        val p = ship.pads[i]
+        text(st.es, center(p) + Offset(0f, ts * 0.78f), 0.24f, TextPrimary, maxWidth = ts * 3f)
     }
 
-    // Diamonds.
-    DIAMONDS.forEachIndexed { i, d ->
-        if (i in collected) return@forEachIndexed
-        val bob = sin(clock * 3f + i) * 2f
-        drawCircle(SolarGold.copy(alpha = 0.25f), radius = 11f, center = Offset(d.x, d.y + bob))
-        rotate(45f, pivot = Offset(d.x, d.y + bob)) {
-            drawRect(SolarGold, topLeft = Offset(d.x - 5f, d.y + bob - 5f), size = Size(10f, 10f))
-        }
-    }
-
-    // The key appears in the corridor once every room is solved.
-    if (next == null && !hasKey) {
-        val bob = sin(clock * 3f) * 4f
-        val pulse = 0.5f + 0.5f * sin(clock * 5f)
-        drawCircle(SolarGold.copy(alpha = 0.25f + 0.25f * pulse), radius = 22f + 6f * pulse, center = KEY_SPOT + Offset(0f, bob))
-        drawLabel(textMeasurer, unitScale, "🔑", KEY_SPOT.x, KEY_SPOT.y + bob + 12f, Color.White, 26)
-    }
-
-    // Exit hatch: grey and locked until Lía carries the key.
-    val hatchTopLeft = Offset(EXIT.x - 38f, EXIT.y - 28f)
-    val hatchColor = if (hasKey) SolarGold else Color(0xFF55607A)
-    if (hasKey) {
-        val pulse = 0.5f + 0.5f * sin(clock * 5f)
-        drawRoundRect(SolarGold.copy(alpha = 0.25f * pulse), topLeft = hatchTopLeft - Offset(8f, 8f), size = Size(92f, 72f), cornerRadius = CornerRadius(18f))
-    }
-    drawRoundRect(hatchColor.copy(alpha = 0.35f), topLeft = hatchTopLeft, size = Size(76f, 56f), cornerRadius = CornerRadius(12f))
-    drawRoundRect(hatchColor, topLeft = hatchTopLeft, size = Size(76f, 56f), cornerRadius = CornerRadius(12f), style = Stroke(3f))
-    drawLabel(textMeasurer, unitScale, if (hasKey) "🚪" else "🔒", EXIT.x, EXIT.y + 6f, Color.White, 18)
-    drawLabel(textMeasurer, unitScale, exitLabel, EXIT.x, EXIT.y + 24f, Color.White, 10)
-
-    // Characters, the one further down drawn last so she stands in front.
+    // Characters: whoever is lower on the screen is drawn last, in front.
+    val spriteH = ts * 1.45f
     val drawNilo = {
-        val frame = if (niloMoving) ((clock * 9f).toInt() + 2) % 4 else 0
-        drawOval(Color(0x66000000), topLeft = Offset(nilo.x - 13f, nilo.y - 4f), size = Size(26f, 8f))
+        val feet = topLeft(nilo.x + 0.5f, nilo.y + 0.9f)
+        drawOval(Color(0x55000000), topLeft = feet - Offset(ts * 0.25f, ts * 0.07f), size = Size(ts * 0.5f, ts * 0.14f))
         withTransform({
-            translate(nilo.x, nilo.y)
+            translate(feet.x, feet.y)
             scale(niloFacing, 1f, pivot = Offset.Zero)
-        }) { drawNiloSprite(niloSprite, frame, LIA_H * 0.95f) }
+        }) { drawNiloSprite(niloSprite, if (walking) ((clock * 9f).toInt() + 2) % 4 else 0, spriteH * 0.92f) }
     }
     val drawLia = {
-        val r = WALK_FRAMES[if (moving) (clock * 9f).toInt() % 4 else 0]
-        val drawW = r[2].toFloat() / r[3] * LIA_H
-        drawOval(Color(0x66000000), topLeft = Offset(lia.x - 14f, lia.y - 4f), size = Size(28f, 8f))
+        val feet = topLeft(lia.x + 0.5f, lia.y + 0.9f)
+        val r = WALK_FRAMES[if (walking) (clock * 9f).toInt() % 4 else 0]
+        val w = r[2].toFloat() / r[3] * spriteH
+        drawOval(Color(0x66000000), topLeft = feet - Offset(ts * 0.28f, ts * 0.07f), size = Size(ts * 0.56f, ts * 0.14f))
         withTransform({
-            translate(lia.x, lia.y)
+            translate(feet.x, feet.y)
             scale(facing, 1f, pivot = Offset.Zero)
         }) {
             drawImage(
                 walkSprite,
                 srcOffset = IntOffset(r[0], r[1]),
                 srcSize = IntSize(r[2], r[3]),
-                dstOffset = IntOffset((-drawW / 2).toInt(), (-LIA_H).toInt()),
-                dstSize = IntSize(drawW.toInt(), LIA_H.toInt())
+                dstOffset = IntOffset((-w / 2).toInt(), (-spriteH).toInt()),
+                dstSize = IntSize(w.toInt(), spriteH.toInt())
             )
         }
     }
     if (nilo.y <= lia.y) { drawNilo(); drawLia() } else { drawLia(); drawNilo() }
-    niloSays?.let { drawBubble(textMeasurer, unitScale, it, nilo.x.coerceIn(80f, DECK_W - 80f), nilo.y - LIA_H - 4f) }
-}
-
-private fun DrawScope.drawLabel(
-    textMeasurer: TextMeasurer,
-    unitScale: Float,
-    text: String,
-    centerX: Float,
-    y: Float,
-    color: Color,
-    fontSize: Int = 12,
-    maxWidth: Float? = null
-) {
-    val layout = textMeasurer.measure(
-        text,
-        TextStyle(color = color, fontSize = fontSize.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center),
-        constraints = maxWidth?.let { Constraints(maxWidth = (it * unitScale).toInt()) } ?: Constraints()
-    )
-    // The deck is drawn scaled; undo that around the label's anchor so text keeps its normal size.
-    withTransform({ scale(1f / unitScale, 1f / unitScale, pivot = Offset(centerX, y)) }) {
-        drawText(layout, topLeft = Offset(centerX - layout.size.width / 2f, y - layout.size.height))
+    niloSays?.let {
+        val head = topLeft(nilo.x + 0.5f, nilo.y + 0.9f) - Offset(0f, spriteH + 4f)
+        drawBubble(textMeasurer, it, head.x.coerceIn(size.width * 0.2f, size.width * 0.8f), head.y.coerceAtLeast(40f))
     }
 }
 
-/** Speech bubble whose bottom edge sits at [bottomY], centred on [centerX]. Text keeps its natural size. */
-private fun DrawScope.drawBubble(
-    textMeasurer: TextMeasurer,
-    unitScale: Float,
-    text: String,
-    centerX: Float,
-    bottomY: Float
-) {
+/** Speech bubble whose bottom edge sits at [bottomY], centred on [centerX]. */
+private fun DrawScope.drawBubble(textMeasurer: TextMeasurer, text: String, centerX: Float, bottomY: Float) {
     val layout = textMeasurer.measure(text, TextStyle(color = TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.Bold))
-    val w = layout.size.width / unitScale + 18f
-    val h = layout.size.height / unitScale + 10f
+    val w = layout.size.width + 16.dp.toPx()
+    val h = layout.size.height + 10.dp.toPx()
     val left = centerX - w / 2
     val top = bottomY - h
-    drawRoundRect(AdventureSurface, topLeft = Offset(left, top), size = Size(w, h), cornerRadius = CornerRadius(9f))
-    drawRoundRect(SolarAmber, topLeft = Offset(left, top), size = Size(w, h), cornerRadius = CornerRadius(9f), style = Stroke(2f))
-    withTransform({ scale(1f / unitScale, 1f / unitScale, pivot = Offset(centerX, top + h / 2)) }) {
-        drawText(layout, topLeft = Offset(centerX - layout.size.width / 2f, top + h / 2 - layout.size.height / 2f))
-    }
+    drawRoundRect(AdventureSurface, topLeft = Offset(left, top), size = Size(w, h), cornerRadius = CornerRadius(9.dp.toPx()))
+    drawRoundRect(SolarAmber, topLeft = Offset(left, top), size = Size(w, h), cornerRadius = CornerRadius(9.dp.toPx()), style = Stroke(2.dp.toPx()))
+    drawText(layout, topLeft = Offset(centerX - layout.size.width / 2f, top + h / 2 - layout.size.height / 2f))
 }
 
 // --------------------------------------------------------------------------- Panels
@@ -731,8 +736,8 @@ private fun MissionPanel(
             Surface(shape = RoundedCornerShape(12.dp), color = accent) {
                 Text(
                     "${station.emoji} ${station.es}",
-                    color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp,
-                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
+                    color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 14.sp,
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
                 )
             }
             Text(station.label(language), color = TextSecondary, fontSize = 12.sp, maxLines = 1, modifier = Modifier.weight(1f).padding(start = 8.dp))
@@ -762,7 +767,7 @@ private fun MissionPanel(
                         Step.Order -> OrderPuzzle(tablet.order, tablet.orderTranslation(language), results, viewModel, language)
                         is Step.Note -> if (step.text.isNotBlank()) AdventureCard(borderColor = accent) {
                             Text(step.emoji, fontSize = 30.sp)
-                            Text(step.text, color = TextPrimary, fontSize = 17.sp, lineHeight = 26.sp, modifier = Modifier.fillMaxWidth())
+                            Text(step.text, color = TextPrimary, fontSize = 15.sp, lineHeight = 22.sp, modifier = Modifier.fillMaxWidth())
                         }
                     }
                 }
@@ -799,7 +804,7 @@ private fun SentenceCard(step: Step.Sentence, viewModel: BlasterViewModel, langu
             modifier = Modifier.weight(1f)
         ) {
             Column(Modifier.padding(16.dp)) {
-                Text(step.text, color = TextPrimary, fontSize = 24.sp, lineHeight = 32.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.fillMaxWidth())
+                Text(step.text, color = TextPrimary, fontSize = 20.sp, lineHeight = 27.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.fillMaxWidth())
                 Spacer(Modifier.height(10.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text("${step.number} / ${step.total}", color = TextSecondary, fontSize = 12.sp, modifier = Modifier.weight(1f))
@@ -824,7 +829,7 @@ private fun ChoiceCard(step: Step.Choice, results: MutableMap<String, Boolean>, 
     val accepted = remember(step) { step.answers.flatMap { it.split("/") }.map { normalizeAnswer(it) } }
     val solved = step.key in results
     AdventureCard(borderColor = if (solved) SuccessGreen else ExplorerBlue) {
-        Text(step.prompt, color = TextPrimary, fontSize = 22.sp, lineHeight = 30.sp, fontWeight = FontWeight.Bold, modifier = Modifier.fillMaxWidth())
+        Text(step.prompt, color = TextPrimary, fontSize = 19.sp, lineHeight = 26.sp, fontWeight = FontWeight.Bold, modifier = Modifier.fillMaxWidth())
     }
     Text(
         language.pick("اضغطي على الإجابة الصحيحة لتقفز ليا إليها!", "Tap the right answer and Lía jumps onto it!"),
@@ -856,87 +861,91 @@ private fun ChoiceCard(step: Step.Choice, results: MutableMap<String, Boolean>, 
     }
 }
 
-/** Words fall through space like meteors: tap the right one. Wrong taps cost a diamond. */
+/**
+ * The meteor game inside the ship: the answers fall as meteors and must be shot before they land.
+ * A wrong shot or a meteor shower that lands costs a diamond; after two misses the answer is shown.
+ */
 @Composable
 private fun FallingWordsCard(step: Step.Falling, results: MutableMap<String, Boolean>, viewModel: BlasterViewModel, language: HelperLanguage) {
     val onMistake = LocalOnMistake.current
-    val wrong = remember(step.key) { mutableStateListOf<String>() }
+    val wrong = remember(step.key) { mutableStateListOf<Int>() }
     val accepted = remember(step) { step.answers.flatMap { it.split("/") }.map { normalizeAnswer(it) } }
+    val correctIndex = step.options.indexOfFirst { normalizeAnswer(it) in accepted }
     val solved = step.key in results
-    var clock by remember(step.key) { mutableFloatStateOf(0f) }
-    LaunchedEffect(step.key, solved) {
-        if (solved) return@LaunchedEffect
-        var last = withFrameNanos { it }
-        while (true) {
-            val now = withFrameNanos { it }
-            clock += ((now - last) / 1_000_000_000f).coerceAtMost(0.05f)
-            last = now
+    val fall = remember(step.key) { Animatable(0f) }
+    var wave by remember(step.key) { mutableIntStateOf(0) }
+    var misses by remember(step.key) { mutableIntStateOf(0) }
+    var blasted by remember(step.key) { mutableStateOf<Int?>(null) }
+
+    fun miss() {
+        misses++
+        viewModel.soundEngine.error()
+        onMistake()
+        if (misses >= 2) results[step.key] = false
+    }
+
+    LaunchedEffect(step.key, wave) {
+        if (step.key in results) return@LaunchedEffect
+        fall.snapTo(0f)
+        fall.animateTo(1f, tween(9000, easing = LinearEasing))
+        // The meteors landed before the right one was shot.
+        if (step.key !in results) {
+            miss()
+            if (step.key !in results) {
+                delay(1200)
+                wave++
+            }
         }
     }
+    LaunchedEffect(solved) { if (solved) fall.stop() }
+
     AdventureCard(borderColor = if (solved) SuccessGreen else SolarGold) {
-        Text(step.prompt, color = TextPrimary, fontSize = 22.sp, lineHeight = 30.sp, fontWeight = FontWeight.Bold, modifier = Modifier.fillMaxWidth())
+        Text(step.prompt, color = TextPrimary, fontSize = 19.sp, lineHeight = 26.sp, fontWeight = FontWeight.Bold, modifier = Modifier.fillMaxWidth())
     }
     Text(
-        language.pick("☄️ اضغطي على الكلمة الصحيحة وهي تسقط!", "☄️ Tap the right word as it falls!"),
+        language.pick("☄️ اضغطي على النيزك الصحيح قبل أن يسقط!", "☄️ Shoot the right meteor before it lands!"),
         color = TextSecondary, fontSize = 13.sp, fontWeight = FontWeight.SemiBold
     )
     BoxWithConstraints(
         Modifier
             .fillMaxWidth()
-            .height(280.dp)
+            .height(300.dp)
             .clip(RoundedCornerShape(18.dp))
-            .background(Brush.verticalGradient(listOf(SpaceDeep, SpaceNavy, Color(0xFF2A1F6B))))
+            .background(Brush.verticalGradient(listOf(SpaceDeep, SpaceNavy)))
     ) {
-        Canvas(Modifier.matchParentSize()) {
-            STARS.forEach { drawCircle(StarWhite.copy(alpha = 0.5f), radius = 2f, center = Offset(it.x * size.width, it.y * size.height)) }
-        }
-        val count = step.options.size.coerceAtLeast(1)
-        val laneW = maxWidth / count
-        step.options.forEachIndexed { i, option ->
-            val isAnswer = normalizeAnswer(option) in accepted
-            // Each word falls in its own lane at its own speed, then starts again from the top.
-            val speed = 0.10f + 0.03f * ((i * 2) % count)
-            val t = if (solved && isAnswer) 0.45f else (i * 0.29f + clock * speed) % 1f
-            val y = (maxHeight + 52.dp) * t - 52.dp
-            val color = when {
-                solved && isAnswer -> SuccessGreen
-                option in wrong -> MeteorRed
-                else -> SolarGold
-            }
-            Surface(
+        StarField(Modifier.matchParentSize())
+        val laneWidth = maxWidth / step.options.size.coerceAtLeast(1)
+        val meteorSize = minOf(laneWidth - 8.dp, 92.dp)
+        val travel = maxHeight - meteorSize - 44.dp
+        step.options.forEachIndexed { index, option ->
+            val stagger = (index % 2) * 0.06f
+            val progress = (fall.value * (1f + stagger) - stagger).coerceIn(0f, 1f)
+            Meteor(
+                text = option,
+                wrong = index in wrong,
+                blasted = blasted == index,
+                reveal = solved && blasted == null && index == correctIndex,
+                modifier = Modifier
+                    .offset(x = laneWidth * index + (laneWidth - meteorSize) / 2, y = travel * progress)
+                    .size(meteorSize),
                 onClick = {
-                    if (!solved && option !in wrong) {
-                        if (isAnswer) {
-                            results[step.key] = wrong.isEmpty()
+                    if (step.key !in results) {
+                        if (index == correctIndex) {
+                            blasted = index
+                            results[step.key] = wrong.isEmpty() && misses == 0
                             viewModel.soundEngine.hit()
                             viewModel.speakSpanish(option)
                         } else {
-                            wrong += option
-                            viewModel.soundEngine.error()
-                            onMistake()
-                            if (wrong.size >= 2) results[step.key] = false
+                            wrong += index
+                            miss()
                         }
                     }
-                },
-                shape = RoundedCornerShape(16.dp),
-                color = color,
-                shadowElevation = 6.dp,
-                modifier = Modifier
-                    .offset(x = laneW * i + 4.dp, y = y)
-                    .width(laneW - 8.dp)
-            ) {
-                Text(
-                    option,
-                    color = if (color == SolarGold) SpaceNavy else Color.White,
-                    fontWeight = FontWeight.ExtraBold,
-                    fontSize = 15.sp,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 10.dp)
-                )
-            }
+                }
+            )
         }
+        Text("🛸", fontSize = 34.sp, modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 4.dp))
     }
-    if (wrong.isNotEmpty() && step.hint.isNotBlank()) {
+    if ((wrong.isNotEmpty() || misses > 0) && step.hint.isNotBlank()) {
         Text("💡 Nilo: " + step.hint, color = SolarAmber, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.fillMaxWidth())
     }
 }

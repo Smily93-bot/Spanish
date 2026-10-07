@@ -226,7 +226,7 @@ private fun Arena(state: MeteorGameState, viewModel: BlasterViewModel, language:
 }
 
 @Composable
-private fun Meteor(text: String, wrong: Boolean, blasted: Boolean, reveal: Boolean, modifier: Modifier, onClick: () -> Unit) {
+internal fun Meteor(text: String, wrong: Boolean, blasted: Boolean, reveal: Boolean, modifier: Modifier, onClick: () -> Unit) {
     val scale by animateFloatAsState(if (blasted) 1.4f else 1f, tween(250), label = "blast")
     val alpha by animateFloatAsState(if (blasted) 0f else if (wrong) 0.35f else 1f, tween(450), label = "fade")
     val rotation = rememberInfiniteTransition(label = "spin")
@@ -262,7 +262,7 @@ private fun Meteor(text: String, wrong: Boolean, blasted: Boolean, reveal: Boole
 }
 
 @Composable
-private fun StarField(modifier: Modifier) {
+internal fun StarField(modifier: Modifier) {
     val stars = remember { List(60) { Triple(Random.nextFloat(), Random.nextFloat(), Random.nextFloat() * 2.5f + 0.5f) } }
     val twinkle = rememberInfiniteTransition(label = "stars")
     val alpha by twinkle.animateFloat(0.4f, 1f, infiniteRepeatable(tween(1600), RepeatMode.Reverse), label = "twinkle")

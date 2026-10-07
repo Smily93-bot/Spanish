@@ -3,6 +3,8 @@ package com.example.ui.screens
 import com.example.flavor.tl
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -271,23 +273,38 @@ private fun CellInput(answer: String, key: String, results: MutableMap<String, B
         text = answer.split("/").first().trim()
         results[key] = false
     }
-    OutlinedTextField(
+    // A compact box so the whole table fits on screen, even with the keyboard open.
+    BasicTextField(
         value = text,
         onValueChange = { if (!solved) text = it },
         singleLine = true,
-        isError = mistakes > 0 && !solved,
-        textStyle = LocalTextStyle.current.copy(fontSize = 13.sp, fontWeight = FontWeight.Bold, color = if (solved) SuccessGreen else TextPrimary),
+        textStyle = LocalTextStyle.current.copy(fontSize = 14.sp, fontWeight = FontWeight.Bold, color = if (solved) SuccessGreen else TextPrimary),
         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.None, autoCorrectEnabled = false, imeAction = ImeAction.Done),
         keyboardActions = KeyboardActions(onDone = { check() }),
-        trailingIcon = {
-            when {
-                solved -> Text("✓", color = SuccessGreen)
-                // After two wrong tries the eye shows the answer — only when tapped on purpose.
-                mistakes >= 2 -> Text("👁", modifier = Modifier.clickable { reveal() })
-                else -> Text("↵", color = ExplorerBlue, modifier = Modifier.clickable { check() })
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(38.dp)
+            .border(
+                1.5.dp,
+                when {
+                    solved -> SuccessGreen
+                    mistakes > 0 -> MeteorRed
+                    else -> ExplorerBlue.copy(alpha = 0.5f)
+                },
+                RoundedCornerShape(8.dp)
+            )
+            .padding(horizontal = 8.dp),
+        decorationBox = { inner ->
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxSize()) {
+                Box(Modifier.weight(1f)) { inner() }
+                when {
+                    solved -> Text("✓", color = SuccessGreen, fontWeight = FontWeight.Bold)
+                    // After two wrong tries the eye shows the answer — only when tapped on purpose.
+                    mistakes >= 2 -> Text("👁", modifier = Modifier.clickable { reveal() })
+                    else -> Text("↵", color = ExplorerBlue, fontWeight = FontWeight.Bold, modifier = Modifier.clickable { check() })
+                }
             }
-        },
-        modifier = Modifier.fillMaxWidth()
+        }
     )
 }
 
