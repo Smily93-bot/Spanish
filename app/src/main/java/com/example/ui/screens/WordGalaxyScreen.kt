@@ -678,7 +678,6 @@ private fun Feedback(
     viewModel: BlasterViewModel,
     onContinue: () -> Unit
 ) {
-    val praise = remember(key) { NiloLines.praise.random() }
     val miss = NiloLine(tl("¡Casi! Lo repetimos luego."), "كدتِ! سنعيدها بعد قليل.", "Almost! We'll try it again soon.")
     Surface(
         shape = RoundedCornerShape(18.dp),
@@ -687,16 +686,12 @@ private fun Feedback(
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            NiloSays(
-                line = if (correct) praise else miss,
-                language = language,
-                onSpeak = { viewModel.speakSpanish(if (correct) praise.es else miss.es) },
-                size = 44.dp
-            )
+            // Short and to the point: no cheering after every right answer, just the meaning.
             Text(
-                "${word.shortSpanish} = ${word.meaning(language)}",
-                color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp
+                (if (correct) "✅ " else "❌ ") + "${word.shortSpanish} = ${word.meaning(language)}",
+                color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp
             )
+            if (!correct) Text("💡 " + miss.meaning(language), color = MeteorRed, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
             if (word.exampleEs.isNotBlank()) {
                 Text(language.pick("💬 مثال", "💬 Example"), color = NebulaPurple, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
                 Text(word.exampleEs, color = TextPrimary, fontSize = 13.sp)

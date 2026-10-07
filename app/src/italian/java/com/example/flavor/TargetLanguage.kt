@@ -336,6 +336,17 @@ private val ITALIAN = mapOf(
     "Siguiente ▶" to "Avanti ▶",
     "¡Gran salto!" to "Gran salto!",
     "¡Ya casi lo tenemos!" to "Ci siamo quasi!",
+    // Top-down ship deck
+    "Sala de radio" to "Sala radio",
+    "Bodega" to "Stiva",
+    "Sala de máquinas" to "Sala macchine",
+    "Puente de mando" to "Ponte di comando",
+    "Lluvia de palabras" to "Pioggia di parole",
+    "SALIDA" to "USCITA",
+    "¡A por la llave! 🔑" to "Alla chiave! 🔑",
+    "¡Primero la sala que brilla!" to "Prima la stanza che brilla!",
+    "¡Mira, la llave!" to "Guarda, la chiave!",
+    "¡Tenemos la llave! ¡A la salida!" to "Abbiamo la chiave! All'uscita!",
 )
 
 /** Same word with the wrong gender or number, used as tempting wrong answers: rossa → rosso, rosse. */

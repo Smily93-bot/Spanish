@@ -54,7 +54,9 @@ fun TabletCodexScreen(viewModel: BlasterViewModel) {
     reward?.let {
         RewardDialog(it, isArabic, language.pick("📜 استعدتِ صفحة الأطلس!", tl("📜 ¡Página del atlas recuperada!"))) {
             viewModel.dismissPracticeReward()
-            viewModel.navigateBack()
+            // Walking out through the hatch leads straight into the next level.
+            val next = tablet?.let { data.tablets.getOrNull(data.tablets.indexOf(it) + 1) }
+            if (next != null) viewModel.openTablet(next.id) else viewModel.navigateBack()
         }
     }
 }
@@ -303,7 +305,7 @@ internal fun QuestionGroup(
 }
 
 @Composable
-private fun QuestionCard(
+internal fun QuestionCard(
     field: TabletField,
     key: String,
     results: MutableMap<String, Boolean>,
