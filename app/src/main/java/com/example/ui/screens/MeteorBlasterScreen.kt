@@ -88,7 +88,7 @@ private fun ModeSelect(viewModel: BlasterViewModel, language: HelperLanguage) {
                 .clip(RoundedCornerShape(22.dp))
                 .background(Brush.verticalGradient(listOf(SpaceDeep, SpaceNavy)))
         ) {
-            StarField(Modifier.matchParentSize())
+            MeteorStarField(Modifier.matchParentSize())
             Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(language.pick("☄️ مدفع النيازك ☄️", "☄️ METEOR BLASTER ☄️"), color = SolarGold, fontWeight = FontWeight.ExtraBold, fontSize = 22.sp)
                 Text(
@@ -197,7 +197,7 @@ private fun Arena(state: MeteorGameState, viewModel: BlasterViewModel, language:
 
         // Falling meteors
         BoxWithConstraints(Modifier.fillMaxWidth().weight(1f)) {
-            StarField(Modifier.matchParentSize())
+            MeteorStarField(Modifier.matchParentSize())
             val laneWidth = maxWidth / state.options.size.coerceAtLeast(1)
             val meteorSize = minOf(laneWidth - 8.dp, 92.dp)
             val travel = maxHeight - meteorSize - 56.dp
@@ -262,7 +262,7 @@ internal fun Meteor(text: String, wrong: Boolean, blasted: Boolean, reveal: Bool
 }
 
 @Composable
-internal fun StarField(modifier: Modifier) {
+internal fun MeteorStarField(modifier: Modifier) {
     val stars = remember { List(60) { Triple(Random.nextFloat(), Random.nextFloat(), Random.nextFloat() * 2.5f + 0.5f) } }
     val twinkle = rememberInfiniteTransition(label = "stars")
     val alpha by twinkle.animateFloat(0.4f, 1f, infiniteRepeatable(tween(1600), RepeatMode.Reverse), label = "twinkle")

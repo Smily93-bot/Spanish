@@ -913,7 +913,7 @@ private fun FallingWordsCard(step: Step.Falling, results: MutableMap<String, Boo
             .clip(RoundedCornerShape(18.dp))
             .background(Brush.verticalGradient(listOf(SpaceDeep, SpaceNavy)))
     ) {
-        StarField(Modifier.matchParentSize())
+        MeteorStarField(Modifier.matchParentSize())
         val laneWidth = maxWidth / step.options.size.coerceAtLeast(1)
         val meteorSize = minOf(laneWidth - 8.dp, 92.dp)
         val travel = maxHeight - meteorSize - 44.dp
