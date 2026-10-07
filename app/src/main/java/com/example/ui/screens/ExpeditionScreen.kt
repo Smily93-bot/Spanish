@@ -94,27 +94,27 @@ private enum class Station(val emoji: String, val es: String, val ar: String, va
  * The ship seen from above, one character per tile:
  * `#` wall, `.` floor, `P` start, `0`–`6` the pad of each room, `a`–`g` the door into room 0–6
  * (it opens when the room before is solved), `X` the exit door (needs the key), `K` where the key
- * appears, `E` the exit hatch, `*` a diamond and `+` a star.
+ * appears, `E` the exit hatch and `*` a diamond.
  *
  * Rooms snake upwards: start → 0 → 1 along the bottom, 2 → 3 → 4 back along the middle,
  * 5 → 6 → exit along the top.
  */
 private val SHIP = listOf(
     "#############",
-    "#*.+#*..#..E#",
+    "#*..#*..#..E#",
     "#.5.g.6.X...#",
     "#...#.K.#...#",
-    "#+.*#*.+#...#",
+    "#..*#*..#...#",
     "##f##########",
-    "#*.+#+.*#*.+#",
+    "#*..#..*#*..#",
     "#.4.e.3.d.2.#",
     "#...#...#...#",
-    "#+.*#*.+#+.*#",
+    "#..*#*..#..*#",
     "##########c##",
-    "#...#*.+#*.+#",
+    "#...#*..#*..#",
     "#.P.a.0.b.1.#",
     "#...#...#...#",
-    "#...#+.*#+.*#",
+    "#...#..*#..*#",
     "#############"
 )
 private const val MAP_W = 13
@@ -235,7 +235,7 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
     /** Lía has just stepped onto [p]: pick things up, open the room's game, take the key, leave. */
     fun arrive(p: IntOffset) {
         when (val c = ship.at(p)) {
-            '*', '+' -> if (p !in collected) {
+            '*' -> if (p !in collected) {
                 collected += p
                 viewModel.soundEngine.click()
                 if (collected.size == 1) say(NiloLines.diamond)
@@ -448,10 +448,16 @@ private fun ArrowPad(onHold: (IntOffset?) -> Unit) {
 
 // --------------------------------------------------------------------------- Drawing
 
-private val WALL = Color(0xFF7D879E)
-private val WALL_LIGHT = Color(0xFFA9B2C6)
-private val WALL_DARK = Color(0xFF545D73)
-private val FLOOR = Color(0xFFE4E8F0)
+private val HULL = Color(0xFF1E2A48)
+private val HULL_LIGHT = Color(0xFF2E3D63)
+private val FLOOR_PLATE = Color(0xFF3A4A72)
+private val FLOOR_SEAM = Color(0xFF28365A)
+
+/** Fixed star field (fractions of the view), so it doesn't flicker between frames. */
+private val SPACE_STARS: List<Offset> = List(80) { i ->
+    val r = kotlin.random.Random(i * 7919 + 13)
+    Offset(r.nextFloat(), r.nextFloat())
+}
 
 private fun DrawScope.drawShip(
     ship: ShipMap,
@@ -472,10 +478,16 @@ private fun DrawScope.drawShip(
     hasKey: Boolean,
     isOpen: (Char) -> Boolean
 ) {
-    drawRect(SpaceDeep)
-    val ts = minOf(size.width / MAP_W, size.height / MAP_H)
+    // Space all around the ship.
+    drawRect(Brush.verticalGradient(listOf(SpaceDeep, SpaceNavy)))
+    SPACE_STARS.forEachIndexed { i, s ->
+        drawCircle(StarWhite.copy(alpha = 0.35f + 0.3f * sin(clock * 1.5f + i)), radius = 1.6f + (i % 3), center = Offset(s.x * size.width, s.y * size.height))
+    }
+
+    // Room for the nose on top, the engines below and the wings at the sides.
+    val ts = minOf(size.width / (MAP_W + 3f), size.height / (MAP_H + 2.4f))
     val ox = (size.width - ts * MAP_W) / 2f
-    val oy = (size.height - ts * MAP_H) / 2f
+    val oy = (size.height - ts * (MAP_H + 2.4f)) / 2f + ts * 1.5f
     fun topLeft(x: Number, y: Number) = Offset(ox + x.toFloat() * ts, oy + y.toFloat() * ts)
     fun center(p: IntOffset) = topLeft(p.x + 0.5f, p.y + 0.5f)
     fun text(s: String, c: Offset, scale: Float, color: Color = Color.White, maxWidth: Float? = null) {
@@ -486,6 +498,49 @@ private fun DrawScope.drawShip(
         )
         drawText(layout, topLeft = Offset(c.x - layout.size.width / 2f, c.y - layout.size.height / 2f))
     }
+    val shipW = ts * MAP_W
+    val shipH = ts * MAP_H
+
+    // Engines: two nozzles with flickering flames.
+    listOf(3.5f, MAP_W - 3.5f).forEachIndexed { k, ex ->
+        val cx = ox + ex * ts
+        val flame = ts * (1.0f + 0.25f * sin(clock * 18f + k * 2f))
+        drawPath(
+            Path().apply {
+                moveTo(cx - ts * 0.55f, oy + shipH)
+                lineTo(cx + ts * 0.55f, oy + shipH)
+                lineTo(cx, oy + shipH + flame)
+                close()
+            },
+            Brush.verticalGradient(listOf(SolarGold, SolarAmber, Color.Transparent), startY = oy + shipH, endY = oy + shipH + flame)
+        )
+        drawRect(HULL_LIGHT, topLeft = Offset(cx - ts * 0.7f, oy + shipH - ts * 0.2f), size = Size(ts * 1.4f, ts * 0.35f))
+    }
+    // Wings.
+    for (side in listOf(-1f, 1f)) {
+        val edge = if (side < 0) ox else ox + shipW
+        val wing = Path().apply {
+            moveTo(edge, oy + ts * 6f)
+            lineTo(edge + side * ts * 1.5f, oy + ts * 11f)
+            lineTo(edge + side * ts * 1.5f, oy + ts * 14.5f)
+            lineTo(edge, oy + ts * 14.5f)
+            close()
+        }
+        drawPath(wing, HULL)
+        drawPath(wing, DiamondCyan.copy(alpha = 0.5f), style = Stroke(ts * 0.06f))
+        // Blinking light at the wing tip.
+        drawCircle(if (side < 0) MeteorRed else SuccessGreen, radius = ts * 0.15f * (0.7f + 0.3f * sin(clock * 4f)), center = Offset(edge + side * ts * 1.5f, oy + ts * 11f))
+    }
+    // Nose with the cockpit window.
+    drawOval(HULL, topLeft = Offset(ox, oy - ts * 1.5f), size = Size(shipW, ts * 3f))
+    drawOval(DiamondCyan.copy(alpha = 0.5f), topLeft = Offset(ox, oy - ts * 1.5f), size = Size(shipW, ts * 3f), style = Stroke(ts * 0.06f))
+    drawOval(
+        Brush.verticalGradient(listOf(DiamondCyan, ExplorerBlue), startY = oy - ts * 1.2f, endY = oy - ts * 0.4f),
+        topLeft = Offset(ox + shipW / 2 - ts * 1.6f, oy - ts * 1.2f), size = Size(ts * 3.2f, ts * 0.9f)
+    )
+    // Hull body.
+    drawRoundRect(HULL, topLeft = Offset(ox, oy), size = Size(shipW, shipH), cornerRadius = CornerRadius(ts * 0.6f))
+
     // Rooms you can reach are lit; rooms still behind locked doors stay dark.
     val reached = next ?: EXIT_ROOM
     fun roomColor(room: Int): Color = when (room) {
@@ -493,36 +548,62 @@ private fun DrawScope.drawShip(
         EXIT_ROOM -> SolarGold
         else -> Station.entries[room].color
     }
+    fun walkable(p: IntOffset) = ship.at(p) != '#'
 
     ship.tiles.forEach { (p, c) ->
         val tl = topLeft(p.x, p.y)
         val tile = Size(ts, ts)
         if (c == '#') {
-            // Bevelled block, like the walls of an old arcade maze.
-            drawRect(WALL, tl, tile)
-            drawRect(WALL_LIGHT, tl, Size(ts, ts * 0.14f))
-            drawRect(WALL_LIGHT, tl, Size(ts * 0.14f, ts))
-            drawRect(WALL_DARK, tl + Offset(0f, ts * 0.86f), Size(ts, ts * 0.14f))
-            drawRect(WALL_DARK, tl + Offset(ts * 0.86f, 0f), Size(ts * 0.14f, ts))
+            // Hull wall: dark metal with a glowing edge where it meets a room.
+            drawRect(HULL, tl, tile)
+            drawRect(HULL_LIGHT, tl + Offset(ts * 0.12f, ts * 0.12f), Size(ts * 0.76f, ts * 0.76f))
+            val glow = DiamondCyan.copy(alpha = 0.55f)
+            val w = ts * 0.06f
+            if (walkable(p + IntOffset(0, -1))) drawRect(glow, tl, Size(ts, w))
+            if (walkable(p + IntOffset(0, 1))) drawRect(glow, tl + Offset(0f, ts - w), Size(ts, w))
+            if (walkable(p + IntOffset(-1, 0))) drawRect(glow, tl, Size(w, ts))
+            if (walkable(p + IntOffset(1, 0))) drawRect(glow, tl + Offset(ts - w, 0f), Size(w, ts))
+            // Portholes along the outer hull.
+            val outer = p.x == 0 || p.x == MAP_W - 1
+            if (outer && p.y % 3 == 1 && p.y in 1 until MAP_H - 1) {
+                drawCircle(SpaceDeep, radius = ts * 0.3f, center = center(p))
+                drawCircle(DiamondCyan.copy(alpha = 0.35f), radius = ts * 0.22f, center = center(p))
+                drawCircle(StarWhite, radius = ts * 0.05f, center = center(p) + Offset(-ts * 0.08f, -ts * 0.08f))
+                drawCircle(HULL_LIGHT, radius = ts * 0.3f, center = center(p), style = Stroke(ts * 0.07f))
+            }
             return@forEach
         }
-        drawRect(FLOOR, tl, tile)
-        drawRect(Color(0xFFC9CFDB), tl, tile, style = Stroke(1f))
+        // Floor plates with seams and rivets.
+        drawRect(FLOOR_PLATE, tl, tile)
+        drawRect(FLOOR_SEAM, tl, tile, style = Stroke(ts * 0.04f))
+        val rivet = ts * 0.035f
+        drawCircle(FLOOR_SEAM, rivet, tl + Offset(ts * 0.15f, ts * 0.15f))
+        drawCircle(FLOOR_SEAM, rivet, tl + Offset(ts * 0.85f, ts * 0.85f))
         val room = ship.room(p)
         if (room != null) {
-            drawRect(roomColor(room).copy(alpha = 0.22f), tl, tile)
-            if (room > reached || (room == EXIT_ROOM && next != null)) drawRect(SpaceNavy.copy(alpha = 0.55f), tl, tile)
+            drawRect(roomColor(room).copy(alpha = 0.30f), tl, tile)
+            if (room > reached || (room == EXIT_ROOM && next != null)) drawRect(Color.Black.copy(alpha = 0.45f), tl, tile)
         }
         when (c) {
             in 'a'..'g', 'X' -> {
                 val color = if (c == 'X') SolarGold else Station.entries[c - 'a'].color
+                val acrossX = walkable(p + IntOffset(-1, 0)) && walkable(p + IntOffset(1, 0))
                 if (isOpen(c)) {
-                    // Open door: just the frame.
-                    drawRect(color, tl, Size(ts, ts * 0.12f))
-                    drawRect(color, tl + Offset(0f, ts * 0.88f), Size(ts, ts * 0.12f))
+                    // Open sliding door: only the glowing frame is left.
+                    if (acrossX) {
+                        drawRect(color, tl, Size(ts, ts * 0.1f))
+                        drawRect(color, tl + Offset(0f, ts * 0.9f), Size(ts, ts * 0.1f))
+                    } else {
+                        drawRect(color, tl, Size(ts * 0.1f, ts))
+                        drawRect(color, tl + Offset(ts * 0.9f, 0f), Size(ts * 0.1f, ts))
+                    }
                 } else {
-                    drawRoundRect(color, tl + Offset(ts * 0.06f, ts * 0.06f), Size(ts * 0.88f, ts * 0.88f), CornerRadius(ts * 0.15f))
-                    text(if (c == 'X') "🔑" else "🔒", center(p), 0.42f)
+                    // Closed: two door halves meeting in the middle, with a lock.
+                    drawRect(color, tl, tile)
+                    drawRect(color.copy(alpha = 0.6f), tl + Offset(ts * 0.1f, ts * 0.1f), Size(ts * 0.8f, ts * 0.8f))
+                    if (acrossX) drawLine(HULL, tl + Offset(0f, ts / 2), tl + Offset(ts, ts / 2), strokeWidth = ts * 0.05f)
+                    else drawLine(HULL, tl + Offset(ts / 2, 0f), tl + Offset(ts / 2, ts), strokeWidth = ts * 0.05f)
+                    text(if (c == 'X') "🔑" else "🔒", center(p), 0.4f)
                 }
             }
             in '0'..'6' -> {
@@ -549,10 +630,6 @@ private fun DrawScope.drawShip(
                 rotate(45f, pivot = cc) { drawRect(SolarGold, cc - Offset(ts * 0.15f, ts * 0.15f), Size(ts * 0.3f, ts * 0.3f)) }
                 rotate(45f, pivot = cc) { drawRect(Color.White.copy(alpha = 0.7f), cc - Offset(ts * 0.15f, ts * 0.15f), Size(ts * 0.3f, ts * 0.3f), style = Stroke(ts * 0.04f)) }
             }
-            '+' -> if (p !in collected) {
-                val bob = sin(clock * 3f + p.x * 2 + p.y) * ts * 0.05f
-                text("⭐", center(p) + Offset(0f, bob), 0.45f)
-            }
             'K' -> if (next == null && !hasKey) {
                 val pulse = 0.5f + 0.5f * sin(clock * 5f)
                 drawCircle(SolarGold.copy(alpha = 0.3f + 0.3f * pulse), radius = ts * (0.45f + 0.1f * pulse), center = center(p))
@@ -569,7 +646,7 @@ private fun DrawScope.drawShip(
     Station.entries.forEachIndexed { i, st ->
         if (i > reached) return@forEachIndexed
         val p = ship.pads[i]
-        text(st.es, center(p) + Offset(0f, ts * 0.78f), 0.24f, TextPrimary, maxWidth = ts * 3f)
+        text(st.es, center(p) + Offset(0f, ts * 0.78f), 0.24f, StarWhite, maxWidth = ts * 3f)
     }
 
     // Characters: whoever is lower on the screen is drawn last, in front.
@@ -774,6 +851,16 @@ private fun MissionPanel(
                 ScrollMoreHint(scroll, language, AdventureBg)
             }
         }
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 6.dp)) {
+            // Back to the previous card, e.g. to read the story again before answering.
+            if (index > 0) {
+                OutlinedButton(
+                    onClick = { index-- },
+                    shape = RoundedCornerShape(14.dp),
+                    border = BorderStroke(2.dp, accent),
+                    modifier = Modifier.height(52.dp).padding(end = 8.dp)
+                ) { Text(language.pick("◀ رجوع", "◀"), color = accent, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp) }
+            }
         BlasterCyberButton(
             text = when {
                 !last -> language.pick("التالي ▶", tl("Siguiente ▶"))
@@ -783,8 +870,9 @@ private fun MissionPanel(
             onClick = { if (last) onSolved() else index++ },
             enabled = done,
             color = if (last) SuccessGreen else accent,
-            modifier = Modifier.fillMaxWidth().padding(top = 6.dp)
+            modifier = Modifier.weight(1f)
         )
+        }
     }
 }
 

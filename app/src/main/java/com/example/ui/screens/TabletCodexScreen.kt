@@ -275,8 +275,9 @@ private fun CellInput(answer: String, key: String, results: MutableMap<String, B
     }
     // A compact box so the whole table fits on screen, even with the keyboard open.
     BasicTextField(
-        value = text,
+        value = if (solved && text.isBlank()) answer.split("/").first().trim() else text,
         onValueChange = { if (!solved) text = it },
+        readOnly = solved,
         singleLine = true,
         textStyle = LocalTextStyle.current.copy(fontSize = 14.sp, fontWeight = FontWeight.Bold, color = if (solved) SuccessGreen else TextPrimary),
         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.None, autoCorrectEnabled = false, imeAction = ImeAction.Done),
@@ -349,8 +350,10 @@ internal fun QuestionCard(
         Text(field.label, color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 15.sp)
         Spacer(Modifier.height(8.dp))
         OutlinedTextField(
-            value = text,
+            // Coming back to an answered question shows its answer instead of an empty, locked box.
+            value = if (solved && text.isBlank()) field.answers.first() else text,
             onValueChange = { if (!solved) text = it },
+            readOnly = solved,
             singleLine = true,
             placeholder = { Text(language.pick(tl("اكتبي الإجابة بالإسبانية"), tl("Escribe en español"))) },
             keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.None, autoCorrectEnabled = false, imeAction = ImeAction.Done),
