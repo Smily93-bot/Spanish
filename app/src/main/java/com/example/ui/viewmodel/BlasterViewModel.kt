@@ -26,6 +26,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 data class MeteorGameState(
     val currentWord: MeteorWord? = null,
@@ -290,6 +291,23 @@ class BlasterViewModel(
     private val _showTour = MutableStateFlow(!prefs.getBoolean(KEY_TOUR_SEEN, false))
     /** True until the player closes the welcome tour card on Home. */
     val showTour: StateFlow<Boolean> = _showTour.asStateFlow()
+
+    /** Starts over: clears levels, stars, chapters, words, streak and grammar stars (language is kept). */
+    fun resetProgress() = viewModelScope.launch {
+        exitMeteorGame()
+        _galaxySession.value = null
+        _grammarRound.value = null
+        withContext(kotlinx.coroutines.Dispatchers.IO) {
+            com.example.data.database.AppDatabase.getInstance(getApplication()).clearAllTables()
+        }
+        repository.ensureInitialized()
+        engagement.resetAll()
+        prefs.edit().remove(KEY_TOUR_SEEN).apply()
+        _showTour.value = true
+        backStack.clear()
+        _currentScreen.value = Screen.CommandBridge
+        soundEngine.click()
+    }
 
     fun dismissTour() {
         prefs.edit().putBoolean(KEY_TOUR_SEEN, true).apply()

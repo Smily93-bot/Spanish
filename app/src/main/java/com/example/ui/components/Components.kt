@@ -205,7 +205,8 @@ private val HIGH_SCORE_FILTERS = listOf(
     Triple("SYNONYM", "المرادفات", tl("Sinónimos")),
     Triple("ANTONYM", "الأضداد", tl("Antónimos")),
     Triple("CLOZE", "الفراغات", tl("Huecos")),
-    Triple("REACTOR", "الجمل", tl("Frases"))
+    Triple("REACTOR", "الجمل", tl("Frases")),
+    Triple("JUMP", "القفز", "Word Jump")
 )
 
 @Composable

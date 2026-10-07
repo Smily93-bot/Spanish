@@ -30,6 +30,9 @@ class SpanishContent(
 
     fun lookup(spanish: String): VocabWord? = bySpanish[normalizeAnswer(spanish)]
 
+    /** Tap-to-choose answers for the expedition questions. */
+    val answerChoices: AnswerChoices by lazy { AnswerChoices(tablets) }
+
     /** Word Galaxy lessons over the 5000 frequency words. */
     val galaxy: GalaxyQuiz by lazy { GalaxyQuiz(frequency) }
 

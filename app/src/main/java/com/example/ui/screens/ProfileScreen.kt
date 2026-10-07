@@ -106,6 +106,35 @@ fun ProfileScreen(viewModel: BlasterViewModel) {
                 )
             }
         }
+        var confirmReset by remember { mutableStateOf(false) }
+        OutlinedButton(
+            onClick = { confirmReset = true },
+            border = BorderStroke(1.5.dp, MeteorRed),
+            shape = RoundedCornerShape(14.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) { Text(language.pick("🔄 إعادة ضبط التقدّم", "🔄 Reset progress"), color = MeteorRed, fontWeight = FontWeight.Bold) }
+        if (confirmReset) {
+            AlertDialog(
+                onDismissRequest = { confirmReset = false },
+                containerColor = AdventureSurface,
+                title = { Text(language.pick("البدء من جديد؟", "Start over?"), fontWeight = FontWeight.ExtraBold) },
+                text = {
+                    Text(
+                        language.pick(
+                            "سيُحذف كل تقدّمك: المستوى والنجوم والفصول والكلمات والسلسلة. لا يمكن التراجع عن ذلك.",
+                            "All progress will be erased: level, stars, chapters, words and streak. This can't be undone."
+                        )
+                    )
+                },
+                confirmButton = {
+                    Button(
+                        onClick = { confirmReset = false; viewModel.resetProgress() },
+                        colors = ButtonDefaults.buttonColors(containerColor = MeteorRed)
+                    ) { Text(language.pick("نعم، ابدئي من جديد", "Yes, reset"), fontWeight = FontWeight.Bold) }
+                },
+                dismissButton = { TextButton(onClick = { confirmReset = false }) { Text(language.pick("إلغاء", "Cancel")) } }
+            )
+        }
         Text(
             language.pick("يعمل التطبيق بالكامل دون إنترنت.", "Works fully offline."),
             color = TextSecondary, fontSize = 11.sp

@@ -96,3 +96,15 @@ object TargetLanguage {
 
 /** On-screen text in the target language. The shared code is written in Spanish, so this build shows it unchanged. */
 fun tl(text: String): String = text
+
+/** Same word with the wrong gender or number, used as tempting wrong answers: roja → rojo, rojas. */
+fun wordEndingVariants(word: String): List<String> {
+    if (word.contains(' ')) return emptyList()
+    val out = mutableListOf<String>()
+    when {
+        word.endsWith("a") -> { out += word.dropLast(1) + "o"; out += word + "s" }
+        word.endsWith("o") -> { out += word.dropLast(1) + "a"; out += word + "s" }
+        word.endsWith("as") || word.endsWith("os") -> { out += word.dropLast(1) }
+    }
+    return out
+}

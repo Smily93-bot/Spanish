@@ -39,7 +39,7 @@ private val TILES = listOf(
     PracticeTile("🌌", "الكلمات", "Words", "أهم 5000 كلمة", "Top 5000 words", DiamondCyan) { it.navigateTo(Screen.WordGalaxy) },
     PracticeTile("🕵️", "القواعد: لماذا؟", "Grammar: why?", "افهمي سبب كل إجابة", "The reason behind answers", NebulaPurple) { it.navigateTo(Screen.GrammarLab) },
     PracticeTile("🗺️", "المغامرة", "Adventure", "قصة ليا ومهماتها", "Lía's story missions", SolarAmber) { it.navigateTo(Screen.AdventureMap) },
-    PracticeTile("☄️", "النيازك", "Meteors", "اختاري المعنى بسرعة", "Pick the meaning fast", MeteorRed) { it.navigateTo(Screen.MeteorBlaster) },
+    PracticeTile("🦘", "القفز", "Word Jump", "اقفزي على الكلمة الصحيحة", "Jump on the right word", MeteorRed) { it.navigateTo(Screen.WordJump) },
     PracticeTile("🧩", "الجمل", "Sentences", "رتّبي الكلمات", "Put words in order", ExplorerBlue) { it.navigateTo(Screen.GrammarReactor) },
     PracticeTile("✏️", "الفراغات", "Fill the gap", "أكملي الجملة", "Complete the sentence", SuccessGreen) { it.navigateTo(Screen.QuantumCloze) }
 )

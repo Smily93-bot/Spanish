@@ -331,5 +331,22 @@ private val ITALIAN = mapOf(
     "Jaguar" to "Giaguaro", "Lince" to "Lince", "Luna" to "Luna", "Marea" to "Marea", "Nube" to "Nuvola",
     "Órbita" to "Orbita", "Pegaso" to "Pegaso", "Río" to "Fiume", "Sol" to "Sole", "Trueno" to "Tuono",
     "Unicornio" to "Unicorno", "Volcán" to "Vulcano", "Zafiro" to "Zaffiro", "Ancla" to "Ancora",
-    "Búho" to "Gufo", "Dragón" to "Drago", "Eclipse" to "Eclissi", "Fénix" to "Fenice", "Girasol" to "Girasole"
+    "Búho" to "Gufo", "Dragón" to "Drago", "Eclipse" to "Eclissi", "Fénix" to "Fenice", "Girasol" to "Girasole",
+    // Word Jump and chapter goals
+    "Siguiente ▶" to "Avanti ▶",
+    "¡Gran salto!" to "Gran salto!",
+    "¡Ya casi lo tenemos!" to "Ci siamo quasi!",
 )
+
+/** Same word with the wrong gender or number, used as tempting wrong answers: rossa → rosso, rosse. */
+fun wordEndingVariants(word: String): List<String> {
+    if (word.contains(' ')) return emptyList()
+    val stem = word.dropLast(1)
+    return when (word.lastOrNull()) {
+        'a' -> listOf(stem + "o", stem + "e")
+        'o' -> listOf(stem + "a", stem + "i")
+        'e' -> listOf(stem + "i", stem + "a")
+        'i' -> listOf(stem + "o", stem + "e")
+        else -> emptyList()
+    }
+}

@@ -155,6 +155,8 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
     var lostDiamonds by remember { mutableIntStateOf(0) }
     var lostAt by remember { mutableFloatStateOf(-10f) }
     var showStory by remember { mutableStateOf(false) }
+    // Word Jump questions already show Lía, so the walking strip hides to keep the screen calm.
+    var jumpStep by remember { mutableStateOf(false) }
     val results = remember { mutableStateMapOf<String, Boolean>() }
     var openStation by remember { mutableStateOf<Int?>(null) }
     var finished by remember { mutableStateOf(false) }
@@ -184,6 +186,11 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
     }
     val totalQuestions = tablet.allQuestions.size + tableCells.size + 1 + searchTargets.size
     val nextStation = Station.entries.indices.firstOrNull { it !in solved } // null once every station is solved
+    // The last sentence of the chapter, revealed word by word as missions are won.
+    val secretWords = remember(tablet.id) {
+        tablet.ending.split(Regex("(?<=[.!?])\\s+")).lastOrNull { it.isNotBlank() }.orEmpty().split(" ").filter { it.isNotBlank() }
+    }
+    val secretOrder = remember(tablet.id) { secretWords.indices.shuffled(kotlin.random.Random(tablet.id.hashCode())) }
 
     // Game loop: runs every frame while no mission panel is open.
     LaunchedEffect(tablet.id) {
@@ -288,7 +295,13 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
         solvedAt[i] = clock
         openStation = null
         viewModel.soundEngine.fanfare()
-        say(if (i == Station.entries.lastIndex) NiloLines.portalOpen else NiloLines.praise.random())
+        say(
+            when {
+                i == Station.entries.lastIndex -> NiloLines.portalOpen
+                solved.size >= Station.entries.size - 2 -> NiloLines.almost
+                else -> NiloLines.praise.random()
+            }
+        )
         if (i == Station.entries.lastIndex) targetX = PORTAL_X
     }
 
@@ -304,10 +317,7 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
     Column(Modifier.fillMaxSize()) {
         // Header: chapter, a button to reread the story, and the diamonds still held.
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)) {
-            Column(Modifier.weight(1f)) {
-                Text("${tablet.level} · ${tablet.title(language)}", color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp, maxLines = 1)
-                Text(tablet.expeditionGoal(language), color = TextSecondary, fontSize = 11.sp, maxLines = 2)
-            }
+            Text("${tablet.level} · ${tablet.title(language)}", color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp, maxLines = 1, modifier = Modifier.weight(1f))
             TextButton(onClick = { showStory = true }) {
                 Text(language.pick("📖 القصة", "📖 Story"), color = ExplorerBlue, fontWeight = FontWeight.Bold)
             }
@@ -325,14 +335,19 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
                     tablet = tablet,
                     language = language,
                     progress = solved.size,
+                    picture = scene?.let { sceneDrawable(it.asset) } ?: backgroundFor(tablet),
+                    secret = secretWords,
+                    secretOrder = secretOrder,
+                    newPiece = solvedAt.values.any { clock - it < 4f },
                     niloLine = niloLine,
-                    onSpeakNilo = { viewModel.speakSpanish((niloLine ?: NiloLines.idle).es) }
+                    onSpeak = { viewModel.speakSpanish(it) }
                 )
             } else {
                 CompositionLocalProvider(LocalOnMistake provides onMistake) {
                     MissionPanel(
                         station = Station.entries[station],
                         tablet = tablet,
+                        data = data,
                         scene = scene,
                         searchTargets = searchTargets,
                         tableCells = tableCells,
@@ -344,18 +359,19 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
                             liaX = stationX(station) - 70f
                             facing = -1f
                         },
-                        onSolved = { solve(station) }
+                        onSolved = { solve(station) },
+                        onJumpStep = { jumpStep = it }
                     )
                 }
             }
         }
 
         // Lía's walk at the bottom of the page; hidden while typing so the answer box stays visible.
-        if (!(keyboardOpen && station != null)) {
+        if (station == null || !(keyboardOpen || jumpStep)) {
             Canvas(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(if (station == null) 240.dp else 150.dp)
+                    .height(if (station == null) 240.dp else 110.dp)
                     .pointerInput(Unit) {
                         detectTapGestures { tap ->
                             // Tap above Lía to jump, anywhere else to walk there.
@@ -630,22 +646,66 @@ private fun WalkPanel(
     tablet: ReadingTablet,
     language: HelperLanguage,
     progress: Int,
+    picture: Int,
+    secret: List<String>,
+    secretOrder: List<Int>,
+    newPiece: Boolean,
     niloLine: NiloLine?,
-    onSpeakNilo: () -> Unit
+    onSpeak: (String) -> Unit
 ) {
+    val total = Station.entries.size
+    // Words of the secret sentence revealed so far, spread over the seven missions.
+    val shownWords = (secret.size * progress + total - 1) / total
+    val shown = secretOrder.take(shownWords).toSet()
     Column(
-        modifier = Modifier.fillMaxSize().background(AdventureBg).padding(14.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
+        modifier = Modifier.fillMaxSize().background(AdventureBg).padding(horizontal = 14.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         AdventureCard(borderColor = SolarGold) {
-            Text(
-                language.pick("المهمة ${progress + 1} من ${Station.entries.size}", "${tl("Misión")} ${minOf(progress + 1, Station.entries.size)} / ${Station.entries.size}"),
-                color = SolarAmber, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold
-            )
-            Spacer(Modifier.height(4.dp))
-            ProgressBar(progress / Station.entries.size.toFloat(), color = SolarGold, height = 8.dp)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("🎯 " + tablet.expeditionGoal(language), color = TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                Text("🧩 $progress/$total", color = SolarAmber, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp)
+            }
+            Spacer(Modifier.height(6.dp))
+            // The chapter picture, uncovered one piece per finished mission.
+            val image = ImageBitmap.imageResource(picture)
+            Canvas(Modifier.fillMaxWidth().height(96.dp).clip(RoundedCornerShape(12.dp))) {
+                val pieceW = size.width / total
+                for (i in 0 until total) {
+                    val left = i * pieceW
+                    if (i < progress) {
+                        val srcLeft = (image.width * i / total)
+                        drawImage(
+                            image,
+                            srcOffset = IntOffset(srcLeft, image.height / 4),
+                            srcSize = IntSize(image.width / total, image.height / 2),
+                            dstOffset = IntOffset(left.toInt(), 0),
+                            dstSize = IntSize(pieceW.toInt() + 1, size.height.toInt())
+                        )
+                    } else {
+                        drawRect(SpaceNavy, topLeft = Offset(left, 0f), size = Size(pieceW - 2f, size.height))
+                        drawCircle(StarWhite.copy(alpha = 0.25f), radius = 6f, center = Offset(left + pieceW / 2, size.height / 2))
+                    }
+                }
+            }
+            Spacer(Modifier.height(8.dp))
+            // The secret sentence: hidden words are blanks the size of the word.
+            Text(language.pick("🔐 الرسالة السرية", "🔐 Secret message"), color = NebulaPurple, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    secret.mapIndexed { i, w -> if (i in shown) w else "▁".repeat(w.trim('.', ',', '¡', '!', '¿', '?').length.coerceIn(2, 8)) }.joinToString(" "),
+                    color = TextPrimary, fontSize = 17.sp, fontWeight = FontWeight.Bold, lineHeight = 24.sp, modifier = Modifier.weight(1f)
+                )
+                if (progress >= total) AudioButton(onClick = { onSpeak(secret.joinToString(" ")) }, size = 34.dp)
+            }
+            if (newPiece) {
+                Text(
+                    language.pick("✨ قطعة جديدة وكلمات جديدة!", "✨ A new piece and new words!"),
+                    color = SuccessGreen, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp
+                )
+            }
         }
-        NiloSays(niloLine ?: NiloLines.idle, language, onSpeak = onSpeakNilo)
+        NiloSays(niloLine ?: NiloLines.idle, language, onSpeak = { onSpeak((niloLine ?: NiloLines.idle).es) }, size = 44.dp)
     }
 }
 
@@ -691,10 +751,62 @@ private fun HoldButton(symbol: String, onHold: (Boolean) -> Unit) {
     }
 }
 
+/** One screen of a mission: missions are played one card at a time, like Reading Blaster. */
+private sealed interface Step {
+    data class Sentence(val text: String, val number: Int, val total: Int, val translation: String?) : Step
+    data class Choice(val key: String, val prompt: String, val answers: List<String>, val hint: String, val options: List<String>) : Step
+    data object Lesson : Step
+    data object Search : Step
+    data object Order : Step
+    data class Note(val emoji: String, val text: String) : Step
+}
+
+private fun storySentences(text: String) = text.split(Regex("(?<=[.!?])\\s+")).filter { it.isNotBlank() }
+
+private fun buildSteps(
+    station: Station,
+    tablet: ReadingTablet,
+    data: SpanishContent,
+    scene: HiddenScene?,
+    searchTargets: List<HiddenObject>,
+    tableCells: Set<Pair<Int, Int>>,
+    language: HelperLanguage
+): List<Step> {
+    val choices = data.answerChoices
+    fun fieldSteps(prefix: String, fields: List<TabletField>) = fields.mapIndexed { i, f ->
+        Step.Choice("$prefix-$i", f.label, f.answers, language.pick(f.hintAr, f.hint), choices.options(f.answers))
+    }
+    return when (station) {
+        Station.STORY -> storySentences(tablet.story).let { s ->
+            s.mapIndexed { i, line -> Step.Sentence(line, i + 1, s.size, tablet.storyAr.takeIf { language == HelperLanguage.ARABIC }) }
+        }
+        Station.OPENING -> fieldSteps("opening", tablet.opening)
+        Station.SEARCH -> if (scene == null || searchTargets.isEmpty()) listOf(Step.Note("🔍", "")) else listOf(Step.Search)
+        Station.CONSOLE -> listOf(Step.Lesson) + tableCells.sortedWith(compareBy({ it.first }, { it.second })).map { (r, c) ->
+            val column = tablet.table.rows.map { it[c] }
+            val answer = tablet.table.rows[r][c]
+            val wrong = column.filter { normalizeAnswer(it) != normalizeAnswer(answer) }.distinct().shuffled().take(3)
+            Step.Choice(
+                key = "table-$r-$c",
+                prompt = "${tablet.table.rows[r][0]}  ___   (${tablet.table.headers[c]})",
+                answers = listOf(answer),
+                hint = "",
+                options = (wrong + answer).shuffled()
+            )
+        }
+        Station.ORDER -> listOf(Step.Order)
+        Station.MISSION -> listOf(Step.Note("🛰️", language.pick(tablet.missionAr, tablet.mission))) + fieldSteps("fields", tablet.fields)
+        Station.PORTAL -> storySentences(tablet.ending).let { s ->
+            s.mapIndexed { i, line -> Step.Sentence(line, i + 1, s.size, null) }
+        } + fieldSteps("gate", tablet.gate) + Step.Note("🏁", tablet.expeditionPayoff(language) + "\n" + language.pick("المكافأة: ", tl("Recompensa: ")) + tablet.reward(language))
+    }
+}
+
 @Composable
 private fun MissionPanel(
     station: Station,
     tablet: ReadingTablet,
+    data: SpanishContent,
     scene: HiddenScene?,
     searchTargets: List<HiddenObject>,
     tableCells: Set<Pair<Int, Int>>,
@@ -702,85 +814,139 @@ private fun MissionPanel(
     viewModel: BlasterViewModel,
     language: HelperLanguage,
     onClose: () -> Unit,
-    onSolved: () -> Unit
+    onSolved: () -> Unit,
+    onJumpStep: (Boolean) -> Unit
 ) {
-    val scroll = rememberScrollState()
-    Box(Modifier.fillMaxSize().background(AdventureBg)) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(scroll)
-            .padding(14.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
+    val steps = remember(station, tablet.id) { buildSteps(station, tablet, data, scene, searchTargets, tableCells, language) }
+    var index by remember(station) { mutableIntStateOf(0) }
+    val step = steps[index]
+    val done = when (step) {
+        is Step.Choice -> step.key in results
+        Step.Search -> searchTargets.all { "search-${it.id}" in results }
+        Step.Order -> "order" in results
+        else -> true
+    }
+    val last = index == steps.lastIndex
+    LaunchedEffect(step) { onJumpStep(step is Step.Choice) }
+
+    Column(Modifier.fillMaxSize().background(AdventureBg).padding(horizontal = 14.dp, vertical = 8.dp)) {
+        // Title, progress dots and close.
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("${station.emoji} ${station.es}", color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
-            Spacer(Modifier.width(8.dp))
-            Text(station.label(language), color = TextSecondary, fontSize = 13.sp, modifier = Modifier.weight(1f))
+            Text("${station.emoji} ${station.label(language)}", color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp, modifier = Modifier.weight(1f))
+            steps.indices.forEach { i ->
+                Box(
+                    Modifier
+                        .padding(horizontal = 2.dp)
+                        .size(if (i == index) 10.dp else 7.dp)
+                        .clip(CircleShape)
+                        .background(if (i <= index) SolarAmber else AdventureCardBorder)
+                )
+            }
             TextButton(onClick = onClose) { Text("✕", color = TextSecondary, fontSize = 18.sp) }
         }
-        val intro = NiloLines.missionIntro[station.ordinal]
-        NiloSays(intro, language, onSpeak = { viewModel.speakSpanish(intro.es) })
-
-        val complete: Boolean = when (station) {
-            Station.STORY -> {
-                StoryCard(language.pick("📡 رسالة واردة", tl("📡 Transmisión entrante")), tablet.story, tablet.storyAr, viewModel, language)
-                true
-            }
-            Station.OPENING -> {
-                QuestionGroup("opening", tablet.opening, results, viewModel, language)
-                tablet.opening.indices.all { "opening-$it" in results }
-            }
-            Station.SEARCH -> {
-                if (scene == null || searchTargets.isEmpty()) true
-                else {
-                    HiddenObjectSearch(scene, searchTargets, results, viewModel, language)
-                    searchTargets.all { "search-${it.id}" in results }
-                }
-            }
-            Station.CONSOLE -> {
-                LessonCard(tablet, viewModel, language)
-                GrammarTableQuiz(tablet.table, tableCells, results, viewModel, language)
-                tableCells.all { "table-${it.first}-${it.second}" in results }
-            }
-            Station.ORDER -> {
-                OrderPuzzle(tablet.order, tablet.orderTranslation(language), results, viewModel, language)
-                "order" in results
-            }
-            Station.MISSION -> {
-                AdventureCard(borderColor = NebulaPurple) {
-                    Text(language.pick("🛰️ المهمة", tl("🛰️ Misión")), color = NebulaPurple, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
-                    Text(language.pick(tablet.missionAr, tablet.mission), color = TextPrimary, fontSize = 14.sp)
-                }
-                QuestionGroup("fields", tablet.fields, results, viewModel, language)
-                tablet.fields.indices.all { "fields-$it" in results }
-            }
-            Station.PORTAL -> {
-                StoryCard(language.pick("📖 خاتمة الفصل", tl("📖 Final del capítulo")), tablet.ending, null, viewModel, language)
-                QuestionGroup("gate", tablet.gate, results, viewModel, language)
-                val done = tablet.gate.indices.all { "gate-$it" in results }
-                if (done) {
-                    AdventureCard(borderColor = SuccessGreen) {
-                        Text("🏁 " + tablet.expeditionPayoff(language), color = SuccessGreen, fontWeight = FontWeight.Bold)
-                        Text(language.pick("المكافأة: ", tl("Recompensa: ")) + tablet.reward(language), color = TextSecondary, fontSize = 12.sp)
+        Box(Modifier.weight(1f).fillMaxWidth()) {
+            key(station, index) {
+                val scroll = rememberScrollState()
+                Column(Modifier.fillMaxSize().verticalScroll(scroll), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    when (step) {
+                        is Step.Sentence -> SentenceCard(step, viewModel, language)
+                        is Step.Choice -> ChoiceCard(step, results, viewModel, language)
+                        Step.Lesson -> LessonCard(tablet, viewModel, language)
+                        Step.Search -> if (scene != null) HiddenObjectSearch(scene, searchTargets, results, viewModel, language)
+                        Step.Order -> OrderPuzzle(tablet.order, tablet.orderTranslation(language), results, viewModel, language)
+                        is Step.Note -> if (step.text.isNotBlank()) AdventureCard(borderColor = NebulaPurple) {
+                            Text(step.emoji, fontSize = 30.sp)
+                            Text(step.text, color = TextPrimary, fontSize = 17.sp, lineHeight = 26.sp, modifier = Modifier.fillMaxWidth())
+                        }
                     }
                 }
-                done
+                ScrollMoreHint(scroll, language, AdventureBg)
             }
         }
-
         BlasterCyberButton(
-            text = if (station == Station.PORTAL) language.pick("افتحي البوابة 🌀", tl("Abrir el portal 🌀"))
-            else language.pick("تمّ! تابعي المشي ▶", tl("¡Hecho! Seguir caminando ▶")),
-            onClick = onSolved,
-            enabled = complete,
-            color = SuccessGreen,
-            modifier = Modifier.fillMaxWidth()
+            text = when {
+                !last -> language.pick("التالي ▶", tl("Siguiente ▶"))
+                station == Station.PORTAL -> language.pick("افتحي البوابة 🌀", tl("Abrir el portal 🌀"))
+                else -> language.pick("تمّ! تابعي المشي ▶", tl("¡Hecho! Seguir caminando ▶"))
+            },
+            onClick = { if (last) onSolved() else index++ },
+            enabled = done,
+            color = if (last) SuccessGreen else ExplorerBlue,
+            modifier = Modifier.fillMaxWidth().padding(top = 6.dp)
         )
-        Spacer(Modifier.height(16.dp))
     }
-    // Tells the player the mission continues below the visible part of the panel.
-    ScrollMoreHint(scroll, language, AdventureBg)
+}
+
+/** One story sentence in Lía's speech bubble, read aloud. */
+@Composable
+private fun SentenceCard(step: Step.Sentence, viewModel: BlasterViewModel, language: HelperLanguage) {
+    var showTranslation by remember { mutableStateOf(false) }
+    LaunchedEffect(step.text) { viewModel.speakSpanish(step.text) }
+    Row(verticalAlignment = Alignment.Top) {
+        Image(painterResource(R.drawable.lia_happy), contentDescription = "Lía", modifier = Modifier.size(70.dp))
+        Spacer(Modifier.width(8.dp))
+        Surface(
+            onClick = { viewModel.speakSpanish(step.text) },
+            shape = RoundedCornerShape(topStart = 4.dp, topEnd = 22.dp, bottomEnd = 22.dp, bottomStart = 22.dp),
+            color = AdventureSurface,
+            border = BorderStroke(2.dp, SolarGold),
+            modifier = Modifier.weight(1f)
+        ) {
+            Column(Modifier.padding(16.dp)) {
+                Text(step.text, color = TextPrimary, fontSize = 24.sp, lineHeight = 32.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.fillMaxWidth())
+                Spacer(Modifier.height(10.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text("${step.number} / ${step.total}", color = TextSecondary, fontSize = 12.sp, modifier = Modifier.weight(1f))
+                    AudioButton(onClick = { viewModel.speakSpanish(step.text) }, size = 40.dp)
+                }
+            }
+        }
+    }
+    if (step.translation != null) {
+        TextButton(onClick = { showTranslation = !showTranslation }) {
+            Text(if (showTranslation) "إخفاء الترجمة" else "🌐 ترجمة القصة", color = ExplorerBlue)
+        }
+        if (showTranslation) Text(step.translation, color = TextSecondary, fontSize = 15.sp, lineHeight = 24.sp, modifier = Modifier.fillMaxWidth())
+    }
+}
+
+/** A question answered by jumping onto the right word bubble (Word Jump). Wrong jumps cost a diamond. */
+@Composable
+private fun ChoiceCard(step: Step.Choice, results: MutableMap<String, Boolean>, viewModel: BlasterViewModel, language: HelperLanguage) {
+    val onMistake = LocalOnMistake.current
+    val wrong = remember { mutableStateListOf<String>() }
+    val accepted = remember(step) { step.answers.flatMap { it.split("/") }.map { normalizeAnswer(it) } }
+    val solved = step.key in results
+    AdventureCard(borderColor = if (solved) SuccessGreen else ExplorerBlue) {
+        Text(step.prompt, color = TextPrimary, fontSize = 22.sp, lineHeight = 30.sp, fontWeight = FontWeight.Bold, modifier = Modifier.fillMaxWidth())
+    }
+    Text(
+        language.pick("اضغطي على الإجابة الصحيحة لتقفز ليا إليها!", "Tap the right answer and Lía jumps onto it!"),
+        color = TextSecondary, fontSize = 13.sp, fontWeight = FontWeight.SemiBold
+    )
+    WordJump(
+        options = step.options,
+        solved = solved,
+        wrong = wrong,
+        check = { normalizeAnswer(it) in accepted },
+        onLanded = { option ->
+            if (step.key !in results) {
+                if (normalizeAnswer(option) in accepted) {
+                    results[step.key] = wrong.isEmpty()
+                    viewModel.soundEngine.hit()
+                    viewModel.speakSpanish(option)
+                } else {
+                    wrong += option
+                    viewModel.soundEngine.error()
+                    onMistake()
+                    // After two misses the right answer lights up so the player can continue.
+                    if (wrong.size >= 2) results[step.key] = false
+                }
+            }
+        }
+    )
+    if (wrong.isNotEmpty() && step.hint.isNotBlank()) {
+        Text("💡 Nilo: " + step.hint, color = SolarAmber, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.fillMaxWidth())
     }
 }
 
