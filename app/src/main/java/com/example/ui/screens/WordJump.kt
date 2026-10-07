@@ -23,6 +23,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.R
@@ -43,7 +44,8 @@ fun WordJump(
     wrong: List<String>,
     check: (String) -> Boolean,
     onLanded: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    boardHeight: Dp = 270.dp
 ) {
     val lia = ImageBitmap.imageResource(R.drawable.explorer_walk)
     val measurer = rememberTextMeasurer()
@@ -58,6 +60,8 @@ fun WordJump(
     var fallStart by remember { mutableFloatStateOf(-10f) }
     var fallFrom by remember { mutableStateOf(Offset.Zero) }
     var boardSize by remember { mutableStateOf(Size.Zero) }
+    var sparkleAt by remember { mutableFloatStateOf(-10f) }        // burst of stars on a right answer
+    var sparklePos by remember { mutableStateOf(Offset.Zero) }
     val jumpTime = 0.55f
 
     // Each bubble drifts sideways in its own lane and wraps around the edges.
@@ -85,8 +89,11 @@ fun WordJump(
             if (target != null && clock - jumpStart >= jumpTime) {
                 jumpTo = null
                 val word = options[target]
-                if (currentCheck(word)) riding = target
-                else {
+                if (currentCheck(word)) {
+                    riding = target
+                    sparkleAt = clock
+                    sparklePos = bubbleCenter(target, clock, boardSize)
+                } else {
                     fallStart = clock
                     fallFrom = bubbleTop(target, clock, boardSize)
                 }
@@ -98,7 +105,7 @@ fun WordJump(
     Canvas(
         modifier
             .fillMaxWidth()
-            .height(270.dp)
+            .height(boardHeight)
             .clip(RoundedCornerShape(20.dp))
             .pointerInput(options, solved, wrong.size) {
                 detectTapGestures { tap ->
@@ -162,6 +169,19 @@ fun WordJump(
         }
         translate(feet.x, feet.y) {
             drawNiloSprite(lia, frame = if (target != null) 1 else 0, height = 84f * u)
+        }
+
+        // Celebration: gold stars fly out from the right bubble.
+        val age = clock - sparkleAt
+        if (age in 0f..0.8f) {
+            val alpha = 1f - age / 0.8f
+            repeat(12) { k ->
+                val angle = k * (2 * Math.PI / 12).toFloat()
+                val r = (20f + 120f * age) * u
+                val c = sparklePos + Offset(kotlin.math.cos(angle) * r, sin(angle) * r)
+                drawCircle(SolarGold.copy(alpha = alpha), radius = (5f - 3f * age) * u, center = c)
+            }
+            drawCircle(SuccessGreen.copy(alpha = 0.35f * alpha), radius = (30f + 90f * age) * u, center = sparklePos, style = Stroke(3f * u))
         }
     }
 }

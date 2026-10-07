@@ -17,6 +17,7 @@ sealed class Screen(val route: String) {
     data object WordGalaxy : Screen("galaxy")
     data object Practice : Screen("practice")
     data object GrammarLab : Screen("grammar")
+    data object WordJump : Screen("jump")
     data object Profile : Screen("profile")
 
     companion object {

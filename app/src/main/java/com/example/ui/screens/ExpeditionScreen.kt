@@ -154,6 +154,8 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
     var lostDiamonds by remember { mutableIntStateOf(0) }
     var lostAt by remember { mutableFloatStateOf(-10f) }
     var showStory by remember { mutableStateOf(false) }
+    // Word Jump questions already show Lía, so the walking strip hides to keep the screen calm.
+    var jumpStep by remember { mutableStateOf(false) }
     val results = remember { mutableStateMapOf<String, Boolean>() }
     var openStation by remember { mutableStateOf<Int?>(null) }
     var finished by remember { mutableStateOf(false) }
@@ -356,14 +358,15 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
                             liaX = stationX(station) - 70f
                             facing = -1f
                         },
-                        onSolved = { solve(station) }
+                        onSolved = { solve(station) },
+                        onJumpStep = { jumpStep = it }
                     )
                 }
             }
         }
 
         // Lía's walk at the bottom of the page; hidden while typing so the answer box stays visible.
-        if (!(keyboardOpen && station != null)) {
+        if (station == null || !(keyboardOpen || jumpStep)) {
             Canvas(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -810,7 +813,8 @@ private fun MissionPanel(
     viewModel: BlasterViewModel,
     language: HelperLanguage,
     onClose: () -> Unit,
-    onSolved: () -> Unit
+    onSolved: () -> Unit,
+    onJumpStep: (Boolean) -> Unit
 ) {
     val steps = remember(station, tablet.id) { buildSteps(station, tablet, data, scene, searchTargets, tableCells, language) }
     var index by remember(station) { mutableIntStateOf(0) }
@@ -822,6 +826,7 @@ private fun MissionPanel(
         else -> true
     }
     val last = index == steps.lastIndex
+    LaunchedEffect(step) { onJumpStep(step is Step.Choice) }
 
     Column(Modifier.fillMaxSize().background(AdventureBg).padding(horizontal = 14.dp, vertical = 8.dp)) {
         // Title, progress dots and close.
