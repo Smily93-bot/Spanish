@@ -82,10 +82,10 @@
       "words": [
         {"t": "rosso", "b": "rosso", "en": "red", "ar": "أحمر", "e": "🔴"},
         {"t": "blu", "b": "blu", "en": "blue", "ar": "أزرق", "e": "🔵"},
-        {"t": "verde", "b": "verde", "en": "green", "ar": "أخضر", "e": "🟢"},
-        {"t": "giallo", "b": "giallo", "en": "yellow", "ar": "أصفر", "e": "🟡"},
-        {"t": "arancione", "b": "arancione", "en": "orange", "ar": "برتقالي", "e": "🟠"},
-        {"t": "viola", "b": "viola", "en": "purple", "ar": "بنفسجي", "e": "🟣"},
+        {"t": "verde", "b": "verde", "en": "green", "ar": "أخضر", "e": "💚"},
+        {"t": "giallo", "b": "giallo", "en": "yellow", "ar": "أصفر", "e": "💛"},
+        {"t": "arancione", "b": "arancione", "en": "orange", "ar": "برتقالي", "e": "🧡"},
+        {"t": "viola", "b": "viola", "en": "purple", "ar": "بنفسجي", "e": "💜"},
         {"t": "nero", "b": "nero", "en": "black", "ar": "أسود", "e": "⚫"},
         {"t": "bianco", "b": "bianco", "en": "white", "ar": "أبيض", "e": "⚪"}
       ],
@@ -206,12 +206,12 @@
       "title": {"t": "Il corpo", "en": "The Body", "ar": "الجسم"},
       "words": [
         {"t": "la mano", "b": "mano", "en": "hand", "ar": "يد", "e": "✋"},
-        {"t": "il piede", "b": "piede", "en": "foot", "ar": "قدم", "e": "🦶"},
+        {"t": "il piede", "b": "piede", "en": "foot", "ar": "قدم", "e": "👣"},
         {"t": "l'occhio", "b": "occhio", "en": "eye", "ar": "عين", "e": "👁️"},
         {"t": "il naso", "b": "naso", "en": "nose", "ar": "أنف", "e": "👃"},
         {"t": "la bocca", "b": "bocca", "en": "mouth", "ar": "فم", "e": "👄"},
         {"t": "l'orecchio", "b": "orecchio", "en": "ear", "ar": "أذن", "e": "👂"},
-        {"t": "il dente", "b": "dente", "en": "tooth", "ar": "سنّ", "e": "🦷"},
+        {"t": "il dente", "b": "dente", "en": "tooth", "ar": "سنّ", "e": "😁"},
         {"t": "il braccio", "b": "braccio", "en": "arm", "ar": "ذراع", "e": "💪"}
       ],
       "phrases": [
@@ -259,9 +259,9 @@
         {"t": "la cucina", "b": "cucina", "en": "kitchen", "ar": "مطبخ", "e": "🍳"},
         {"t": "il bagno", "b": "bagno", "en": "bathroom", "ar": "حمّام", "e": "🛁"},
         {"t": "il letto", "b": "letto", "en": "bed", "ar": "سرير", "e": "🛏️"},
-        {"t": "la sedia", "b": "sedia", "en": "chair", "ar": "كرسي", "e": "🪑"},
+        {"t": "la sedia", "b": "sedia", "en": "chair", "ar": "كرسي", "e": "💺"},
         {"t": "il divano", "b": "divano", "en": "sofa", "ar": "أريكة", "e": "🛋️"},
-        {"t": "la finestra", "b": "finestra", "en": "window", "ar": "نافذة", "e": "🪟"},
+        {"t": "l'orologio", "b": "orologio", "en": "clock", "ar": "ساعة", "e": "⏰"},
         {"t": "la doccia", "b": "doccia", "en": "shower", "ar": "دُشّ", "e": "🚿"}
       ],
       "phrases": [
@@ -283,7 +283,7 @@
         {"t": "la stella", "b": "stella", "en": "star", "ar": "نجمة", "e": "⭐"},
         {"t": "la luna", "b": "luna", "en": "moon", "ar": "قمر", "e": "🌙"},
         {"t": "il sole", "b": "sole", "en": "sun", "ar": "شمس", "e": "☀️"},
-        {"t": "il pianeta", "b": "pianeta", "en": "planet", "ar": "كوكب", "e": "🪐"},
+        {"t": "il pianeta", "b": "pianeta", "en": "planet", "ar": "كوكب", "e": "🌍"},
         {"t": "il razzo", "b": "razzo", "en": "rocket", "ar": "صاروخ", "e": "🚀"},
         {"t": "la chiave", "b": "chiave", "en": "key", "ar": "مفتاح", "e": "🔑"},
         {"t": "la porta", "b": "porta", "en": "door", "ar": "باب", "e": "🚪"},

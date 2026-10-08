@@ -168,7 +168,7 @@ private fun UnitLesson(unit: CourseUnit, number: Int, viewModel: BlasterViewMode
         Spacer(Modifier.height(10.dp))
         Box(Modifier.weight(1f).fillMaxWidth()) {
             key(index) {
-                val onMistake = { mistakes++ }
+                val onMistake: () -> Unit = { mistakes++ }
                 val done = { stepDone = true }
                 when (step) {
                     is UnitStep.Learn -> LearnCard(step.word, viewModel, language)

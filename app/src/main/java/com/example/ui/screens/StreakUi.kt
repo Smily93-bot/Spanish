@@ -105,7 +105,7 @@ fun StreakCard(viewModel: BlasterViewModel, language: HelperLanguage) {
                 )
             }
             Column(horizontalAlignment = Alignment.End) {
-                Text("🧊 ${streak.freezes}", color = DiamondCyan, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                Text("❄️ ${streak.freezes}", color = DiamondCyan, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                 Text(language.pick("أفضل: ${streak.bestStreak}", "Best: ${streak.bestStreak}"), color = TextSecondary, fontSize = 11.sp)
             }
         }
@@ -166,8 +166,8 @@ fun StreakSettings(viewModel: BlasterViewModel, language: HelperLanguage) {
         }
         Text(
             language.pick(
-                "🧊 تجميد السلسلة يحميها إذا فاتك يوم. تحصلين على واحد كل 7 أيام.",
-                "🧊 A streak freeze saves you if you miss a day. Earn one every 7 days."
+                "❄️ تجميد السلسلة يحميها إذا فاتك يوم. تحصلين على واحد كل 7 أيام.",
+                "❄️ A streak freeze saves you if you miss a day. Earn one every 7 days."
             ),
             color = TextSecondary, fontSize = 11.sp
         )
@@ -214,7 +214,7 @@ private fun WeekRow(streak: StreakState, today: Long, language: HelperLanguage) 
                     Text(
                         when {
                             met -> "🔥"
-                            frozen -> "🧊"
+                            frozen -> "❄️"
                             else -> ""
                         },
                         fontSize = 14.sp
@@ -264,7 +264,7 @@ fun StreakCelebration(viewModel: BlasterViewModel, language: HelperLanguage) {
                 if (e.earnedFreeze) {
                     Spacer(Modifier.height(6.dp))
                     Text(
-                        language.pick("🧊 ربحتِ تجميدًا للسلسلة!", "🧊 You earned a streak freeze!"),
+                        language.pick("❄️ ربحتِ تجميدًا للسلسلة!", "❄️ You earned a streak freeze!"),
                         color = DiamondCyan, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center
                     )
                 }

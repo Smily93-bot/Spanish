@@ -39,7 +39,7 @@ private data class Sector(val level: CefrLevel, val name: String, val nameAr: St
 
 private val SECTORS = listOf(
     Sector(CefrLevel.A1, tl("Sector Amanecer"), "قطاع الفجر", Color(0xFF2E9F5B), "🌍"),
-    Sector(CefrLevel.A2, tl("Cinturón de Archivos"), "حزام الأرشيف", Color(0xFF1667C9), "🪐"),
+    Sector(CefrLevel.A2, tl("Cinturón de Archivos"), "حزام الأرشيف", Color(0xFF1667C9), "🌍"),
     Sector(CefrLevel.B1, tl("Jardín de Memorias"), "حديقة الذكريات", Color(0xFF7C4DDB), "🌸"),
     Sector(CefrLevel.B2, tl("Nebulosa Condicional"), "سديم الشرط", Color(0xFFE07A10), "🌌"),
     Sector(CefrLevel.C1, tl("Observatorio del Tiempo"), "مرصد الزمن", Color(0xFFE5484D), "🔭"),

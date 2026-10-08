@@ -97,7 +97,7 @@ private enum class Station(
     CONSOLE("🔧", tl("Sala de máquinas"), "غرفة المحركات", "Engine room", MeteorRed,
         "اقرئي القاعدة أولًا، ثم أكملي الجدول.", "Read the rule first, then fill in the table.",
         tl("Lee la regla y completa la tabla.")),
-    ORDER("🧩", tl("Mensaje roto"), "الرسالة المبعثرة", "Broken message", NebulaPurple,
+    ORDER("🔀", tl("Mensaje roto"), "الرسالة المبعثرة", "Broken message", NebulaPurple,
         "رتّبي الكلمات لتكوّني الجملة. المعنى مكتوب فوقها.", "Put the words in order to build the sentence. Its meaning is shown above.",
         tl("Ordena las palabras para formar la frase.")),
     MISSION("🛰️", tl("Puente de mando"), "غرفة القيادة", "Bridge", SuccessGreen,
@@ -1746,8 +1746,8 @@ private fun HiddenObjectSearch(
     }
     Text(
         language.pick(
-            "🤏 قرّبي بإصبعين أو اضغطي مرتين للتكبير · اضغطي على الكلمة لسماعها.",
-            "🤏 Pinch or double-tap to zoom · tap a word to hear it."
+            "👆 قرّبي بإصبعين أو اضغطي مرتين للتكبير · اضغطي على الكلمة لسماعها.",
+            "👆 Pinch or double-tap to zoom · tap a word to hear it."
         ),
         color = TextSecondary, fontSize = 12.sp
     )

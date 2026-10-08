@@ -82,10 +82,10 @@
       "words": [
         {"t": "rojo", "b": "rojo", "en": "red", "ar": "أحمر", "e": "🔴"},
         {"t": "azul", "b": "azul", "en": "blue", "ar": "أزرق", "e": "🔵"},
-        {"t": "verde", "b": "verde", "en": "green", "ar": "أخضر", "e": "🟢"},
-        {"t": "amarillo", "b": "amarillo", "en": "yellow", "ar": "أصفر", "e": "🟡"},
-        {"t": "naranja", "b": "naranja", "en": "orange", "ar": "برتقالي", "e": "🟠"},
-        {"t": "morado", "b": "morado", "en": "purple", "ar": "بنفسجي", "e": "🟣"},
+        {"t": "verde", "b": "verde", "en": "green", "ar": "أخضر", "e": "💚"},
+        {"t": "amarillo", "b": "amarillo", "en": "yellow", "ar": "أصفر", "e": "💛"},
+        {"t": "naranja", "b": "naranja", "en": "orange", "ar": "برتقالي", "e": "🧡"},
+        {"t": "morado", "b": "morado", "en": "purple", "ar": "بنفسجي", "e": "💜"},
         {"t": "negro", "b": "negro", "en": "black", "ar": "أسود", "e": "⚫"},
         {"t": "blanco", "b": "blanco", "en": "white", "ar": "أبيض", "e": "⚪"}
       ],
@@ -206,12 +206,12 @@
       "title": {"t": "El cuerpo", "en": "The Body", "ar": "الجسم"},
       "words": [
         {"t": "la mano", "b": "mano", "en": "hand", "ar": "يد", "e": "✋"},
-        {"t": "el pie", "b": "pie", "en": "foot", "ar": "قدم", "e": "🦶"},
+        {"t": "el pie", "b": "pie", "en": "foot", "ar": "قدم", "e": "👣"},
         {"t": "el ojo", "b": "ojo", "en": "eye", "ar": "عين", "e": "👁️"},
         {"t": "la nariz", "b": "nariz", "en": "nose", "ar": "أنف", "e": "👃"},
         {"t": "la boca", "b": "boca", "en": "mouth", "ar": "فم", "e": "👄"},
         {"t": "la oreja", "b": "oreja", "en": "ear", "ar": "أذن", "e": "👂"},
-        {"t": "el diente", "b": "diente", "en": "tooth", "ar": "سنّ", "e": "🦷"},
+        {"t": "el diente", "b": "diente", "en": "tooth", "ar": "سنّ", "e": "😁"},
         {"t": "el brazo", "b": "brazo", "en": "arm", "ar": "ذراع", "e": "💪"}
       ],
       "phrases": [
@@ -259,16 +259,16 @@
         {"t": "la cocina", "b": "cocina", "en": "kitchen", "ar": "مطبخ", "e": "🍳"},
         {"t": "el baño", "b": "baño", "en": "bathroom", "ar": "حمّام", "e": "🛁"},
         {"t": "la cama", "b": "cama", "en": "bed", "ar": "سرير", "e": "🛏️"},
-        {"t": "la silla", "b": "silla", "en": "chair", "ar": "كرسي", "e": "🪑"},
+        {"t": "la silla", "b": "silla", "en": "chair", "ar": "كرسي", "e": "💺"},
         {"t": "el sofá", "b": "sofá", "en": "sofa", "ar": "أريكة", "e": "🛋️"},
-        {"t": "la ventana", "b": "ventana", "en": "window", "ar": "نافذة", "e": "🪟"},
+        {"t": "el reloj", "b": "reloj", "en": "clock", "ar": "ساعة", "e": "⏰"},
         {"t": "la ducha", "b": "ducha", "en": "shower", "ar": "دُشّ", "e": "🚿"}
       ],
       "phrases": [
         {"t": "Hay dos sillas en la cocina.", "en": "There are two chairs in the kitchen.", "ar": "يوجد كرسيّان في المطبخ."},
         {"t": "En mi casa hay un sofá rojo.", "en": "In my house there is a red sofa.", "ar": "في بيتي توجد أريكة حمراء."},
         {"t": "¿Hay una ducha en el baño? Sí.", "en": "Is there a shower in the bathroom? Yes.", "ar": "هل يوجد دُشّ في الحمّام؟ نعم."},
-        {"t": "Hay tres ventanas.", "en": "There are three windows.", "ar": "توجد ثلاث نوافذ."}
+        {"t": "Hay un reloj en la cocina.", "en": "There is a clock in the kitchen.", "ar": "توجد ساعة في المطبخ."}
       ],
       "tip": {
         "en": "\"Hay\" means both \"there is\" and \"there are\": hay una cama, hay dos camas. To ask, just say it as a question: \"¿Hay una ducha?\".",
@@ -283,7 +283,7 @@
         {"t": "la estrella", "b": "estrella", "en": "star", "ar": "نجمة", "e": "⭐"},
         {"t": "la luna", "b": "luna", "en": "moon", "ar": "قمر", "e": "🌙"},
         {"t": "el sol", "b": "sol", "en": "sun", "ar": "شمس", "e": "☀️"},
-        {"t": "el planeta", "b": "planeta", "en": "planet", "ar": "كوكب", "e": "🪐"},
+        {"t": "el planeta", "b": "planeta", "en": "planet", "ar": "كوكب", "e": "🌍"},
         {"t": "el cohete", "b": "cohete", "en": "rocket", "ar": "صاروخ", "e": "🚀"},
         {"t": "la llave", "b": "llave", "en": "key", "ar": "مفتاح", "e": "🔑"},
         {"t": "la puerta", "b": "puerta", "en": "door", "ar": "باب", "e": "🚪"},

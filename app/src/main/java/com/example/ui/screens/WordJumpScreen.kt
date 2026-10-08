@@ -46,7 +46,7 @@ fun WordJumpScreen(viewModel: BlasterViewModel) {
         key(run) { JumpRun(data, viewModel, language) }
     }
     reward?.let {
-        RewardDialog(it, language == HelperLanguage.ARABIC, language.pick("🦘 قفزة رائعة!", "🦘 " + tl("¡Gran salto!"))) {
+        RewardDialog(it, language == HelperLanguage.ARABIC, language.pick("🐸 قفزة رائعة!", "🐸 " + tl("¡Gran salto!"))) {
             viewModel.dismissPracticeReward()
             run = 0
         }
@@ -60,7 +60,7 @@ private fun JumpStart(language: HelperLanguage, onStart: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
     ) {
-        Text("🦘", fontSize = 72.sp)
+        Text("🐸", fontSize = 72.sp)
         Text("Word Jump", color = TextPrimary, fontSize = 30.sp, fontWeight = FontWeight.ExtraBold)
         Text(
             language.pick(
@@ -111,7 +111,7 @@ private fun JumpRun(data: SpanishContent, viewModel: BlasterViewModel, language:
     Column(Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 10.dp)) {
         // One quiet status line.
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("❤️".repeat(lives) + "🤍".repeat(JUMP_LIVES - lives), fontSize = 18.sp)
+            Text("❤️".repeat(lives) + "🖤".repeat(JUMP_LIVES - lives), fontSize = 18.sp)
             Text("$round / $JUMP_ROUNDS", color = TextSecondary, fontSize = 14.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, modifier = Modifier.weight(1f))
             Text("⭐ $score", color = SolarAmber, fontSize = 18.sp, fontWeight = FontWeight.ExtraBold)
         }
