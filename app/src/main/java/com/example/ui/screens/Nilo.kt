@@ -47,7 +47,7 @@ object NiloLines {
     val findRoomKey = NiloLine(tl("¡Busca la tarjeta de acceso de esta sala!"), "ابحثي عن بطاقة الدخول لهذه الغرفة!", "Find this room's access card!")
     val pushBoxes = NiloLine(tl("¡Empuja las baterías a los cargadores!"), "ادفعي البطاريات إلى أماكن الشحن!", "Push the batteries onto the chargers!")
     val boxesDone = NiloLine(tl("¡Bien! Las baterías están cargando."), "رائع! البطاريات تُشحن.", "Great! The batteries are charging.")
-    val ice = NiloLine(tl("¡Gravedad cero! ¡Lía flota!"), "انعدام الجاذبية! ليا تطفو!", "Zero gravity! Lía floats!")
+    val reversed = NiloLine(tl("¡Los controles están al revés!"), "أزرار التحكم معكوسة!", "The controls are reversed!")
     val robot = NiloLine(tl("¡Cuidado con el robot de seguridad!"), "انتبهي من روبوت الحراسة!", "Watch out for the security robot!")
     val home = NiloLine(tl("¡Lo logramos! ¡Una página más!"), "نجحنا! صفحة أخرى!", "We did it! One more page!")
     val praise = listOf(

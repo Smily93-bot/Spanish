@@ -108,3 +108,59 @@ fun wordEndingVariants(word: String): List<String> {
     }
     return out
 }
+
+/** Common irregular forms → the dictionary word ("soy" → "ser"), for tap-to-translate. */
+private val FORMS: Map<String, String> = listOf(
+    "ser" to "soy eres es somos sois son era eras éramos eran fue fui fueron sido sea",
+    "estar" to "estoy estás está estamos estáis están estaba estaban estuvo estado esté",
+    "tener" to "tengo tienes tiene tenemos tenéis tienen tenía tuvo tenga",
+    "haber" to "hay he has ha hemos habéis han había hubo haya habría",
+    "ir" to "voy vas va vamos vais van iba",
+    "hacer" to "hago haces hace hacemos hacen hizo hecho haga",
+    "poder" to "puedo puedes puede podemos pueden pudo podría",
+    "querer" to "quiero quieres quiere queremos quieren quería quisiera",
+    "decir" to "digo dices dice decimos dicen dijo dicho diga",
+    "ver" to "veo ves vemos veis visto vio",
+    "saber" to "sé sabes sabe sabemos saben supo",
+    "venir" to "vengo vienes viene venimos vienen vino",
+    "poner" to "pongo pone ponemos ponen puesto",
+    "salir" to "salgo sale salen salió",
+    "dar" to "doy das da damos dan dio",
+    "abrir" to "abierto abierta abiertos abiertas",
+    "escribir" to "escrito escrita",
+    "el" to "la los las lo",
+    "un" to "una unos unas uno",
+    "de" to "del",
+    "a" to "al",
+    "este" to "esta estos estas esto",
+    "ese" to "esa esos esas eso",
+    "mi" to "mis",
+    "tu" to "tus",
+    "su" to "sus",
+    "nuestro" to "nuestra nuestros nuestras",
+    "vosotros" to "vosotras",
+    "nosotros" to "nosotras",
+).flatMap { (lemma, forms) -> forms.split(" ").map { it to lemma } }.toMap()
+
+/**
+ * Dictionary words a form found in a sentence may come from, most likely first: "está" → "estar",
+ * "llaves" → "llave", "roja" → "rojo", "necesito" → "necesitar".
+ */
+fun lemmaCandidates(word: String): List<String> = buildList {
+    FORMS[word]?.let { add(it) }
+    if (word.endsWith("es")) add(word.dropLast(2))
+    if (word.endsWith("s")) add(word.dropLast(1))
+    if (word.endsWith("as")) add(word.dropLast(2) + "o")
+    if (word.endsWith("a")) add(word.dropLast(1) + "o")
+    for (ending in VERB_ENDINGS) {
+        if (word.endsWith(ending) && word.length > ending.length + 1) {
+            val stem = word.dropLast(ending.length)
+            add(stem + "ar"); add(stem + "er"); add(stem + "ir")
+        }
+    }
+}
+
+private val VERB_ENDINGS = listOf(
+    "amos", "emos", "imos", "áis", "éis", "ando", "iendo", "ado", "ada", "ados", "adas", "ido", "ida", "idos", "idas",
+    "aba", "aban", "ía", "ían", "an", "en", "as", "es", "o", "a", "e", "ó", "ió", "é", "í"
+)

@@ -1,5 +1,6 @@
 package com.example.data.content
 
+import com.example.flavor.lemmaCandidates
 import android.content.Context
 import com.example.data.model.*
 import com.example.flavor.TargetLanguage
@@ -29,6 +30,12 @@ class SpanishContent(
         (topicWords + frequency).associateBy { normalizeAnswer(it.shortSpanish) }
 
     fun lookup(spanish: String): VocabWord? = bySpanish[normalizeAnswer(spanish)]
+
+    /** Dictionary entry for a word as it appears in a sentence: the word itself, else its likely base forms. */
+    fun glossary(word: String): VocabWord? {
+        val w = word.lowercase().trim()
+        return lookup(w) ?: lemmaCandidates(w).firstNotNullOfOrNull { lookup(it) }
+    }
 
     /** Tap-to-choose answers for the expedition questions. */
     val answerChoices: AnswerChoices by lazy { AnswerChoices(tablets) }

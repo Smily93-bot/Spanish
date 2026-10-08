@@ -351,7 +351,7 @@ private val ITALIAN = mapOf(
     "¡Busca la tarjeta de acceso de esta sala!" to "Cerca la tessera d'accesso di questa stanza!",
     "¡Empuja las baterías a los cargadores!" to "Spingi le batterie sui caricatori!",
     "¡Bien! Las baterías están cargando." to "Brava! Le batterie si stanno caricando.",
-    "¡Gravedad cero! ¡Lía flota!" to "Gravità zero! Lía fluttua!",
+    "¡Los controles están al revés!" to "I comandi sono al contrario!",
     "¡Cuidado con el robot de seguridad!" to "Attenta al robot di sicurezza!",
     "¡Mira, la llave!" to "Guarda, la chiave!",
     "¡Tenemos la llave! ¡A la salida!" to "Abbiamo la chiave! All'uscita!",
@@ -369,3 +369,59 @@ fun wordEndingVariants(word: String): List<String> {
         else -> emptyList()
     }
 }
+
+/** Common irregular forms and article contractions → the dictionary word ("sono" → "essere"), for tap-to-translate. */
+private val FORMS: Map<String, String> = listOf(
+    "essere" to "sono sei è siamo siete era erano stato stata fu sia",
+    "avere" to "ho hai ha abbiamo avete hanno aveva avuto abbia",
+    "andare" to "vado vai va andiamo andate vanno andato",
+    "fare" to "faccio fai fa facciamo fate fanno fatto",
+    "potere" to "posso puoi può possiamo potete possono",
+    "volere" to "voglio vuoi vuole vogliamo volete vogliono",
+    "dire" to "dico dici dice diciamo dite dicono detto",
+    "vedere" to "vedo vedi vede vediamo vedono visto",
+    "sapere" to "so sai sa sappiamo sanno",
+    "venire" to "vengo vieni viene veniamo vengono venuto",
+    "stare" to "sto stai sta stiamo stanno",
+    "dare" to "do dai dà diamo danno",
+    "aprire" to "aperto aperta aperti aperte",
+    "perdere" to "perso persa",
+    "il" to "lo la i gli le l",
+    "uno" to "un una",
+    "di" to "del dello della dei degli delle dell",
+    "a" to "al allo alla ai agli alle all",
+    "in" to "nel nello nella nei negli nelle nell",
+    "da" to "dal dallo dalla dagli dalle dall",
+    "su" to "sul sullo sulla sui sugli sulle sull",
+    "questo" to "questa questi queste",
+    "quello" to "quella quelli quelle quel",
+    "mio" to "mia miei mie",
+    "tuo" to "tua tuoi tue",
+    "suo" to "sua suoi sue",
+    "nostro" to "nostra nostri nostre",
+).flatMap { (lemma, forms) -> forms.split(" ").map { it to lemma } }.toMap()
+
+/**
+ * Dictionary words a form found in a sentence may come from, most likely first: "è" → "essere",
+ * "l'atlante" → "atlante", "chiavi" → "chiave", "rossa" → "rosso", "parliamo" → "parlare".
+ */
+fun lemmaCandidates(word: String): List<String> = buildList {
+    val w = word.substringAfterLast('\'')
+    FORMS[w]?.let { add(it) }
+    add(w)
+    if (w.endsWith("i")) { add(w.dropLast(1) + "o"); add(w.dropLast(1) + "e") }
+    if (w.endsWith("e")) { add(w.dropLast(1) + "a"); add(w.dropLast(1) + "o") }
+    if (w.endsWith("a")) add(w.dropLast(1) + "o")
+    if (w.endsWith("che")) add(w.dropLast(3) + "ca")
+    for (ending in VERB_ENDINGS) {
+        if (w.endsWith(ending) && w.length > ending.length + 1) {
+            val stem = w.dropLast(ending.length)
+            add(stem + "are"); add(stem + "ere"); add(stem + "ire")
+        }
+    }
+}
+
+private val VERB_ENDINGS = listOf(
+    "iamo", "ate", "ete", "ite", "ano", "ono", "ato", "ata", "ati", "uto", "uta", "ito", "ita",
+    "ava", "avano", "eva", "evano", "o", "i", "a", "e"
+)

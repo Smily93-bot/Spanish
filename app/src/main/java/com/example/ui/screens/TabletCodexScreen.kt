@@ -376,9 +376,10 @@ internal fun QuestionCard(
                 }
             }
         }
-        if (mistakes > 0 && !solved) {
+        // The tip explains the question in the helper language, so it's there from the start.
+        if (!solved) {
             Spacer(Modifier.height(6.dp))
-            Text("💡 Nilo: " + language.pick(field.hintAr, field.hint), color = SolarAmber, fontSize = 12.sp)
+            Text("💡 " + language.pick(field.hintAr, field.hint), color = SolarAmber, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
         }
     }
 }
