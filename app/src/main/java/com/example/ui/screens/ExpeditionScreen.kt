@@ -29,6 +29,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -96,7 +97,7 @@ private enum class Station(val emoji: String, val es: String, val ar: String, va
  * Ships seen from above, one character per tile:
  * `#` wall, `.` floor, `P` start, `0`–`6` the pad of each room, `a`–`g` the door into room 0–6
  * (it opens when the room before is solved), `X` the exit door (needs the key), `K` where the key
- * appears and `E` the exit hatch. Diamonds (`*`) and consoles (`o`) are added per level.
+ * appears and `E` the exit hatch. Diamonds (`*`) are added per level.
  */
 private val SHIP_PLANS = listOf(
     // Three rows of three square rooms.
@@ -168,7 +169,7 @@ private val SIDES = listOf(IntOffset(1, 0), IntOffset(-1, 0), IntOffset(0, 1), I
 
 /**
  * The ship for one level: the floor plans take turns (and are mirrored on the next round), and
- * each level scatters its own consoles and diamonds through the rooms.
+ * each level scatters its own diamonds through the rooms.
  */
 private class ShipMap(level: Int) {
     private val grid: Array<CharArray>
@@ -181,32 +182,11 @@ private class ShipMap(level: Int) {
         return IntOffset(1, 1)
     }
 
-    /** True when every walkable tile can still be reached from the start (doors counted as open). */
-    private fun allReachable(): Boolean {
-        val start = find('P')
-        val seen = hashSetOf(start)
-        val queue = ArrayDeque(listOf(start))
-        while (queue.isNotEmpty()) {
-            val p = queue.removeFirst()
-            SIDES.map { p + it }.filter { inside(it) && at(it) != '#' && at(it) != 'o' && seen.add(it) }.forEach { queue.addLast(it) }
-        }
-        val walkable = (0 until MAP_H).sumOf { y -> (0 until MAP_W).count { x -> grid[y][x] != '#' && grid[y][x] != 'o' } }
-        return seen.size == walkable
-    }
-
     init {
         val plan = SHIP_PLANS[(level - 1).mod(SHIP_PLANS.size)]
         val mirrored = ((level - 1) / SHIP_PLANS.size) % 2 == 1
         grid = Array(MAP_H) { y -> (if (mirrored) plan[y].reversed() else plan[y]).toCharArray() }
         val random = kotlin.random.Random(level * 7919 + 17)
-        // A few consoles and crates, never next to a door or a pad and never cutting a room off.
-        repeat(14) {
-            val p = IntOffset(random.nextInt(1, MAP_W - 1), random.nextInt(1, MAP_H - 1))
-            if (at(p) == '.' && SIDES.all { at(p + it) in ".#o" }) {
-                grid[p.y][p.x] = 'o'
-                if (!allReachable()) grid[p.y][p.x] = '.'
-            }
-        }
         // Rooms: flood out from each pad (and the start and exit) without passing walls or doors.
         val seeds = listOf(find('P') to START_ROOM, find('E') to EXIT_ROOM) + (0..6).map { find('0' + it) to it }
         seeds.forEach { (seed, id) ->
@@ -372,7 +352,7 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
             val next = liaTo + dir
             val c = ship.at(next)
             when {
-                c == '#' || c == 'o' -> Unit
+                c == '#' -> Unit
                 !doorOpen(c) -> if (clock - lastBumpAt > 3f) {
                     lastBumpAt = clock
                     viewModel.soundEngine.error()
@@ -435,7 +415,8 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
                 onSpeak = { viewModel.speakSpanish(it) }
             )
             Box(Modifier.weight(1f).fillMaxWidth()) {
-                Canvas(Modifier.fillMaxSize()) {
+                // Clipped so the zoomed-in ship never draws over the goal text above it.
+                Canvas(Modifier.fillMaxSize().clipToBounds()) {
                     drawShip(
                         ship = ship,
                         walkSprite = walkSprite,
@@ -756,14 +737,6 @@ private fun DrawScope.drawShip(
                 drawCircle(SolarGold.copy(alpha = 0.3f), radius = ts * 0.3f, center = cc)
                 rotate(45f, pivot = cc) { drawRect(SolarGold, cc - Offset(ts * 0.15f, ts * 0.15f), Size(ts * 0.3f, ts * 0.3f)) }
                 rotate(45f, pivot = cc) { drawRect(Color.White.copy(alpha = 0.7f), cc - Offset(ts * 0.15f, ts * 0.15f), Size(ts * 0.3f, ts * 0.3f), style = Stroke(ts * 0.04f)) }
-            }
-            'o' -> {
-                // A console: a metal block with blinking lights.
-                drawRoundRect(HULL_LIGHT, tl + Offset(ts * 0.1f, ts * 0.1f), Size(ts * 0.8f, ts * 0.8f), CornerRadius(ts * 0.15f))
-                drawRoundRect(HULL, tl + Offset(ts * 0.22f, ts * 0.22f), Size(ts * 0.56f, ts * 0.32f), CornerRadius(ts * 0.08f))
-                val blink = sin(clock * 3f + p.x * 1.7f + p.y) > 0f
-                drawCircle(if (blink) SuccessGreen else MeteorRed, radius = ts * 0.07f, center = tl + Offset(ts * 0.33f, ts * 0.7f))
-                drawCircle(if (blink) SolarGold else DiamondCyan, radius = ts * 0.07f, center = tl + Offset(ts * 0.67f, ts * 0.7f))
             }
             'K' -> if (next == null && !hasKey) {
                 val pulse = 0.5f + 0.5f * sin(clock * 5f)

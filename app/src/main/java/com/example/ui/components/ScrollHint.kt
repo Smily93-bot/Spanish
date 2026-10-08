@@ -24,6 +24,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import kotlinx.coroutines.delay
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,9 +52,16 @@ import kotlinx.coroutines.launch
 @Composable
 fun BoxScope.ScrollMoreHint(scroll: ScrollState, language: HelperLanguage, fadeColor: Color) {
     val scope = rememberCoroutineScope()
+    // Wait until a new page has finished laying out: right after "Next" the page can look longer
+    // for a moment, which made the hint flash even when there was nothing below.
+    var settled by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        delay(700)
+        settled = true
+    }
     AnimatedVisibility(
         // Hidden while typing: the keyboard already covers the bottom of the panel.
-        visible = scroll.canScrollForward && WindowInsets.ime.getBottom(LocalDensity.current) == 0,
+        visible = settled && scroll.canScrollForward && WindowInsets.ime.getBottom(LocalDensity.current) == 0,
         enter = fadeIn(),
         exit = fadeOut(),
         modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth()
