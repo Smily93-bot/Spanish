@@ -1,0 +1,304 @@
+{
+  "units": [
+    {
+      "id": "u1",
+      "emoji": "👋",
+      "title": {"t": "I saluti", "en": "Greetings", "ar": "التحيّات"},
+      "words": [
+        {"t": "salve", "b": "salve", "en": "hello (polite)", "ar": "مرحبًا", "e": "🙋"},
+        {"t": "ciao", "b": "ciao", "en": "hi / bye", "ar": "أهلًا / وداعًا", "e": "👋"},
+        {"t": "grazie", "b": "grazie", "en": "thank you", "ar": "شكرًا", "e": "🙏"},
+        {"t": "l'amico", "b": "amico", "en": "friend", "ar": "صديق", "e": "🤝"},
+        {"t": "bene", "b": "bene", "en": "well, fine", "ar": "بخير", "e": "👍"},
+        {"t": "male", "b": "male", "en": "not well", "ar": "ليس بخير", "e": "👎"},
+        {"t": "la mattina", "b": "mattina", "en": "morning", "ar": "الصباح", "e": "🌅"},
+        {"t": "la notte", "b": "notte", "en": "night", "ar": "الليل", "e": "🌃"}
+      ],
+      "phrases": [
+        {"t": "Ciao, amico! Come stai?", "en": "Hi, friend! How are you?", "ar": "أهلًا يا صديقي! كيف حالك؟"},
+        {"t": "Bene, grazie.", "en": "Fine, thank you.", "ar": "بخير، شكرًا."},
+        {"t": "Sì, per favore. No, grazie.", "en": "Yes, please. No, thank you.", "ar": "نعم، من فضلك. لا، شكرًا."},
+        {"t": "Buonanotte! Arrivederci!", "en": "Good night! Goodbye!", "ar": "طابت ليلتك! مع السلامة!"}
+      ],
+      "tip": {
+        "en": "Greetings change with the time of day: \"buongiorno\" in the morning, \"buonasera\" in the evening, \"buonanotte\" at bedtime. \"Ciao\" is for friends; with grown-ups say \"salve\" or \"buongiorno\".",
+        "ar": "تتغيّر التحيّة حسب الوقت: \"buongiorno\" في الصباح، و\"buonasera\" في المساء، و\"buonanotte\" قبل النوم. قولي \"ciao\" لأصدقائك، ومع الكبار قولي \"salve\" أو \"buongiorno\"."
+      }
+    },
+    {
+      "id": "u2",
+      "emoji": "🧒",
+      "title": {"t": "Io e te", "en": "Me and You", "ar": "أنا وأنتِ"},
+      "words": [
+        {"t": "il nome", "b": "nome", "en": "name", "ar": "الاسم", "e": "📛"},
+        {"t": "il bambino", "b": "bambino", "en": "boy", "ar": "ولد", "e": "👦"},
+        {"t": "la bambina", "b": "bambina", "en": "girl", "ar": "بنت", "e": "👧"},
+        {"t": "l'uomo", "b": "uomo", "en": "man", "ar": "رجل", "e": "👨"},
+        {"t": "la donna", "b": "donna", "en": "woman", "ar": "امرأة", "e": "👩"},
+        {"t": "il neonato", "b": "neonato", "en": "baby", "ar": "رضيع", "e": "👶"},
+        {"t": "felice", "b": "felice", "en": "happy", "ar": "سعيد", "e": "😄"},
+        {"t": "triste", "b": "triste", "en": "sad", "ar": "حزين", "e": "😢"}
+      ],
+      "phrases": [
+        {"t": "Ciao, mi chiamo Sara.", "en": "Hi, my name is Sara.", "ar": "أهلًا، اسمي سارة."},
+        {"t": "Come ti chiami?", "en": "What is your name?", "ar": "ما اسمك؟"},
+        {"t": "Sono una bambina. Sono felice.", "en": "I am a girl. I am happy.", "ar": "أنا بنت. أنا سعيدة."},
+        {"t": "Tu sei il mio amico.", "en": "You are my friend.", "ar": "أنت صديقي."}
+      ],
+      "tip": {
+        "en": "\"Sono\" means \"I am\" and \"sei\" means \"you are\": \"Sono Sara\". To say your name, use \"Mi chiamo...\" (my name is...). To ask, say \"Come ti chiami?\".",
+        "ar": "\"Sono\" تعني \"أنا\" و\"sei\" تعني \"أنتِ\": \"Sono Sara\". لتقولي اسمك استعملي \"Mi chiamo...\" أي \"اسمي...\". وللسؤال قولي \"Come ti chiami?\"."
+      }
+    },
+    {
+      "id": "u3",
+      "emoji": "🔢",
+      "title": {"t": "I numeri", "en": "Numbers", "ar": "الأرقام"},
+      "words": [
+        {"t": "uno", "b": "uno", "en": "one", "ar": "واحد", "e": "1️⃣"},
+        {"t": "due", "b": "due", "en": "two", "ar": "اثنان", "e": "2️⃣"},
+        {"t": "tre", "b": "tre", "en": "three", "ar": "ثلاثة", "e": "3️⃣"},
+        {"t": "quattro", "b": "quattro", "en": "four", "ar": "أربعة", "e": "4️⃣"},
+        {"t": "cinque", "b": "cinque", "en": "five", "ar": "خمسة", "e": "5️⃣"},
+        {"t": "sei", "b": "sei", "en": "six", "ar": "ستة", "e": "6️⃣"},
+        {"t": "sette", "b": "sette", "en": "seven", "ar": "سبعة", "e": "7️⃣"},
+        {"t": "otto", "b": "otto", "en": "eight", "ar": "ثمانية", "e": "8️⃣"}
+      ],
+      "phrases": [
+        {"t": "Uno, due, tre, quattro, cinque.", "en": "One, two, three, four, five.", "ar": "واحد، اثنان، ثلاثة، أربعة، خمسة."},
+        {"t": "Sei, sette, otto, nove, dieci.", "en": "Six, seven, eight, nine, ten.", "ar": "ستة، سبعة، ثمانية، تسعة، عشرة."},
+        {"t": "Quanti amici? Due amici.", "en": "How many friends? Two friends.", "ar": "كم صديقًا؟ صديقان."},
+        {"t": "Quante bambine? Quattro bambine.", "en": "How many girls? Four girls.", "ar": "كم بنتًا؟ أربع بنات."}
+      ],
+      "tip": {
+        "en": "Nine is \"nove\" and ten is \"dieci\". To ask \"how many?\" say \"quanti?\" for masculine words and \"quante?\" for feminine words: \"Quante bambine?\".",
+        "ar": "تسعة هي \"nove\" وعشرة هي \"dieci\". لتسألي \"كم؟\" قولي \"quanti?\" مع الكلمات المذكّرة، و\"quante?\" مع الكلمات المؤنّثة: \"Quante bambine?\"."
+      }
+    },
+    {
+      "id": "u4",
+      "emoji": "🎨",
+      "title": {"t": "I colori", "en": "Colours", "ar": "الألوان"},
+      "words": [
+        {"t": "rosso", "b": "rosso", "en": "red", "ar": "أحمر", "e": "🔴"},
+        {"t": "blu", "b": "blu", "en": "blue", "ar": "أزرق", "e": "🔵"},
+        {"t": "verde", "b": "verde", "en": "green", "ar": "أخضر", "e": "🟢"},
+        {"t": "giallo", "b": "giallo", "en": "yellow", "ar": "أصفر", "e": "🟡"},
+        {"t": "arancione", "b": "arancione", "en": "orange", "ar": "برتقالي", "e": "🟠"},
+        {"t": "viola", "b": "viola", "en": "purple", "ar": "بنفسجي", "e": "🟣"},
+        {"t": "nero", "b": "nero", "en": "black", "ar": "أسود", "e": "⚫"},
+        {"t": "bianco", "b": "bianco", "en": "white", "ar": "أبيض", "e": "⚪"}
+      ],
+      "phrases": [
+        {"t": "Rosso, giallo e blu.", "en": "Red, yellow and blue.", "ar": "أحمر وأصفر وأزرق."},
+        {"t": "Di che colore è? È verde.", "en": "What colour is it? It is green.", "ar": "ما لونه؟ إنّه أخضر."},
+        {"t": "La notte è nera.", "en": "The night is black.", "ar": "الليل أسود."},
+        {"t": "Bianco e nero.", "en": "White and black.", "ar": "أبيض وأسود."}
+      ],
+      "tip": {
+        "en": "In Italian the colour comes after the noun, just like in Arabic: \"la notte nera\". Many colours change their ending: \"rosso\" for masculine words, \"rossa\" for feminine words.",
+        "ar": "في الإيطالية يأتي اللون بعد الاسم، تمامًا كما في العربية: \"la notte nera\". وكثير من الألوان يتغيّر آخرها: \"rosso\" مع الكلمات المذكّرة، و\"rossa\" مع الكلمات المؤنّثة."
+      }
+    },
+    {
+      "id": "u5",
+      "emoji": "🤗",
+      "title": {"t": "La famiglia", "en": "Family", "ar": "العائلة"},
+      "words": [
+        {"t": "il papà", "b": "papà", "en": "dad", "ar": "أب", "e": "👨"},
+        {"t": "la mamma", "b": "mamma", "en": "mum", "ar": "أم", "e": "👩"},
+        {"t": "il fratello", "b": "fratello", "en": "brother", "ar": "أخ", "e": "👦"},
+        {"t": "la sorella", "b": "sorella", "en": "sister", "ar": "أخت", "e": "👧"},
+        {"t": "il nonno", "b": "nonno", "en": "grandpa", "ar": "جدّ", "e": "👴"},
+        {"t": "la nonna", "b": "nonna", "en": "grandma", "ar": "جدّة", "e": "👵"},
+        {"t": "la famiglia", "b": "famiglia", "en": "family", "ar": "عائلة", "e": "👪"},
+        {"t": "l'amore", "b": "amore", "en": "love", "ar": "حبّ", "e": "❤️"}
+      ],
+      "phrases": [
+        {"t": "Questa è la mia famiglia.", "en": "This is my family.", "ar": "هذه عائلتي."},
+        {"t": "Lui è il mio papà e lei è la mia mamma.", "en": "He is my dad and she is my mum.", "ar": "هو أبي وهي أمي."},
+        {"t": "La nonna è felice.", "en": "Grandma is happy.", "ar": "الجدّة سعيدة."},
+        {"t": "Mio fratello e mia sorella.", "en": "My brother and my sister.", "ar": "أخي وأختي."}
+      ],
+      "tip": {
+        "en": "Every Italian noun is masculine or feminine. Masculine words use \"il\" (il nonno), feminine words use \"la\" (la nonna). Use \"lo\" before z or s + consonant (lo zio) and \"l'\" before a vowel (l'amore).",
+        "ar": "كل اسم في الإيطالية مذكّر أو مؤنّث. المذكّر يأخذ \"il\" مثل il nonno، والمؤنّث يأخذ \"la\" مثل la nonna. استعملي \"lo\" قبل z أو s مع حرف ساكن مثل lo zio، و\"l'\" قبل حرف علّة مثل l'amore."
+      }
+    },
+    {
+      "id": "u6",
+      "emoji": "📚",
+      "title": {"t": "La scuola", "en": "School", "ar": "المدرسة"},
+      "words": [
+        {"t": "il libro", "b": "libro", "en": "book", "ar": "كتاب", "e": "📖"},
+        {"t": "la matita", "b": "matita", "en": "pencil", "ar": "قلم رصاص", "e": "✏️"},
+        {"t": "lo zaino", "b": "zaino", "en": "school bag", "ar": "حقيبة مدرسية", "e": "🎒"},
+        {"t": "il righello", "b": "righello", "en": "ruler", "ar": "مسطرة", "e": "📏"},
+        {"t": "le forbici", "b": "forbici", "en": "scissors", "ar": "مقصّ", "e": "✂️"},
+        {"t": "la scuola", "b": "scuola", "en": "school", "ar": "مدرسة", "e": "🏫"},
+        {"t": "il quaderno", "b": "quaderno", "en": "notebook", "ar": "دفتر", "e": "📓"},
+        {"t": "il pennello", "b": "pennello", "en": "paintbrush", "ar": "فرشاة رسم", "e": "🖌️"}
+      ],
+      "phrases": [
+        {"t": "Due libri e tre matite.", "en": "Two books and three pencils.", "ar": "كتابان وثلاثة أقلام رصاص."},
+        {"t": "Il mio zaino è blu.", "en": "My school bag is blue.", "ar": "حقيبتي المدرسية زرقاء."},
+        {"t": "Quattro pennelli verdi.", "en": "Four green paintbrushes.", "ar": "أربع فُرَش رسم خضراء."},
+        {"t": "Le forbici e il righello.", "en": "The scissors and the ruler.", "ar": "المقصّ والمسطرة."}
+      ],
+      "tip": {
+        "en": "For more than one, masculine words change -o to -i (libro → libri) and feminine words change -a to -e (matita → matite). \"Il\" becomes \"i\" and \"la\" becomes \"le\".",
+        "ar": "للجمع تتغيّر -o إلى -i في المذكّر (libro ← libri)، وتتغيّر -a إلى -e في المؤنّث (matita ← matite). تصبح \"il\" هي \"i\"، وتصبح \"la\" هي \"le\"."
+      }
+    },
+    {
+      "id": "u7",
+      "emoji": "🍽️",
+      "title": {"t": "Il cibo", "en": "Food & Drinks", "ar": "الطعام والشراب"},
+      "words": [
+        {"t": "la mela", "b": "mela", "en": "apple", "ar": "تفاحة", "e": "🍎"},
+        {"t": "la banana", "b": "banana", "en": "banana", "ar": "موزة", "e": "🍌"},
+        {"t": "il pane", "b": "pane", "en": "bread", "ar": "خبز", "e": "🍞"},
+        {"t": "il latte", "b": "latte", "en": "milk", "ar": "حليب", "e": "🥛"},
+        {"t": "l'acqua", "b": "acqua", "en": "water", "ar": "ماء", "e": "💧"},
+        {"t": "il formaggio", "b": "formaggio", "en": "cheese", "ar": "جبن", "e": "🧀"},
+        {"t": "l'uovo", "b": "uovo", "en": "egg", "ar": "بيضة", "e": "🥚"},
+        {"t": "la fragola", "b": "fragola", "en": "strawberry", "ar": "فراولة", "e": "🍓"}
+      ],
+      "phrases": [
+        {"t": "Mi piace la mela.", "en": "I like the apple.", "ar": "أحبّ التفاحة."},
+        {"t": "Non mi piace il latte.", "en": "I don't like milk.", "ar": "لا أحبّ الحليب."},
+        {"t": "Ti piace il formaggio? Sì!", "en": "Do you like cheese? Yes!", "ar": "هل تحبّين الجبن؟ نعم!"},
+        {"t": "Mi piace il pane con il formaggio.", "en": "I like bread with cheese.", "ar": "أحبّ الخبز مع الجبن."}
+      ],
+      "tip": {
+        "en": "\"Mi piace\" means \"I like\" and \"non mi piace\" means \"I don't like\". To ask a friend, say \"Ti piace...?\" (do you like...?).",
+        "ar": "\"Mi piace\" تعني \"أحبّ\"، و\"non mi piace\" تعني \"لا أحبّ\". لتسألي صديقتك قولي \"Ti piace...?\" أي \"هل تحبّين...؟\"."
+      }
+    },
+    {
+      "id": "u8",
+      "emoji": "🐾",
+      "title": {"t": "Gli animali", "en": "Animals", "ar": "الحيوانات"},
+      "words": [
+        {"t": "il cane", "b": "cane", "en": "dog", "ar": "كلب", "e": "🐶"},
+        {"t": "il gatto", "b": "gatto", "en": "cat", "ar": "قطّة", "e": "🐱"},
+        {"t": "l'uccello", "b": "uccello", "en": "bird", "ar": "عصفور", "e": "🐦"},
+        {"t": "il pesce", "b": "pesce", "en": "fish", "ar": "سمكة", "e": "🐟"},
+        {"t": "il cavallo", "b": "cavallo", "en": "horse", "ar": "حصان", "e": "🐴"},
+        {"t": "la mucca", "b": "mucca", "en": "cow", "ar": "بقرة", "e": "🐮"},
+        {"t": "il leone", "b": "leone", "en": "lion", "ar": "أسد", "e": "🦁"},
+        {"t": "il coniglio", "b": "coniglio", "en": "rabbit", "ar": "أرنب", "e": "🐰"}
+      ],
+      "phrases": [
+        {"t": "Un cane e un gatto.", "en": "A dog and a cat.", "ar": "كلب وقطّة."},
+        {"t": "È una mucca bianca e nera.", "en": "It is a black and white cow.", "ar": "إنّها بقرة بيضاء وسوداء."},
+        {"t": "Tre uccelli blu.", "en": "Three blue birds.", "ar": "ثلاثة عصافير زرقاء."},
+        {"t": "Mi piace il coniglio.", "en": "I like the rabbit.", "ar": "أحبّ الأرنب."}
+      ],
+      "tip": {
+        "en": "\"Un\" and \"una\" mean \"a\" or \"an\": un cane, una mucca. Use \"uno\" before z or s + consonant (uno zaino) and \"un'\" before a vowel in feminine words (un'amica).",
+        "ar": "\"Un\" و\"una\" تشبهان التنوين في العربية: un cane تعني \"كلبٌ\"، وuna mucca تعني \"بقرةٌ\". استعملي \"uno\" قبل z أو s مع حرف ساكن مثل uno zaino، و\"un'\" قبل حرف علّة في المؤنّث مثل un'amica."
+      }
+    },
+    {
+      "id": "u9",
+      "emoji": "🖐️",
+      "title": {"t": "Il corpo", "en": "The Body", "ar": "الجسم"},
+      "words": [
+        {"t": "la mano", "b": "mano", "en": "hand", "ar": "يد", "e": "✋"},
+        {"t": "il piede", "b": "piede", "en": "foot", "ar": "قدم", "e": "🦶"},
+        {"t": "l'occhio", "b": "occhio", "en": "eye", "ar": "عين", "e": "👁️"},
+        {"t": "il naso", "b": "naso", "en": "nose", "ar": "أنف", "e": "👃"},
+        {"t": "la bocca", "b": "bocca", "en": "mouth", "ar": "فم", "e": "👄"},
+        {"t": "l'orecchio", "b": "orecchio", "en": "ear", "ar": "أذن", "e": "👂"},
+        {"t": "il dente", "b": "dente", "en": "tooth", "ar": "سنّ", "e": "🦷"},
+        {"t": "il braccio", "b": "braccio", "en": "arm", "ar": "ذراع", "e": "💪"}
+      ],
+      "phrases": [
+        {"t": "Ho due occhi e due orecchie.", "en": "I have two eyes and two ears.", "ar": "لديّ عينان وأذنان."},
+        {"t": "Ho un naso e una bocca.", "en": "I have a nose and a mouth.", "ar": "لديّ أنف وفم."},
+        {"t": "Ho due mani e due piedi.", "en": "I have two hands and two feet.", "ar": "لديّ يدان وقدمان."},
+        {"t": "Il mio gatto ha gli occhi verdi.", "en": "My cat has green eyes.", "ar": "لقطّي عينان خضراوان."}
+      ],
+      "tip": {
+        "en": "\"Ho\" means \"I have\" (the h is silent): \"Ho due mani\". \"Hai...?\" means \"do you have...?\". Italian also uses it for age: \"Ho sette anni\" (I am seven).",
+        "ar": "\"Ho\" تعني \"لديّ\"، والحرف h لا يُنطق: \"Ho due mani\". و\"Hai...?\" تعني \"هل لديكِ...؟\". وتُستعمل للعمر أيضًا: \"Ho sette anni\" أي \"عمري سبع سنوات\"."
+      }
+    },
+    {
+      "id": "u10",
+      "emoji": "👚",
+      "title": {"t": "I vestiti", "en": "Clothes", "ar": "الملابس"},
+      "words": [
+        {"t": "la maglietta", "b": "maglietta", "en": "T-shirt", "ar": "قميص قصير", "e": "👕"},
+        {"t": "i pantaloni", "b": "pantaloni", "en": "trousers", "ar": "بنطال", "e": "👖"},
+        {"t": "il vestito", "b": "vestito", "en": "dress", "ar": "فستان", "e": "👗"},
+        {"t": "la scarpa", "b": "scarpa", "en": "shoe", "ar": "حذاء", "e": "👟"},
+        {"t": "il cappello", "b": "cappello", "en": "hat", "ar": "قبّعة", "e": "🎩"},
+        {"t": "il calzino", "b": "calzino", "en": "sock", "ar": "جورب", "e": "🧦"},
+        {"t": "la sciarpa", "b": "sciarpa", "en": "scarf", "ar": "وشاح", "e": "🧣"},
+        {"t": "il cappotto", "b": "cappotto", "en": "coat", "ar": "معطف", "e": "🧥"}
+      ],
+      "phrases": [
+        {"t": "Porto una maglietta rossa.", "en": "I'm wearing a red T-shirt.", "ar": "أرتدي قميصًا أحمر."},
+        {"t": "Porto un vestito blu.", "en": "I'm wearing a blue dress.", "ar": "أرتدي فستانًا أزرق."},
+        {"t": "Il mio papà porta un cappello nero.", "en": "My dad is wearing a black hat.", "ar": "أبي يرتدي قبّعة سوداء."},
+        {"t": "Porti le scarpe bianche?", "en": "Are you wearing white shoes?", "ar": "هل ترتدين حذاءً أبيض؟"}
+      ],
+      "tip": {
+        "en": "\"Porto\" means \"I'm wearing\" and \"porti\" means \"you're wearing\". Remember: the colour comes after and matches: un vestito rosso, una maglietta rossa, le scarpe rosse.",
+        "ar": "\"Porto\" تعني \"أرتدي\"، و\"porti\" تعني \"ترتدين\". تذكّري: اللون يأتي بعد الاسم ويوافقه: un vestito rosso، una maglietta rossa، le scarpe rosse."
+      }
+    },
+    {
+      "id": "u11",
+      "emoji": "🏡",
+      "title": {"t": "La casa", "en": "House & Rooms", "ar": "البيت والغرف"},
+      "words": [
+        {"t": "la casa", "b": "casa", "en": "house", "ar": "بيت", "e": "🏠"},
+        {"t": "la cucina", "b": "cucina", "en": "kitchen", "ar": "مطبخ", "e": "🍳"},
+        {"t": "il bagno", "b": "bagno", "en": "bathroom", "ar": "حمّام", "e": "🛁"},
+        {"t": "il letto", "b": "letto", "en": "bed", "ar": "سرير", "e": "🛏️"},
+        {"t": "la sedia", "b": "sedia", "en": "chair", "ar": "كرسي", "e": "🪑"},
+        {"t": "il divano", "b": "divano", "en": "sofa", "ar": "أريكة", "e": "🛋️"},
+        {"t": "la finestra", "b": "finestra", "en": "window", "ar": "نافذة", "e": "🪟"},
+        {"t": "la doccia", "b": "doccia", "en": "shower", "ar": "دُشّ", "e": "🚿"}
+      ],
+      "phrases": [
+        {"t": "In cucina ci sono due sedie.", "en": "In the kitchen there are two chairs.", "ar": "يوجد كرسيّان في المطبخ."},
+        {"t": "Nella mia casa c'è un divano rosso.", "en": "In my house there is a red sofa.", "ar": "في بيتي توجد أريكة حمراء."},
+        {"t": "C'è una doccia in bagno? Sì.", "en": "Is there a shower in the bathroom? Yes.", "ar": "هل يوجد دُشّ في الحمّام؟ نعم."},
+        {"t": "Ci sono tre finestre.", "en": "There are three windows.", "ar": "توجد ثلاث نوافذ."}
+      ],
+      "tip": {
+        "en": "\"C'è\" means \"there is\" (one thing) and \"ci sono\" means \"there are\" (many things): c'è un letto, ci sono due letti. To ask, just say it as a question: \"C'è una doccia?\".",
+        "ar": "\"C'è\" تعني \"يوجد\" لشيء واحد، و\"ci sono\" تعني \"توجد\" لعدّة أشياء: c'è un letto، ci sono due letti. وللسؤال قوليها بنبرة سؤال: \"C'è una doccia?\"."
+      }
+    },
+    {
+      "id": "u12",
+      "emoji": "🌌",
+      "title": {"t": "Lo spazio", "en": "Space & the Ship", "ar": "الفضاء والسفينة"},
+      "words": [
+        {"t": "la stella", "b": "stella", "en": "star", "ar": "نجمة", "e": "⭐"},
+        {"t": "la luna", "b": "luna", "en": "moon", "ar": "قمر", "e": "🌙"},
+        {"t": "il sole", "b": "sole", "en": "sun", "ar": "شمس", "e": "☀️"},
+        {"t": "il pianeta", "b": "pianeta", "en": "planet", "ar": "كوكب", "e": "🪐"},
+        {"t": "il razzo", "b": "razzo", "en": "rocket", "ar": "صاروخ", "e": "🚀"},
+        {"t": "la chiave", "b": "chiave", "en": "key", "ar": "مفتاح", "e": "🔑"},
+        {"t": "la porta", "b": "porta", "en": "door", "ar": "باب", "e": "🚪"},
+        {"t": "la luce", "b": "luce", "en": "light", "ar": "ضوء", "e": "💡"}
+      ],
+      "phrases": [
+        {"t": "Dov'è la chiave?", "en": "Where is the key?", "ar": "أين المفتاح؟"},
+        {"t": "La chiave è sulla sedia.", "en": "The key is on the chair.", "ar": "المفتاح على الكرسي."},
+        {"t": "Il razzo è sulla luna.", "en": "The rocket is on the moon.", "ar": "الصاروخ على القمر."},
+        {"t": "Il sole è giallo e la luna è bianca.", "en": "The sun is yellow and the moon is white.", "ar": "الشمس صفراء والقمر أبيض."}
+      ],
+      "tip": {
+        "en": "Use \"è\" to say where something is: \"La chiave è sul tavolo\" (the key is on the table). Ask with \"Dov'è...?\" (where is...?).",
+        "ar": "استعملي \"è\" لتقولي أين يوجد الشيء: \"La chiave è sul tavolo\" أي \"المفتاح على الطاولة\". واسألي بـ \"Dov'è...?\" أي \"أين...؟\"."
+      }
+    }
+  ]
+}
