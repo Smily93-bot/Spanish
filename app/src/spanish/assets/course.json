@@ -1,0 +1,304 @@
+{
+  "units": [
+    {
+      "id": "u1",
+      "emoji": "👋",
+      "title": {"t": "Saludos", "en": "Greetings", "ar": "التحيّات"},
+      "words": [
+        {"t": "hola", "b": "hola", "en": "hello", "ar": "مرحبًا", "e": "🙋"},
+        {"t": "adiós", "b": "adiós", "en": "goodbye", "ar": "مع السلامة", "e": "👋"},
+        {"t": "gracias", "b": "gracias", "en": "thank you", "ar": "شكرًا", "e": "🙏"},
+        {"t": "el amigo", "b": "amigo", "en": "friend", "ar": "صديق", "e": "🤝"},
+        {"t": "bien", "b": "bien", "en": "well, fine", "ar": "بخير", "e": "👍"},
+        {"t": "mal", "b": "mal", "en": "bad", "ar": "سيّئ", "e": "👎"},
+        {"t": "la mañana", "b": "mañana", "en": "morning", "ar": "الصباح", "e": "🌅"},
+        {"t": "la noche", "b": "noche", "en": "night", "ar": "الليل", "e": "🌃"}
+      ],
+      "phrases": [
+        {"t": "¡Hola, amigo! ¿Cómo estás?", "en": "Hi, friend! How are you?", "ar": "مرحبًا يا صديقي! كيف حالك؟"},
+        {"t": "Bien, gracias.", "en": "Fine, thank you.", "ar": "بخير، شكرًا."},
+        {"t": "Sí, por favor. No, gracias.", "en": "Yes, please. No, thank you.", "ar": "نعم، من فضلك. لا، شكرًا."},
+        {"t": "Buenas noches. ¡Adiós!", "en": "Good night. Goodbye!", "ar": "طابت ليلتك. مع السلامة!"}
+      ],
+      "tip": {
+        "en": "Greetings change with the time of day: \"buenos días\" in the morning, \"buenas tardes\" in the afternoon, \"buenas noches\" at night. \"Hola\" is for friends; with grown-ups you can say \"¿Cómo está usted?\".",
+        "ar": "تتغيّر التحيّة حسب الوقت: \"buenos días\" في الصباح، و\"buenas tardes\" بعد الظهر، و\"buenas noches\" في الليل. قولي \"Hola\" لأصدقائك، ومع الكبار قولي \"¿Cómo está usted?\"."
+      }
+    },
+    {
+      "id": "u2",
+      "emoji": "🧒",
+      "title": {"t": "Yo y tú", "en": "Me and You", "ar": "أنا وأنتِ"},
+      "words": [
+        {"t": "el nombre", "b": "nombre", "en": "name", "ar": "الاسم", "e": "📛"},
+        {"t": "el niño", "b": "niño", "en": "boy", "ar": "ولد", "e": "👦"},
+        {"t": "la niña", "b": "niña", "en": "girl", "ar": "بنت", "e": "👧"},
+        {"t": "el hombre", "b": "hombre", "en": "man", "ar": "رجل", "e": "👨"},
+        {"t": "la mujer", "b": "mujer", "en": "woman", "ar": "امرأة", "e": "👩"},
+        {"t": "el bebé", "b": "bebé", "en": "baby", "ar": "رضيع", "e": "👶"},
+        {"t": "feliz", "b": "feliz", "en": "happy", "ar": "سعيد", "e": "😄"},
+        {"t": "triste", "b": "triste", "en": "sad", "ar": "حزين", "e": "😢"}
+      ],
+      "phrases": [
+        {"t": "Hola, me llamo Ana.", "en": "Hi, my name is Ana.", "ar": "مرحبًا، اسمي آنا."},
+        {"t": "¿Cómo te llamas?", "en": "What is your name?", "ar": "ما اسمك؟"},
+        {"t": "Soy una niña. Soy feliz.", "en": "I am a girl. I am happy.", "ar": "أنا بنت. أنا سعيدة."},
+        {"t": "Tú eres mi amigo.", "en": "You are my friend.", "ar": "أنت صديقي."}
+      ],
+      "tip": {
+        "en": "\"Soy\" means \"I am\" and \"eres\" means \"you are\": \"Soy Ana\". To say your name, use \"Me llamo...\" (my name is...). To ask, say \"¿Cómo te llamas?\".",
+        "ar": "\"Soy\" تعني \"أنا\" و\"eres\" تعني \"أنتِ\": \"Soy Ana\". لتقولي اسمك استعملي \"Me llamo...\" أي \"اسمي...\". وللسؤال قولي \"¿Cómo te llamas?\"."
+      }
+    },
+    {
+      "id": "u3",
+      "emoji": "🔢",
+      "title": {"t": "Los números", "en": "Numbers", "ar": "الأرقام"},
+      "words": [
+        {"t": "uno", "b": "uno", "en": "one", "ar": "واحد", "e": "1️⃣"},
+        {"t": "dos", "b": "dos", "en": "two", "ar": "اثنان", "e": "2️⃣"},
+        {"t": "tres", "b": "tres", "en": "three", "ar": "ثلاثة", "e": "3️⃣"},
+        {"t": "cuatro", "b": "cuatro", "en": "four", "ar": "أربعة", "e": "4️⃣"},
+        {"t": "cinco", "b": "cinco", "en": "five", "ar": "خمسة", "e": "5️⃣"},
+        {"t": "seis", "b": "seis", "en": "six", "ar": "ستة", "e": "6️⃣"},
+        {"t": "siete", "b": "siete", "en": "seven", "ar": "سبعة", "e": "7️⃣"},
+        {"t": "ocho", "b": "ocho", "en": "eight", "ar": "ثمانية", "e": "8️⃣"}
+      ],
+      "phrases": [
+        {"t": "Uno, dos, tres, cuatro, cinco.", "en": "One, two, three, four, five.", "ar": "واحد، اثنان، ثلاثة، أربعة، خمسة."},
+        {"t": "Seis, siete, ocho, nueve, diez.", "en": "Six, seven, eight, nine, ten.", "ar": "ستة، سبعة، ثمانية، تسعة، عشرة."},
+        {"t": "¿Cuántos amigos? Dos amigos.", "en": "How many friends? Two friends.", "ar": "كم صديقًا؟ صديقان."},
+        {"t": "¿Cuántas niñas? Cuatro niñas.", "en": "How many girls? Four girls.", "ar": "كم بنتًا؟ أربع بنات."}
+      ],
+      "tip": {
+        "en": "Nine is \"nueve\" and ten is \"diez\". To ask \"how many?\" say \"¿cuántos?\" for el-words and \"¿cuántas?\" for la-words: \"¿Cuántas niñas?\".",
+        "ar": "تسعة هي \"nueve\" وعشرة هي \"diez\". لتسألي \"كم؟\" قولي \"¿cuántos?\" مع كلمات el، و\"¿cuántas?\" مع كلمات la: \"¿Cuántas niñas?\"."
+      }
+    },
+    {
+      "id": "u4",
+      "emoji": "🎨",
+      "title": {"t": "Los colores", "en": "Colours", "ar": "الألوان"},
+      "words": [
+        {"t": "rojo", "b": "rojo", "en": "red", "ar": "أحمر", "e": "🔴"},
+        {"t": "azul", "b": "azul", "en": "blue", "ar": "أزرق", "e": "🔵"},
+        {"t": "verde", "b": "verde", "en": "green", "ar": "أخضر", "e": "🟢"},
+        {"t": "amarillo", "b": "amarillo", "en": "yellow", "ar": "أصفر", "e": "🟡"},
+        {"t": "naranja", "b": "naranja", "en": "orange", "ar": "برتقالي", "e": "🟠"},
+        {"t": "morado", "b": "morado", "en": "purple", "ar": "بنفسجي", "e": "🟣"},
+        {"t": "negro", "b": "negro", "en": "black", "ar": "أسود", "e": "⚫"},
+        {"t": "blanco", "b": "blanco", "en": "white", "ar": "أبيض", "e": "⚪"}
+      ],
+      "phrases": [
+        {"t": "Rojo, amarillo y azul.", "en": "Red, yellow and blue.", "ar": "أحمر وأصفر وأزرق."},
+        {"t": "¿De qué color es? Es verde.", "en": "What colour is it? It is green.", "ar": "ما لونه؟ إنّه أخضر."},
+        {"t": "La noche es negra.", "en": "The night is black.", "ar": "الليل أسود."},
+        {"t": "Blanco y negro.", "en": "White and black.", "ar": "أبيض وأسود."}
+      ],
+      "tip": {
+        "en": "In Spanish the colour comes after the noun, just like in Arabic: \"la noche negra\". Many colours change their ending: \"rojo\" with el-words, \"roja\" with la-words.",
+        "ar": "في الإسبانية يأتي اللون بعد الاسم، تمامًا كما في العربية: \"la noche negra\". وكثير من الألوان يتغيّر آخرها: \"rojo\" مع كلمات el، و\"roja\" مع كلمات la."
+      }
+    },
+    {
+      "id": "u5",
+      "emoji": "🤗",
+      "title": {"t": "La familia", "en": "Family", "ar": "العائلة"},
+      "words": [
+        {"t": "el papá", "b": "papá", "en": "dad", "ar": "أب", "e": "👨"},
+        {"t": "la mamá", "b": "mamá", "en": "mum", "ar": "أم", "e": "👩"},
+        {"t": "el hermano", "b": "hermano", "en": "brother", "ar": "أخ", "e": "👦"},
+        {"t": "la hermana", "b": "hermana", "en": "sister", "ar": "أخت", "e": "👧"},
+        {"t": "el abuelo", "b": "abuelo", "en": "grandpa", "ar": "جدّ", "e": "👴"},
+        {"t": "la abuela", "b": "abuela", "en": "grandma", "ar": "جدّة", "e": "👵"},
+        {"t": "la familia", "b": "familia", "en": "family", "ar": "عائلة", "e": "👪"},
+        {"t": "el amor", "b": "amor", "en": "love", "ar": "حبّ", "e": "❤️"}
+      ],
+      "phrases": [
+        {"t": "Esta es mi familia.", "en": "This is my family.", "ar": "هذه عائلتي."},
+        {"t": "Él es mi papá y ella es mi mamá.", "en": "He is my dad and she is my mum.", "ar": "هو أبي وهي أمي."},
+        {"t": "Mi abuela es feliz.", "en": "My grandma is happy.", "ar": "جدّتي سعيدة."},
+        {"t": "Mi hermano y mi hermana.", "en": "My brother and my sister.", "ar": "أخي وأختي."}
+      ],
+      "tip": {
+        "en": "Every Spanish noun is masculine or feminine. Masculine nouns use \"el\" (el abuelo) and feminine nouns use \"la\" (la abuela). Words ending in -o are often masculine, words ending in -a often feminine.",
+        "ar": "كل اسم في الإسبانية مذكّر أو مؤنّث. المذكّر يأخذ \"el\" مثل el abuelo، والمؤنّث يأخذ \"la\" مثل la abuela. الكلمات المنتهية بـ -o غالبًا مذكّرة، والمنتهية بـ -a غالبًا مؤنّثة."
+      }
+    },
+    {
+      "id": "u6",
+      "emoji": "📚",
+      "title": {"t": "La escuela", "en": "School", "ar": "المدرسة"},
+      "words": [
+        {"t": "el libro", "b": "libro", "en": "book", "ar": "كتاب", "e": "📖"},
+        {"t": "el lápiz", "b": "lápiz", "en": "pencil", "ar": "قلم رصاص", "e": "✏️"},
+        {"t": "la mochila", "b": "mochila", "en": "school bag", "ar": "حقيبة مدرسية", "e": "🎒"},
+        {"t": "la regla", "b": "regla", "en": "ruler", "ar": "مسطرة", "e": "📏"},
+        {"t": "las tijeras", "b": "tijeras", "en": "scissors", "ar": "مقصّ", "e": "✂️"},
+        {"t": "la escuela", "b": "escuela", "en": "school", "ar": "مدرسة", "e": "🏫"},
+        {"t": "el cuaderno", "b": "cuaderno", "en": "notebook", "ar": "دفتر", "e": "📓"},
+        {"t": "el pincel", "b": "pincel", "en": "paintbrush", "ar": "فرشاة رسم", "e": "🖌️"}
+      ],
+      "phrases": [
+        {"t": "Dos libros y tres lápices.", "en": "Two books and three pencils.", "ar": "كتابان وثلاثة أقلام رصاص."},
+        {"t": "Mi mochila es azul.", "en": "My school bag is blue.", "ar": "حقيبتي المدرسية زرقاء."},
+        {"t": "Cuatro pinceles verdes.", "en": "Four green paintbrushes.", "ar": "أربع فُرَش رسم خضراء."},
+        {"t": "Las tijeras y la regla.", "en": "The scissors and the ruler.", "ar": "المقصّ والمسطرة."}
+      ],
+      "tip": {
+        "en": "For more than one, add -s after a vowel (libro → libros) and -es after a consonant (pincel → pinceles). \"El\" becomes \"los\" and \"la\" becomes \"las\". Watch out: lápiz → lápices.",
+        "ar": "للجمع أضيفي -s بعد حرف علّة (libro ← libros)، وأضيفي -es بعد حرف ساكن (pincel ← pinceles). تصبح \"el\" هي \"los\"، وتصبح \"la\" هي \"las\". انتبهي: lápiz ← lápices."
+      }
+    },
+    {
+      "id": "u7",
+      "emoji": "🍽️",
+      "title": {"t": "La comida", "en": "Food & Drinks", "ar": "الطعام والشراب"},
+      "words": [
+        {"t": "la manzana", "b": "manzana", "en": "apple", "ar": "تفاحة", "e": "🍎"},
+        {"t": "el plátano", "b": "plátano", "en": "banana", "ar": "موزة", "e": "🍌"},
+        {"t": "el pan", "b": "pan", "en": "bread", "ar": "خبز", "e": "🍞"},
+        {"t": "la leche", "b": "leche", "en": "milk", "ar": "حليب", "e": "🥛"},
+        {"t": "el agua", "b": "agua", "en": "water", "ar": "ماء", "e": "💧"},
+        {"t": "el queso", "b": "queso", "en": "cheese", "ar": "جبن", "e": "🧀"},
+        {"t": "el huevo", "b": "huevo", "en": "egg", "ar": "بيضة", "e": "🥚"},
+        {"t": "la fresa", "b": "fresa", "en": "strawberry", "ar": "فراولة", "e": "🍓"}
+      ],
+      "phrases": [
+        {"t": "Me gusta la manzana.", "en": "I like the apple.", "ar": "أحبّ التفاحة."},
+        {"t": "No me gusta la leche.", "en": "I don't like milk.", "ar": "لا أحبّ الحليب."},
+        {"t": "¿Te gusta el queso? ¡Sí!", "en": "Do you like cheese? Yes!", "ar": "هل تحبّين الجبن؟ نعم!"},
+        {"t": "Me gusta el pan con queso.", "en": "I like bread with cheese.", "ar": "أحبّ الخبز مع الجبن."}
+      ],
+      "tip": {
+        "en": "\"Me gusta\" means \"I like\" and \"no me gusta\" means \"I don't like\". To ask a friend, say \"¿Te gusta...?\" (do you like...?).",
+        "ar": "\"Me gusta\" تعني \"أحبّ\"، و\"no me gusta\" تعني \"لا أحبّ\". لتسألي صديقتك قولي \"¿Te gusta...?\" أي \"هل تحبّين...؟\"."
+      }
+    },
+    {
+      "id": "u8",
+      "emoji": "🐾",
+      "title": {"t": "Los animales", "en": "Animals", "ar": "الحيوانات"},
+      "words": [
+        {"t": "el perro", "b": "perro", "en": "dog", "ar": "كلب", "e": "🐶"},
+        {"t": "el gato", "b": "gato", "en": "cat", "ar": "قطّة", "e": "🐱"},
+        {"t": "el pájaro", "b": "pájaro", "en": "bird", "ar": "عصفور", "e": "🐦"},
+        {"t": "el pez", "b": "pez", "en": "fish", "ar": "سمكة", "e": "🐟"},
+        {"t": "el caballo", "b": "caballo", "en": "horse", "ar": "حصان", "e": "🐴"},
+        {"t": "la vaca", "b": "vaca", "en": "cow", "ar": "بقرة", "e": "🐮"},
+        {"t": "el león", "b": "león", "en": "lion", "ar": "أسد", "e": "🦁"},
+        {"t": "el conejo", "b": "conejo", "en": "rabbit", "ar": "أرنب", "e": "🐰"}
+      ],
+      "phrases": [
+        {"t": "Un perro y un gato.", "en": "A dog and a cat.", "ar": "كلب وقطّة."},
+        {"t": "Es una vaca blanca y negra.", "en": "It is a black and white cow.", "ar": "إنّها بقرة بيضاء وسوداء."},
+        {"t": "Tres pájaros azules.", "en": "Three blue birds.", "ar": "ثلاثة عصافير زرقاء."},
+        {"t": "Me gusta el conejo.", "en": "I like the rabbit.", "ar": "أحبّ الأرنب."}
+      ],
+      "tip": {
+        "en": "\"Un\" and \"una\" mean \"a\" or \"an\". Use \"un\" with el-words (un perro) and \"una\" with la-words (una vaca).",
+        "ar": "\"Un\" و\"una\" تشبهان التنوين في العربية: un perro تعني \"كلبٌ\". استعملي \"un\" مع كلمات el مثل un perro، و\"una\" مع كلمات la مثل una vaca."
+      }
+    },
+    {
+      "id": "u9",
+      "emoji": "🖐️",
+      "title": {"t": "El cuerpo", "en": "The Body", "ar": "الجسم"},
+      "words": [
+        {"t": "la mano", "b": "mano", "en": "hand", "ar": "يد", "e": "✋"},
+        {"t": "el pie", "b": "pie", "en": "foot", "ar": "قدم", "e": "🦶"},
+        {"t": "el ojo", "b": "ojo", "en": "eye", "ar": "عين", "e": "👁️"},
+        {"t": "la nariz", "b": "nariz", "en": "nose", "ar": "أنف", "e": "👃"},
+        {"t": "la boca", "b": "boca", "en": "mouth", "ar": "فم", "e": "👄"},
+        {"t": "la oreja", "b": "oreja", "en": "ear", "ar": "أذن", "e": "👂"},
+        {"t": "el diente", "b": "diente", "en": "tooth", "ar": "سنّ", "e": "🦷"},
+        {"t": "el brazo", "b": "brazo", "en": "arm", "ar": "ذراع", "e": "💪"}
+      ],
+      "phrases": [
+        {"t": "Tengo dos ojos y dos orejas.", "en": "I have two eyes and two ears.", "ar": "لديّ عينان وأذنان."},
+        {"t": "Tengo una nariz y una boca.", "en": "I have a nose and a mouth.", "ar": "لديّ أنف وفم."},
+        {"t": "Tengo dos manos y dos pies.", "en": "I have two hands and two feet.", "ar": "لديّ يدان وقدمان."},
+        {"t": "Mi gato tiene ojos verdes.", "en": "My cat has green eyes.", "ar": "لقطّي عينان خضراوان."}
+      ],
+      "tip": {
+        "en": "\"Tengo\" means \"I have\": \"Tengo dos manos\". \"¿Tienes...?\" means \"do you have...?\". Spanish also uses it for age: \"Tengo siete años\" (I am seven).",
+        "ar": "\"Tengo\" تعني \"لديّ\": \"Tengo dos manos\". و\"¿Tienes...?\" تعني \"هل لديكِ...؟\". وتُستعمل للعمر أيضًا: \"Tengo siete años\" أي \"عمري سبع سنوات\"."
+      }
+    },
+    {
+      "id": "u10",
+      "emoji": "👚",
+      "title": {"t": "La ropa", "en": "Clothes", "ar": "الملابس"},
+      "words": [
+        {"t": "la camiseta", "b": "camiseta", "en": "T-shirt", "ar": "قميص قصير", "e": "👕"},
+        {"t": "el pantalón", "b": "pantalón", "en": "trousers", "ar": "بنطال", "e": "👖"},
+        {"t": "el vestido", "b": "vestido", "en": "dress", "ar": "فستان", "e": "👗"},
+        {"t": "el zapato", "b": "zapato", "en": "shoe", "ar": "حذاء", "e": "👟"},
+        {"t": "el sombrero", "b": "sombrero", "en": "hat", "ar": "قبّعة", "e": "🎩"},
+        {"t": "el calcetín", "b": "calcetín", "en": "sock", "ar": "جورب", "e": "🧦"},
+        {"t": "la bufanda", "b": "bufanda", "en": "scarf", "ar": "وشاح", "e": "🧣"},
+        {"t": "el abrigo", "b": "abrigo", "en": "coat", "ar": "معطف", "e": "🧥"}
+      ],
+      "phrases": [
+        {"t": "Llevo una camiseta roja.", "en": "I'm wearing a red T-shirt.", "ar": "أرتدي قميصًا أحمر."},
+        {"t": "Llevo un vestido azul.", "en": "I'm wearing a blue dress.", "ar": "أرتدي فستانًا أزرق."},
+        {"t": "Mi papá lleva un sombrero negro.", "en": "My dad is wearing a black hat.", "ar": "أبي يرتدي قبّعة سوداء."},
+        {"t": "¿Llevas zapatos blancos?", "en": "Are you wearing white shoes?", "ar": "هل ترتدين حذاءً أبيض؟"}
+      ],
+      "tip": {
+        "en": "\"Llevo\" means \"I'm wearing\" and \"llevas\" means \"you're wearing\". Remember: the colour comes after and matches: un vestido rojo, una camiseta roja, zapatos rojos.",
+        "ar": "\"Llevo\" تعني \"أرتدي\"، و\"llevas\" تعني \"ترتدين\". تذكّري: اللون يأتي بعد الاسم ويوافقه: un vestido rojo، una camiseta roja، zapatos rojos."
+      }
+    },
+    {
+      "id": "u11",
+      "emoji": "🏡",
+      "title": {"t": "La casa", "en": "House & Rooms", "ar": "البيت والغرف"},
+      "words": [
+        {"t": "la casa", "b": "casa", "en": "house", "ar": "بيت", "e": "🏠"},
+        {"t": "la cocina", "b": "cocina", "en": "kitchen", "ar": "مطبخ", "e": "🍳"},
+        {"t": "el baño", "b": "baño", "en": "bathroom", "ar": "حمّام", "e": "🛁"},
+        {"t": "la cama", "b": "cama", "en": "bed", "ar": "سرير", "e": "🛏️"},
+        {"t": "la silla", "b": "silla", "en": "chair", "ar": "كرسي", "e": "🪑"},
+        {"t": "el sofá", "b": "sofá", "en": "sofa", "ar": "أريكة", "e": "🛋️"},
+        {"t": "la ventana", "b": "ventana", "en": "window", "ar": "نافذة", "e": "🪟"},
+        {"t": "la ducha", "b": "ducha", "en": "shower", "ar": "دُشّ", "e": "🚿"}
+      ],
+      "phrases": [
+        {"t": "Hay dos sillas en la cocina.", "en": "There are two chairs in the kitchen.", "ar": "يوجد كرسيّان في المطبخ."},
+        {"t": "En mi casa hay un sofá rojo.", "en": "In my house there is a red sofa.", "ar": "في بيتي توجد أريكة حمراء."},
+        {"t": "¿Hay una ducha en el baño? Sí.", "en": "Is there a shower in the bathroom? Yes.", "ar": "هل يوجد دُشّ في الحمّام؟ نعم."},
+        {"t": "Hay tres ventanas.", "en": "There are three windows.", "ar": "توجد ثلاث نوافذ."}
+      ],
+      "tip": {
+        "en": "\"Hay\" means both \"there is\" and \"there are\": hay una cama, hay dos camas. To ask, just say it as a question: \"¿Hay una ducha?\".",
+        "ar": "\"Hay\" تعني \"يوجد\" للمفرد والجمع: hay una cama، hay dos camas. وللسؤال قوليها بنبرة سؤال: \"¿Hay una ducha?\"."
+      }
+    },
+    {
+      "id": "u12",
+      "emoji": "🌌",
+      "title": {"t": "El espacio", "en": "Space & the Ship", "ar": "الفضاء والسفينة"},
+      "words": [
+        {"t": "la estrella", "b": "estrella", "en": "star", "ar": "نجمة", "e": "⭐"},
+        {"t": "la luna", "b": "luna", "en": "moon", "ar": "قمر", "e": "🌙"},
+        {"t": "el sol", "b": "sol", "en": "sun", "ar": "شمس", "e": "☀️"},
+        {"t": "el planeta", "b": "planeta", "en": "planet", "ar": "كوكب", "e": "🪐"},
+        {"t": "el cohete", "b": "cohete", "en": "rocket", "ar": "صاروخ", "e": "🚀"},
+        {"t": "la llave", "b": "llave", "en": "key", "ar": "مفتاح", "e": "🔑"},
+        {"t": "la puerta", "b": "puerta", "en": "door", "ar": "باب", "e": "🚪"},
+        {"t": "la luz", "b": "luz", "en": "light", "ar": "ضوء", "e": "💡"}
+      ],
+      "phrases": [
+        {"t": "¿Dónde está la llave?", "en": "Where is the key?", "ar": "أين المفتاح؟"},
+        {"t": "La llave está en la silla.", "en": "The key is on the chair.", "ar": "المفتاح على الكرسي."},
+        {"t": "El cohete está en la luna.", "en": "The rocket is on the moon.", "ar": "الصاروخ على القمر."},
+        {"t": "El sol es amarillo y la luna es blanca.", "en": "The sun is yellow and the moon is white.", "ar": "الشمس صفراء والقمر أبيض."}
+      ],
+      "tip": {
+        "en": "Use \"está\" to say where something is: \"La llave está en la mesa\" (the key is on the table). Ask with \"¿Dónde está...?\" (where is...?).",
+        "ar": "استعملي \"está\" لتقولي أين يوجد الشيء: \"La llave está en la mesa\" أي \"المفتاح على الطاولة\". واسألي بـ \"¿Dónde está...?\" أي \"أين...؟\"."
+      }
+    }
+  ]
+}
