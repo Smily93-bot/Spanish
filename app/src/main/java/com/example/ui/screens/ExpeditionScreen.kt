@@ -71,6 +71,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.R
+import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.graphics.compositeOver
+import com.example.data.ship.*
 import com.example.ads.RewardedAds
 import com.example.data.content.SpanishContent
 import com.example.data.model.*
@@ -112,280 +115,10 @@ private enum class Station(
     fun how(language: HelperLanguage) = language.pick(howAr, howEn)
 }
 
-// --------------------------------------------------------------------------- Ship floor plans
+// --------------------------------------------------------------------------- Ship levels (see data/ship)
 
-/*
- * Ships seen from above, one character per tile:
- * `#` wall, `.` floor, `P` start, `0`–`6` the pad of each room, `a`–`g` the door into room 0–6
- * (it opens when the room before is solved), `X` the exit door (needs the key), `K` where the key
- * appears and `E` the exit hatch. Diamonds (`*`) are added per level.
- */
-private val SHIP_PLANS = listOf(
-    // Three rows of three square rooms.
-    listOf(
-        "#############",
-        "#...#...#..E#",
-        "#.5.g.6.X...#",
-        "#...#.K.#...#",
-        "#...#...#...#",
-        "##f##########",
-        "#...#...#...#",
-        "#.4.e.3.d.2.#",
-        "#...#...#...#",
-        "#...#...#...#",
-        "##########c##",
-        "#...#...#...#",
-        "#.P.a.0.b.1.#",
-        "#...#...#...#",
-        "#...#...#...#",
-        "#############"
-    ),
-    // Long halls and small cabins.
-    listOf(
-        "#############",
-        "#..#....#...#",
-        "#E.X..6.g.5.#",
-        "#..#.K..#...#",
-        "##########f##",
-        "#.......#...#",
-        "#...3...e.4.#",
-        "#.......#...#",
-        "##d##########",
-        "#.....#.....#",
-        "#..2..c..1..#",
-        "#.....#.....#",
-        "##########b##",
-        "#.P.a..0....#",
-        "#...#.......#",
-        "#############"
-    ),
-    // Three tall decks side by side.
-    listOf(
-        "#############",
-        "#...#...#.E.#",
-        "#...c...#...#",
-        "#.1.#.2.##X##",
-        "#...#...#...#",
-        "##b##...#...#",
-        "#...##d##.6.#",
-        "#...#...#K..#",
-        "#.0.#.3.#...#",
-        "#...#...##g##",
-        "#...##e##...#",
-        "##a##...#.5.#",
-        "#...#...f...#",
-        "#.P.#.4.#...#",
-        "#...#...#...#",
-        "#############"
-    )
-)
-private const val MAP_W = 13
-private const val MAP_H = 16
-private const val START_ROOM = -1
-private const val EXIT_ROOM = 7
-private const val STEP_TIME = 0.17f   // seconds to walk one tile
+private const val STEP_TIME = 0.16f   // seconds to walk one tile
 private const val ZOOM = 1.3f         // how much closer than "whole ship on screen"
-private val DOORS = "abcdefgX"
-private val SIDES = listOf(IntOffset(1, 0), IntOffset(-1, 0), IntOffset(0, 1), IntOffset(0, -1))
-
-/**
- * Spaceship puzzles some rooms get before their game opens (after the old PC games Chip's Challenge
- * and Sokoban). The names in code stay simple; on screen they are ship things.
- */
-private enum class Challenge(val icon: String) {
-    KEY("💳"),      // find the room's access card first
-    BOXES("🔋"),    // push the batteries onto the chargers (Sokoban)
-    ROBOT("🤖"),    // a patrolling security robot: touching it costs a diamond
-    FETCH("🎁")     // a crew member asks (in the target language) for a thing kept in an earlier room
-}
-
-/** Fetch quest: the crew in [room] needs [wanted]; it lies in an earlier room next to two decoys. */
-private class Fetch(val room: Int, val wanted: CourseWord, val items: List<Pair<IntOffset, CourseWord>>)
-
-/** A robot walking back and forth over [length] tiles from [from] in direction [dir]. */
-private class Robot(val room: Int, val from: IntOffset, val dir: IntOffset, val length: Int) {
-    /** Position in tiles at time [clock] (two tiles a second). */
-    fun at(clock: Float): Offset {
-        val span = (length - 1).coerceAtLeast(1)
-        val s = (clock * 2f) % (2f * span)
-        val k = if (s <= span) s else 2f * span - s
-        return Offset(from.x + dir.x * k, from.y + dir.y * k)
-    }
-}
-
-/**
- * The ship for one level: the floor plans take turns (and are mirrored on the next round), each
- * level scatters its own diamonds, and from level to level more rooms get a puzzle.
- */
-private class ShipMap(level: Int, private val things: List<CourseWord>) {
-    private val grid: Array<CharArray>
-    private val roomOf = HashMap<IntOffset, Int>()
-    val challenges = HashMap<Int, Challenge>()
-    /** Boxes (room, start tile) and the circles they must be pushed onto. */
-    val crateStarts = mutableListOf<Pair<Int, IntOffset>>()
-    val targets = HashMap<Int, MutableList<IntOffset>>()
-    val robots = mutableListOf<Robot>()
-    val fetches = HashMap<Int, Fetch>()
-    /** Tiles taken by a puzzle, kept free of diamonds (declared before init, which fills it). */
-    private val used = hashSetOf<IntOffset>()
-
-    fun at(p: IntOffset): Char = grid.getOrNull(p.y)?.getOrNull(p.x) ?: '#'
-    private fun inside(p: IntOffset) = p.x in 0 until MAP_W && p.y in 0 until MAP_H
-    private fun find(c: Char): IntOffset {
-        grid.forEachIndexed { y, row -> val x = row.indexOf(c); if (x >= 0) return IntOffset(x, y) }
-        return IntOffset(1, 1)
-    }
-
-    init {
-        val plan = SHIP_PLANS[(level - 1).mod(SHIP_PLANS.size)]
-        val mirrored = ((level - 1) / SHIP_PLANS.size) % 2 == 1
-        grid = Array(MAP_H) { y -> (if (mirrored) plan[y].reversed() else plan[y]).toCharArray() }
-        val random = kotlin.random.Random(level * 7919 + 17)
-        // Rooms: flood out from each pad (and the start and exit) without passing walls or doors.
-        val seeds = listOf(find('P') to START_ROOM, find('E') to EXIT_ROOM) + (0..6).map { find('0' + it) to it }
-        seeds.forEach { (seed, id) ->
-            val stack = ArrayDeque(listOf(seed))
-            while (stack.isNotEmpty()) {
-                val p = stack.removeLast()
-                if (!inside(p) || p in roomOf || at(p) == '#' || at(p) in DOORS) continue
-                roomOf[p] = id
-                SIDES.forEach { stack.addLast(p + it) }
-            }
-        }
-        placeChallenges(level, random)
-        // Diamonds in different places every level: two in each room, one in the start room.
-        (listOf(START_ROOM) + (0..6)).forEach { id ->
-            roomOf.filter { (p, r) -> r == id && at(p) == '.' && p !in used }.keys.shuffled(random)
-                .take(if (id == START_ROOM) 1 else 2)
-                .forEach { grid[it.y][it.x] = '*' }
-        }
-    }
-
-    // ------------------------------------------------------------------ Puzzles
-
-    private fun doorInto(room: Int) = find(DOORS[room])
-    fun doorTo(room: Int) = doorInto(room)
-
-    /** A plain floor tile of [room] that isn't next to a door, a pad or the start/key/exit. */
-    private fun free(p: IntOffset, room: Int) =
-        roomOf[p] == room && at(p) == '.' && p !in used && SIDES.none { at(p + it) in DOORS || at(p + it) in "0123456PKE" }
-
-    private fun freeTiles(room: Int) = roomOf.keys.filter { free(it, room) }
-
-    /** Tiles reachable from the start with every door open. */
-    private fun reachable(blocked: Set<IntOffset> = emptySet()): Set<IntOffset> {
-        fun open(p: IntOffset) = inside(p) && at(p) != '#' && p !in blocked
-        val start = find('P')
-        val seen = hashSetOf(start)
-        val queue = ArrayDeque(listOf(start))
-        while (queue.isNotEmpty()) {
-            val p = queue.removeFirst()
-            for (d in SIDES) {
-                val q = p + d
-                if (open(q) && seen.add(q)) queue.addLast(q)
-            }
-        }
-        return seen
-    }
-
-    /** Every pad, the key spot and the exit can be reached. */
-    private fun solvable(blocked: Set<IntOffset> = emptySet()): Boolean {
-        val seen = reachable(blocked)
-        return (0..6).all { find('0' + it) in seen } && find('K') in seen && find('E') in seen
-    }
-
-    private fun placeChallenges(level: Int, random: kotlin.random.Random) {
-        // More rooms get a puzzle as the levels go on; fetch quests send Lía back to earlier rooms.
-        val kinds = when (level) {
-            1 -> listOf(Challenge.FETCH, Challenge.KEY)
-            2 -> listOf(Challenge.FETCH, Challenge.BOXES, Challenge.KEY)
-            3 -> listOf(Challenge.FETCH, Challenge.BOXES, Challenge.KEY, Challenge.FETCH)
-            else -> listOf(
-                Challenge.FETCH, Challenge.FETCH, Challenge.BOXES, Challenge.BOXES,
-                Challenge.KEY, Challenge.ROBOT
-            ).shuffled(random).take(minOf(7, 3 + level / 2))
-        }
-        val rooms = (0..6).shuffled(random).toMutableList()
-        for (kind in kinds) {
-            val room = rooms.firstOrNull { place(kind, it, level, random) } ?: continue
-            rooms.remove(room)
-            challenges[room] = kind
-        }
-    }
-
-    private fun place(kind: Challenge, room: Int, level: Int, random: kotlin.random.Random): Boolean {
-        val tiles = freeTiles(room)
-        when (kind) {
-            Challenge.KEY -> {
-                // The key hides in the corner furthest from the door.
-                val door = doorInto(room)
-                val p = tiles.maxByOrNull { abs(it.x - door.x) + abs(it.y - door.y) } ?: return false
-                grid[p.y][p.x] = 'k'
-                used += p
-                return true
-            }
-            Challenge.BOXES -> {
-                // Each box sits in a straight line: where Lía stands, the box, (free tiles,) the circle.
-                val pushes = if (level >= 4) 2 else 1
-                var placed = 0
-                for (start in tiles.shuffled(random)) {
-                    if (placed == 3) break
-                    for (d in SIDES.shuffled(random)) {
-                        val line = (0..pushes + 1).map { IntOffset(start.x + d.x * it, start.y + d.y * it) }
-                        if (!line.all { free(it, room) }) continue
-                        val crate = line[1]
-                        val target = line.last()
-                        val boxesNow = crateStarts.filter { it.first == room }.map { it.second }.toSet() + crate
-                        val boxesDone = targets[room].orEmpty().toSet() + target
-                        if (!solvable(boxesNow) || !solvable(boxesDone) || line[0] !in reachable(boxesNow)) continue
-                        crateStarts += room to crate
-                        targets.getOrPut(room) { mutableListOf() } += target
-                        grid[target.y][target.x] = 'T'
-                        used += line
-                        placed++
-                        break
-                    }
-                }
-                if (placed == 0) return false
-                return true
-            }
-            Challenge.FETCH -> {
-                // Only things you can carry: nouns (taught with their article), not "hello" or "sad".
-                val articles = setOf("el", "la", "los", "las", "il", "lo", "i", "gli", "le")
-                val nouns = things.filter { w ->
-                    val first = w.word.lowercase().substringBefore(' ')
-                    (w.word.contains(' ') && first in articles) || w.word.lowercase().startsWith("l'")
-                }
-                val picks = nouns.distinctBy { it.emoji }.shuffled(random).take(3)
-                if (picks.size < 3) return false
-                // The thing waits in a room Lía has already passed, so she has to walk back for it.
-                val source = (START_ROOM until room).shuffled(random).firstOrNull { freeTiles(it).size >= 3 } ?: return false
-                val spots = freeTiles(source).shuffled(random).take(3)
-                fetches[room] = Fetch(room, picks[0], spots.zip(picks.shuffled(random)))
-                used += spots
-                return true
-            }
-            Challenge.ROBOT -> {
-                for (start in tiles.shuffled(random)) {
-                    for (d in listOf(IntOffset(1, 0), IntOffset(0, 1))) {
-                        var length = 1
-                        while (length < 5 && free(IntOffset(start.x + d.x * length, start.y + d.y * length), room)) length++
-                        if (length >= 3) {
-                            robots += Robot(room, start, d, length)
-                            return true
-                        }
-                    }
-                }
-                return false
-            }
-        }
-    }
-
-    val pads = (0..6).map { find('0' + it) }
-    val start = find('P')
-    val tiles: List<Pair<IntOffset, Char>> = grid.flatMapIndexed { y, row -> row.mapIndexed { x, c -> IntOffset(x, y) to c } }
-    fun room(p: IntOffset): Int? = roomOf[p]
-}
 
 /** Walk-cycle frames inside explorer_walk.webp (x, y, width, height). */
 internal val WALK_FRAMES = listOf(
@@ -401,42 +134,64 @@ private fun sceneDrawable(asset: String): Int = when (asset) {
     else -> R.drawable.hidden_cabin
 }
 
+/** Bright, clear colours for the coloured keys and doors (red, blue, green, yellow). */
+private val KEY_TINTS = listOf(Color(0xFFE5484D), Color(0xFF1E6FE0), Color(0xFF2E9F5B), Color(0xFFF2B53A))
+
+/** Which learning room each floor tile belongs to (rooms are flooded out from their pads). */
+private fun roomsOf(level: ShipLevel): Map<Cell, Int> {
+    val out = HashMap<Cell, Int>()
+    val stop = "#RBGYH=-"
+    level.pads.forEachIndexed { i, pad ->
+        val stack = ArrayDeque(listOf(pad))
+        while (stack.isNotEmpty()) {
+            val p = stack.removeLast()
+            if (p in out || level.at(p) in stop || level.at(p) in "TU") continue
+            out[p] = i
+            for (d in listOf(UP, DOWN, LEFT, RIGHT)) stack.addLast(p + d)
+        }
+    }
+    return out
+}
+
 @Composable
 fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: BlasterViewModel, language: HelperLanguage) {
     val walkSprite = ImageBitmap.imageResource(R.drawable.explorer_walk)
     val niloSprite = ImageBitmap.imageResource(R.drawable.nilo_walk)
     val textMeasurer = rememberTextMeasurer()
+    val context = LocalContext.current
     val chapterNumber = data.tablets.indexOf(tablet) + 1
-    val ship = remember(tablet.id) {
-        // Things to fetch come from the units with objects you can pick up (school, food, animals, clothes, space).
-        val carryable = data.course.filter { it.id in setOf("u6", "u7", "u8", "u10", "u12") }.flatMap { it.words }
-        ShipMap(level = chapterNumber, things = carryable.ifEmpty { data.courseWords })
+    val levels = remember {
+        runCatching { ShipLevel.parseAll(context.assets.open("ship_levels.json").bufferedReader().use { it.readText() }) }.getOrDefault(emptyList())
     }
+    if (levels.isEmpty()) return LoadingContent(language == HelperLanguage.ARABIC)
+    val level = levels[(chapterNumber - 1).mod(levels.size)]
+    val rooms = remember(level) { roomsOf(level) }
 
-    // Lía walks tile by tile: from → to, progress 0..1.
-    var liaFrom by remember { mutableStateOf(ship.start) }
-    var liaTo by remember { mutableStateOf(ship.start) }
-    var niloFrom by remember { mutableStateOf(ship.start - IntOffset(1, 0)) }
-    var niloTo by remember { mutableStateOf(ship.start - IntOffset(1, 0)) }
+    // Fetch quest: a thing for each fetch spot (from units with things you can carry); one is wanted.
+    val things = remember(tablet.id) {
+        val carryable = data.course.filter { it.id in setOf("u6", "u7", "u8", "u10", "u12") }.flatMap { it.words }
+        carryable.ifEmpty { data.courseWords }.distinctBy { it.emoji }.shuffled().take(level.fetchSpots.size)
+    }
+    val wanted = remember(tablet.id) { if (things.isEmpty()) 0 else things.indices.random() }
+
+    // The game itself: an immutable state, a list for undo, and the last checkpoint.
+    var state by remember(tablet.id) { mutableStateOf(ShipRules.start(level)) }
+    val history = remember(tablet.id) { mutableStateListOf<ShipState>() }
+    var checkpoint by remember(tablet.id) { mutableStateOf(state) }
+    // Animation between tiles.
+    var fromPos by remember(tablet.id) { mutableStateOf(level.start) }
+    var fromRobots by remember(tablet.id) { mutableStateOf(level.robots.map { it.at }) }
+    var niloFrom by remember(tablet.id) { mutableStateOf(level.start) }
+    var niloTo by remember(tablet.id) { mutableStateOf(level.start) }
     var progress by remember { mutableFloatStateOf(1f) }
-    var facing by remember { mutableFloatStateOf(1f) }
-    var held by remember { mutableStateOf<IntOffset?>(null) }
-    // Puzzles: where the batteries are now, access cards picked up, robot bumps.
-    val crates = remember(tablet.id) { ship.crateStarts.map { it.second }.toMutableStateList() }
-    val roomKeys = remember { mutableStateListOf<Int>() }
-    // Fetch quests: things lying around, the one Lía carries, and rooms that got what they needed.
-    val things = remember(tablet.id) { ship.fetches.values.flatMap { it.items }.toMutableStateMap() }
-    var carrying by remember { mutableStateOf<CourseWord?>(null) }
-    val delivered = remember { mutableStateListOf<Int>() }
-    var lastHintAt by remember { mutableFloatStateOf(-10f) }
-    var lastRobotHit by remember { mutableFloatStateOf(-10f) }
+    var pending by remember { mutableStateOf<ShipEvent?>(null) }
+    var held by remember { mutableStateOf<Cell?>(null) }
     var clock by remember { mutableFloatStateOf(0f) }
+    var lastBumpAt by remember { mutableFloatStateOf(-10f) }
 
-    // Mission state.
-    val solved = remember { mutableStateListOf<Int>() }
+    // Learning rooms and diamonds.
     val solvedAt = remember { mutableStateMapOf<Int, Float>() }
-    val collected = remember { mutableStateListOf<IntOffset>() }
-    // Each wrong answer costs one collected diamond, so diamonds are worth protecting.
+    // Each wrong answer costs one diamond, so diamonds are worth protecting.
     var lostDiamonds by remember { mutableIntStateOf(0) }
     var lostAt by remember { mutableFloatStateOf(-10f) }
     // With no diamonds left, a mistake pauses the game until a short video earns one back.
@@ -444,23 +199,26 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
     var outOfDiamonds by remember { mutableStateOf(false) }
     var adMisses by remember { mutableIntStateOf(0) }
     var showStory by remember { mutableStateOf(false) }
+    var showTip by remember { mutableStateOf(false) }
     // Every chapter starts with its lesson and words, before the ship.
     var briefed by remember { mutableStateOf(false) }
     val results = remember { mutableStateMapOf<String, Boolean>() }
     var openStation by remember { mutableStateOf<Int?>(null) }
-    var hasKey by remember { mutableStateOf(false) }
     var finished by remember { mutableStateOf(false) }
 
-    // Nilo, Lía's co-pilot: walks one step behind her and comments in the target language.
+    // Nilo, Lía's co-pilot: walks one step behind her and only speaks when it matters.
     var niloLine by remember { mutableStateOf<NiloLine?>(null) }
     var niloLineUntil by remember { mutableFloatStateOf(0f) }
-    var lastMoveAt by remember { mutableFloatStateOf(0f) }
-    var lastBumpAt by remember { mutableFloatStateOf(-10f) }
 
     fun say(line: NiloLine, speak: Boolean = true) {
         niloLine = line
         niloLineUntil = clock + 2.5f
         if (speak) viewModel.speakSpanish(line.es)
+    }
+    /** A picture-only bubble (🔒, ⚡…): clear without reading. */
+    fun show(icon: String) {
+        niloLine = NiloLine(icon, icon, icon)
+        niloLineUntil = clock + 1.4f
     }
 
     val scene = data.scenes[tablet.scene]
@@ -470,101 +228,116 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
             .shuffled().take(4).toSet()
     }
     val totalQuestions = tablet.allQuestions.size + tableCells.size + 1 + searchTargets.size
-    val nextStation = Station.entries.indices.firstOrNull { it !in solved } // null once every room is solved
+    val nextStation = state.solved.takeIf { it < 7 }
     // The last sentence of the chapter, revealed word by word as rooms are won.
     val secretWords = remember(tablet.id) {
         tablet.ending.split(Regex("(?<=[.!?])\\s+")).lastOrNull { it.isNotBlank() }.orEmpty().split(" ").filter { it.isNotBlank() }
     }
     val secretOrder = remember(tablet.id) { secretWords.indices.shuffled(kotlin.random.Random(tablet.id.hashCode())) }
+    val diamonds = (state.diamonds.size + adDiamonds - lostDiamonds).coerceAtLeast(0)
 
-    fun doorOpen(c: Char): Boolean = when (c) {
-        in 'a'..'g' -> c == 'a' || (c - 'a' - 1) in solved
-        'X' -> hasKey
-        else -> true
-    }
-
-    /** A room's puzzle is done (or it has none), so its game can open. */
-    fun puzzleDone(room: Int): Boolean = when (ship.challenges[room]) {
-        Challenge.KEY -> room in roomKeys
-        Challenge.BOXES -> ship.targets[room].orEmpty().all { it in crates }
-        Challenge.FETCH -> room in delivered
-        else -> true
-    }
-
-    fun hint(line: NiloLine) {
-        if (clock - lastHintAt > 3f) {
-            lastHintAt = clock
-            say(line)
+    fun loseDiamond() {
+        if (state.diamonds.size + adDiamonds - lostDiamonds > 0) {
+            lostDiamonds++
+            lostAt = clock
         }
     }
 
-    /** Lía has just stepped onto [p]: pick things up, open the room's game, take the key, leave. */
-    fun arrive(p: IntOffset) {
-        things[p]?.let { thing ->
-            // Pick it up; whatever she was carrying is left here instead.
-            things.remove(p)
-            carrying?.let { things[p] = it }
-            carrying = thing
-            viewModel.soundEngine.click()
-            say(NiloLine("🎒 ${thing.word}", "🎒 ${thing.word}", "🎒 ${thing.word}"))
-        }
-        when (val c = ship.at(p)) {
-            'k' -> ship.room(p)?.let { room ->
-                if (room !in roomKeys) {
-                    roomKeys += room
-                    viewModel.soundEngine.powerUp()
-                    say(NiloLines.roomKey)
-                }
-            }
-            '*' -> if (p !in collected) {
-                collected += p
-                viewModel.soundEngine.click()
-            }
-            in '0'..'6' -> {
-                val i = c - '0'
-                val fetch = ship.fetches[i]
-                if (fetch != null && i !in delivered && i == Station.entries.indices.firstOrNull { it !in solved }) {
-                    val inHand = carrying
-                    when {
-                        inHand == fetch.wanted -> {
-                            delivered += i
-                            carrying = null
-                            viewModel.soundEngine.powerUp()
-                            say(NiloLines.thanks)
-                        }
-                        inHand != null -> say(NiloLine("${tl("No, eso no es")} ${fetch.wanted.word}.", "", ""))
-                        else -> say(NiloLine("${tl("Necesito")} ${fetch.wanted.word}.", "", ""))
-                    }
-                }
-                if (i == Station.entries.indices.firstOrNull { it !in solved } && !puzzleDone(i)) {
-                    viewModel.soundEngine.error()
-                    when (ship.challenges[i]) {
-                        Challenge.KEY -> hint(NiloLines.findRoomKey)
-                        Challenge.BOXES -> hint(NiloLines.pushBoxes)
-                        else -> Unit
-                    }
-                } else if (i == Station.entries.indices.firstOrNull { it !in solved }) {
-                    openStation = i
-                    held = null
-                    viewModel.soundEngine.powerUp()
-                }
-            }
-            'K' -> if (solved.size == Station.entries.size && !hasKey) {
-                hasKey = true
+    fun backToCheckpoint() {
+        state = checkpoint
+        history.clear()
+        fromPos = checkpoint.pos
+        fromRobots = checkpoint.robots.map { it.at }
+        niloFrom = checkpoint.pos
+        niloTo = checkpoint.pos
+        progress = 1f
+        pending = null
+    }
+
+    /** Lía has arrived on her tile: open a room's game, ask for a thing, or finish the level. */
+    fun arrived(event: ShipEvent?) {
+        when (event) {
+            is ShipEvent.RoomOpen -> {
+                if (event.room == level.fetchPad) say(NiloLines.thanks)
+                openStation = event.room
+                held = null
                 viewModel.soundEngine.powerUp()
-                say(NiloLines.gotKey)
             }
-            'E' -> if (hasKey && !finished) {
+            is ShipEvent.NeedThing -> {
+                val want = things.getOrNull(wanted)
+                if (want != null) {
+                    viewModel.soundEngine.error()
+                    say(
+                        if (event.carrying >= 0) NiloLine("${tl("No, eso no es")} ${want.word}.", "", "")
+                        else NiloLine("${tl("Necesito")} ${want.word}.", "", "")
+                    )
+                }
+            }
+            ShipEvent.Win -> if (!finished) {
                 finished = true
                 held = null
                 say(NiloLines.home)
-                val kept = (collected.size + adDiamonds - lostDiamonds).coerceAtLeast(0)
+                val kept = (state.diamonds.size + adDiamonds - lostDiamonds).coerceAtLeast(0)
                 viewModel.completeTablet(tablet, results.values.count { it }, totalQuestions, bonusCredits = kept * 5)
+            }
+            else -> Unit
+        }
+    }
+
+    fun tryStep(dir: Cell) {
+        val result = ShipRules.step(level, state, dir, wanted)
+        when (val e = result.event) {
+            is ShipEvent.Blocked -> {
+                state = result.state
+                if (clock - lastBumpAt > 1f) {
+                    lastBumpAt = clock
+                    viewModel.soundEngine.error()
+                    // Say it with a picture: what this obstacle needs.
+                    when {
+                        e.tile in DOOR_COLORS -> show("🔒")
+                        e.tile == 'H' -> show("🔋 ➜ ⚡")
+                        e.tile == '=' || e.tile == '-' -> show("🔘 ➜ ⚡")
+                        e.tile == 'c' -> show("🔋 ✋")
+                    }
+                }
+            }
+            ShipEvent.Hit -> {
+                // A robot caught Lía: −1 diamond and back to the last checkpoint.
+                viewModel.soundEngine.error()
+                loseDiamond()
+                backToCheckpoint()
+                say(NiloLines.robot)
+            }
+            else -> {
+                history += state
+                if (history.size > 300) history.removeAt(0)
+                niloFrom = niloTo
+                niloTo = state.pos
+                fromPos = state.pos
+                fromRobots = state.robots.map { it.at }
+                state = result.state
+                when {
+                    result.gotKey != null || result.openedDoor || result.teleported || result.switched -> viewModel.soundEngine.powerUp()
+                    result.gotDiamond || result.pushed || result.pickedThing -> viewModel.soundEngine.click()
+                }
+                result.pickedThing.takeIf { it }?.let {
+                    things.getOrNull(state.carry)?.let { t -> say(NiloLine("🙌 ${t.word}", "", "")) }
+                }
+                if (result.teleported) {
+                    fromPos = state.pos
+                    niloFrom = state.pos
+                    niloTo = state.pos
+                    progress = 1f
+                    arrived(e)
+                } else {
+                    progress = 0f
+                    pending = e
+                }
             }
         }
     }
 
-    // Game loop: walks Lía one tile at a time while an arrow is held.
+    // Game loop: moves Lía one tile at a time while an arrow is held (turn based: nothing else moves on its own).
     LaunchedEffect(tablet.id) {
         var last = withFrameNanos { it }
         while (true) {
@@ -575,88 +348,31 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
             if (niloLine != null && clock > niloLineUntil && openStation == null) niloLine = null
             if (progress < 1f) {
                 progress = (progress + dt / STEP_TIME).coerceAtMost(1f)
-                if (progress >= 1f) arrive(liaTo)
+                if (progress >= 1f) {
+                    val e = pending
+                    pending = null
+                    arrived(e)
+                }
                 continue
             }
-            if (openStation != null || finished) continue
-            // Robots: bumping into one costs a diamond and sends Lía back a step.
-            if (clock - lastRobotHit > 1.5f && ship.robots.any { (it.at(clock) - Offset(liaTo.x.toFloat(), liaTo.y.toFloat())).getDistance() < 0.6f }) {
-                lastRobotHit = clock
-                if (collected.size + adDiamonds - lostDiamonds > 0) {
-                    lostDiamonds++
-                    lostAt = clock
-                }
-                viewModel.soundEngine.error()
-                say(NiloLines.robot)
-                if (liaFrom != liaTo) {
-                    val back = liaFrom
-                    liaFrom = liaTo
-                    liaTo = back
-                    progress = 0f
-                    continue
-                }
-            }
-            val dir = held
-            if (dir == null) {
-                continue
-            }
-            if (dir.x != 0) facing = dir.x.toFloat()
-            val next = liaTo + dir
-            val c = ship.at(next)
-            val crate = crates.indexOf(next)
-            when {
-                c == '#' -> Unit
-                !doorOpen(c) -> {
-                    if (clock - lastBumpAt > 3f) {
-                        lastBumpAt = clock
-                        viewModel.soundEngine.error()
-                        say(if (c == 'X') NiloLines.needKey else NiloLines.locked)
-                    }
-                }
-                crate >= 0 -> {
-                    // Sokoban: a box moves one tile if the tile behind it is empty floor in the same room.
-                    val beyond = next + dir
-                    if (ship.at(beyond) in ".T" && beyond !in crates && ship.room(beyond) == ship.room(next)) {
-                        crates[crate] = beyond
-                        viewModel.soundEngine.click()
-                        niloFrom = niloTo
-                        niloTo = liaTo
-                        liaFrom = liaTo
-                        liaTo = next
-                        progress = 0f
-                        lastMoveAt = clock
-                        val room = ship.room(beyond)
-                        if (room != null && ship.challenges[room] == Challenge.BOXES && puzzleDone(room)) {
-                            viewModel.soundEngine.powerUp()
-                            say(NiloLines.boxesDone)
-                        }
-                    }
-                }
-                else -> {
-                    niloFrom = niloTo
-                    niloTo = liaTo
-                    liaFrom = liaTo
-                    liaTo = next
-                    progress = 0f
-                    lastMoveAt = clock
-                }
-            }
+            if (openStation != null || finished || !briefed) continue
+            held?.let { tryStep(it) }
         }
     }
 
-    fun solve(i: Int) {
-        if (i in solved) return
-        solved += i
-        solvedAt[i] = clock
+    fun solve(room: Int) {
+        state = ShipRules.solveRoom(level, state, room)
+        checkpoint = state
+        history.clear()
+        solvedAt[room] = clock
         openStation = null
         viewModel.soundEngine.fanfare()
-        // Only the last room speaks (the key appears); a door opening is visible on the map.
-        if (i == Station.entries.lastIndex) say(NiloLines.findKey)
+        // The reward key appears above Lía for a moment.
+        level.rewards.getOrNull(room)?.takeIf { it in KEY_COLORS }?.let { show("🔑 +1") }
     }
 
-    val diamonds = (collected.size + adDiamonds - lostDiamonds).coerceAtLeast(0)
     val onMistake: () -> Unit = {
-        if (collected.size + adDiamonds - lostDiamonds > 0) {
+        if (state.diamonds.size + adDiamonds - lostDiamonds > 0) {
             lostDiamonds++
             lostAt = clock
         } else {
@@ -665,7 +381,7 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
     }
 
     Column(Modifier.fillMaxSize().background(AdventureBg)) {
-        // Header: chapter, a button to reread the story, and the diamonds still held.
+        // Header: chapter, the lesson and story buttons, and the diamonds still held.
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)) {
             Text("${tablet.level} · ${tablet.title(language)}", color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp, maxLines = 1, modifier = Modifier.weight(1f))
             TextButton(onClick = { briefed = false }, contentPadding = PaddingValues(horizontal = 6.dp)) {
@@ -674,7 +390,6 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
             TextButton(onClick = { showStory = true }, contentPadding = PaddingValues(horizontal = 6.dp)) {
                 Text(language.pick("📖 القصة", "📖 Story"), color = ExplorerBlue, fontWeight = FontWeight.Bold, fontSize = 14.sp)
             }
-            if (hasKey) Text("🔑", fontSize = 18.sp, modifier = Modifier.padding(end = 6.dp))
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(end = 6.dp)) {
                 Text("💎 $diamonds", color = SolarAmber, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
                 if (clock - lostAt < 1.5f) Text("−1", color = MeteorRed, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
@@ -684,15 +399,13 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
         val station = openStation
         if (!briefed) {
             Box(Modifier.weight(1f).fillMaxWidth()) {
-                MissionBriefing(tablet, chapterNumber, data, viewModel, language, onStart = {
-                    briefed = true
-                })
+                MissionBriefing(tablet, chapterNumber, level, data, viewModel, language, onStart = { briefed = true })
             }
         } else if (station == null) {
             GoalStrip(
                 tablet = tablet,
                 language = language,
-                progress = solved.size,
+                progress = state.solved,
                 secret = secretWords,
                 secretOrder = secretOrder,
                 newPiece = solvedAt.values.any { clock - it < 4f },
@@ -701,34 +414,48 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
             Box(Modifier.weight(1f).fillMaxWidth()) {
                 // Clipped so the zoomed-in ship never draws over the goal text above it.
                 Canvas(Modifier.fillMaxSize().clipToBounds()) {
+                    val t = progress
                     drawShip(
-                        ship = ship,
+                        level = level,
+                        state = state,
+                        rooms = rooms,
                         walkSprite = walkSprite,
                         niloSprite = niloSprite,
                         textMeasurer = textMeasurer,
                         clock = clock,
-                        lia = lerpTile(liaFrom, liaTo, progress),
-                        facing = facing,
-                        walking = progress < 1f,
-                        nilo = lerpTile(niloFrom, niloTo, progress),
-                        niloFacing = if (niloTo.x != niloFrom.x) (niloTo.x - niloFrom.x).toFloat() else facing,
+                        lia = lerpCell(fromPos, state.pos, t),
+                        walking = t < 1f,
+                        nilo = lerpCell(niloFrom, niloTo, t),
+                        robots = state.robots.mapIndexed { i, r -> lerpCell(fromRobots.getOrElse(i) { r.at }, r.at, t) },
                         niloSays = niloLine?.es,
-                        solved = solved,
                         solvedAt = solvedAt,
-                        next = nextStation,
-                        collected = collected,
-                        hasKey = hasKey,
-                        isOpen = ::doorOpen,
-                        crates = crates,
-                        roomKeys = roomKeys,
-                        puzzleDone = ::puzzleDone,
-                        things = things,
-                        carrying = carrying
+                        thingEmoji = { things.getOrNull(it)?.emoji ?: "🎁" },
+                        wantedEmoji = things.getOrNull(wanted)?.emoji
                     )
                 }
+                // Keys Lía holds, and the thing she carries.
+                val heldKeys = state.keys.withIndex().filter { it.value > 0 }
+                if (heldKeys.isNotEmpty() || state.carry >= 0) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(8.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(SpaceNavy.copy(alpha = 0.85f))
+                            .padding(horizontal = 10.dp, vertical = 6.dp)
+                    ) {
+                        heldKeys.forEach { (i, n) ->
+                            Canvas(Modifier.size(22.dp)) { drawKeyIcon(KEY_TINTS[i], center, size.minDimension) }
+                            if (n > 1) Text("×$n", color = StarWhite, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+                        }
+                        things.getOrNull(state.carry)?.let { Text("🙌 ${it.emoji}", color = SolarGold, fontWeight = FontWeight.Bold, fontSize = 15.sp) }
+                    }
+                }
                 // The current fetch request, in the target language (tap to hear it).
-                val request = nextStation?.let { ship.fetches[it] }?.takeIf { it.room !in delivered }
-                if (request != null || carrying != null) {
+                val want = things.getOrNull(wanted)
+                if (want != null && nextStation == level.fetchPad) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
@@ -736,42 +463,30 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
                             .padding(8.dp)
                             .clip(RoundedCornerShape(14.dp))
                             .background(SpaceNavy.copy(alpha = 0.85f))
-                            .clickable { request?.let { viewModel.speakSpanish(it.wanted.word) } }
+                            .clickable { viewModel.speakSpanish(want.word) }
                             .padding(horizontal = 10.dp, vertical = 6.dp)
                     ) {
-                        if (request != null) {
-                            Text("🛰️ ${tl("Necesito")}: ${request.wanted.word} 🔊", color = StarWhite, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                        }
-                        carrying?.let { Text("   🙌 ${it.emoji}", color = SolarGold, fontWeight = FontWeight.Bold, fontSize = 14.sp) }
-                    }
-                }
-                // Battery rooms (Sokoban): put the batteries back if one gets stuck.
-                val hereRoom = ship.room(liaTo)
-                if (hereRoom != null && ship.challenges[hereRoom] == Challenge.BOXES && !puzzleDone(hereRoom) && hereRoom == nextStation) {
-                    Surface(
-                        onClick = {
-                            ship.crateStarts.forEachIndexed { k, (room, start) -> if (room == hereRoom) crates[k] = start }
-                            // Back to the door so Lía isn't standing inside a box.
-                            val door = ship.doorTo(hereRoom)
-                            liaFrom = door
-                            liaTo = door
-                            niloFrom = door
-                            niloTo = door
-                            progress = 1f
-                        },
-                        shape = RoundedCornerShape(50),
-                        color = SolarAmber,
-                        modifier = Modifier.align(Alignment.TopEnd).padding(8.dp)
-                    ) {
-                        Text(
-                            language.pick("↺ أعيدي البطاريات", "↺ Reset batteries"),
-                            color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 14.sp,
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
-                        )
+                        Text("🛰️ ${tl("Necesito")}: ${want.word} 🔊", color = StarWhite, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                     }
                 }
             }
-            ArrowPad(onHold = { held = it })
+            ShipControls(
+                canUndo = history.isNotEmpty(),
+                onHold = { held = it },
+                onUndo = {
+                    history.removeLastOrNull()?.let { previous ->
+                        state = previous
+                        fromPos = previous.pos
+                        fromRobots = previous.robots.map { it.at }
+                        niloFrom = previous.pos
+                        niloTo = previous.pos
+                        progress = 1f
+                        pending = null
+                    }
+                },
+                onRestart = { backToCheckpoint() },
+                onTip = { showTip = true }
+            )
         } else {
             Box(Modifier.weight(1f).fillMaxWidth()) {
                 CompositionLocalProvider(LocalOnMistake provides onMistake) {
@@ -794,8 +509,28 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
         }
     }
 
+    if (showTip) {
+        AlertDialog(
+            onDismissRequest = { showTip = false },
+            containerColor = AdventureSurface,
+            title = { Text(language.pick("💡 تلميح", "💡 Tip"), color = SolarAmber, fontWeight = FontWeight.ExtraBold) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(language.pick(bidiSafe(level.newAr), level.newEn), color = TextPrimary, fontSize = 16.sp, lineHeight = 23.sp)
+                    Text(
+                        language.pick(
+                            "↶ تراجعي خطوة · ↺ عودي إلى آخر غرفة · الروبوتات تتحرك فقط عندما تتحركين.",
+                            "↶ undo a step · ↺ back to the last room · robots only move when you move."
+                        ),
+                        color = TextSecondary, fontSize = 13.sp
+                    )
+                }
+            },
+            confirmButton = { TextButton(onClick = { showTip = false }) { Text(language.pick("حسنًا", "OK")) } }
+        )
+    }
+
     if (outOfDiamonds) {
-        val context = LocalContext.current
         AlertDialog(
             onDismissRequest = {},
             containerColor = AdventureSurface,
@@ -847,23 +582,29 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
     }
 }
 
-private fun lerpTile(from: IntOffset, to: IntOffset, t: Float) =
-    Offset(from.x + (to.x - from.x) * t, from.y + (to.y - from.y) * t)
+private fun lerpCell(from: Cell, to: Cell, t: Float) = Offset(from.x + (to.x - from.x) * t, from.y + (to.y - from.y) * t)
 
-/** ▲ ◀ ▼ ▶ arrows; hold one to keep walking that way. */
+/** ▲ ◀ ▼ ▶ in the middle (hold to keep walking), undo on the left, tip and restart on the right. */
 @Composable
-private fun ArrowPad(onHold: (IntOffset?) -> Unit) {
+private fun ShipControls(canUndo: Boolean, onHold: (Cell?) -> Unit, onUndo: () -> Unit, onRestart: () -> Unit, onTip: () -> Unit) {
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier.fillMaxWidth().background(AdventureBg).padding(vertical = 6.dp)
         ) {
-            PadButton("▲", ExplorerBlue, size = 54.dp, onPress = { onHold(IntOffset(0, -1)) }, onRelease = { onHold(null) })
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                PadButton("◀", ExplorerBlue, size = 54.dp, onPress = { onHold(IntOffset(-1, 0)) }, onRelease = { onHold(null) })
-                PadButton("▼", ExplorerBlue, size = 54.dp, onPress = { onHold(IntOffset(0, 1)) }, onRelease = { onHold(null) })
-                PadButton("▶", ExplorerBlue, size = 54.dp, onPress = { onHold(IntOffset(1, 0)) }, onRelease = { onHold(null) })
+            PadButton("↶", if (canUndo) NebulaPurple else NebulaPurple.copy(alpha = 0.35f), size = 50.dp, onPress = { if (canUndo) onUndo() })
+            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                PadButton("▲", ExplorerBlue, size = 54.dp, onPress = { onHold(UP) }, onRelease = { onHold(null) })
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    PadButton("◀", ExplorerBlue, size = 54.dp, onPress = { onHold(LEFT) }, onRelease = { onHold(null) })
+                    PadButton("▼", ExplorerBlue, size = 54.dp, onPress = { onHold(DOWN) }, onRelease = { onHold(null) })
+                    PadButton("▶", ExplorerBlue, size = 54.dp, onPress = { onHold(RIGHT) }, onRelease = { onHold(null) })
+                }
+            }
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                PadButton("💡", SolarGold, size = 46.dp, onPress = onTip)
+                PadButton("↺", MeteorRed, size = 46.dp, onPress = onRestart)
             }
         }
     }
@@ -873,8 +614,13 @@ private fun ArrowPad(onHold: (IntOffset?) -> Unit) {
 
 private val HULL = Color(0xFF1E2A48)
 private val HULL_LIGHT = Color(0xFF2E3D63)
-private val FLOOR_PLATE = Color(0xFF3A4A72)
-private val FLOOR_SEAM = Color(0xFF28365A)
+// Bright, Chip's-Challenge-like tiles: light floor plates, strong blue walls with bevels.
+private val FLOOR = Color(0xFFE3E9F3)
+private val FLOOR_LIGHT = Color(0xFFFFFFFF)
+private val FLOOR_SHADE = Color(0xFFB4BED0)
+private val WALL = Color(0xFF3D5A99)
+private val WALL_LIGHT = Color(0xFF7193DC)
+private val WALL_SHADE = Color(0xFF263B68)
 
 /** Fixed star field (fractions of the view), so it doesn't flicker between frames. */
 private val SPACE_STARS: List<Offset> = List(80) { i ->
@@ -882,30 +628,37 @@ private val SPACE_STARS: List<Offset> = List(80) { i ->
     Offset(r.nextFloat(), r.nextFloat())
 }
 
+/** A key drawn as a shape (ring, shaft and teeth), so every colour is clear. */
+private fun DrawScope.drawKeyIcon(color: Color, c: Offset, s: Float) {
+    val ring = s * 0.22f
+    val ringCenter = c + Offset(-s * 0.18f, 0f)
+    drawCircle(color, radius = ring, center = ringCenter)
+    drawCircle(Color.White.copy(alpha = 0.9f), radius = ring * 0.45f, center = ringCenter)
+    drawRect(color, topLeft = Offset(ringCenter.x + ring * 0.8f, c.y - s * 0.06f), size = Size(s * 0.42f, s * 0.12f))
+    drawRect(color, topLeft = Offset(c.x + s * 0.12f, c.y), size = Size(s * 0.08f, s * 0.16f))
+    drawRect(color, topLeft = Offset(c.x + s * 0.26f, c.y), size = Size(s * 0.08f, s * 0.12f))
+    drawCircle(Color.Black.copy(alpha = 0.25f), radius = ring, center = ringCenter, style = Stroke(s * 0.04f))
+}
+
 private fun DrawScope.drawShip(
-    ship: ShipMap,
+    level: ShipLevel,
+    state: ShipState,
+    rooms: Map<Cell, Int>,
     walkSprite: ImageBitmap,
     niloSprite: ImageBitmap,
     textMeasurer: TextMeasurer,
     clock: Float,
     lia: Offset,
-    facing: Float,
     walking: Boolean,
     nilo: Offset,
-    niloFacing: Float,
+    robots: List<Offset>,
     niloSays: String?,
-    solved: List<Int>,
     solvedAt: Map<Int, Float>,
-    next: Int?,
-    collected: List<IntOffset>,
-    hasKey: Boolean,
-    isOpen: (Char) -> Boolean,
-    crates: List<IntOffset>,
-    roomKeys: List<Int>,
-    puzzleDone: (Int) -> Boolean,
-    things: Map<IntOffset, CourseWord>,
-    carrying: CourseWord?
+    thingEmoji: (Int) -> String,
+    wantedEmoji: String?
 ) {
+    val mapW = level.width
+    val mapH = level.height
     // Space all around the ship.
     drawRect(Brush.verticalGradient(listOf(SpaceDeep, SpaceNavy)))
     SPACE_STARS.forEachIndexed { i, s ->
@@ -913,16 +666,15 @@ private fun DrawScope.drawShip(
     }
 
     // A little closer than the whole ship: the camera follows Lía and stops at the ship's edges.
-    // (The extra 3 × 2.4 tiles leave room for the wings, the nose and the engines.)
-    val ts = minOf(size.width / (MAP_W + 3f), size.height / (MAP_H + 2.4f)) * ZOOM
+    val ts = minOf(size.width / (mapW + 3f), size.height / (mapH + 2.4f)) * ZOOM
     fun follow(view: Float, total: Float, margin: Float, focus: Float): Float {
         if (total <= view) return (view - total) / 2f + margin
         return (view / 2f - focus).coerceIn(view - total + margin, margin)
     }
-    val ox = follow(size.width, ts * (MAP_W + 3f), ts * 1.5f, (lia.x + 0.5f) * ts)
-    val oy = follow(size.height, ts * (MAP_H + 2.4f), ts * 1.5f, (lia.y + 0.5f) * ts)
+    val ox = follow(size.width, ts * (mapW + 3f), ts * 1.5f, (lia.x + 0.5f) * ts)
+    val oy = follow(size.height, ts * (mapH + 2.4f), ts * 1.5f, (lia.y + 0.5f) * ts)
     fun topLeft(x: Number, y: Number) = Offset(ox + x.toFloat() * ts, oy + y.toFloat() * ts)
-    fun center(p: IntOffset) = topLeft(p.x + 0.5f, p.y + 0.5f)
+    fun center(p: Cell) = topLeft(p.x + 0.5f, p.y + 0.5f)
     fun text(s: String, c: Offset, scale: Float, color: Color = Color.White, maxWidth: Float? = null) {
         val layout = textMeasurer.measure(
             s,
@@ -931,11 +683,11 @@ private fun DrawScope.drawShip(
         )
         drawText(layout, topLeft = Offset(c.x - layout.size.width / 2f, c.y - layout.size.height / 2f))
     }
-    val shipW = ts * MAP_W
-    val shipH = ts * MAP_H
+    val shipW = ts * mapW
+    val shipH = ts * mapH
 
-    // Engines: two nozzles with flickering flames.
-    listOf(3.5f, MAP_W - 3.5f).forEachIndexed { k, ex ->
+    // Engines, wings and nose around the hull.
+    listOf(mapW * 0.27f, mapW * 0.73f).forEachIndexed { k, ex ->
         val cx = ox + ex * ts
         val flame = ts * (1.0f + 0.25f * sin(clock * 18f + k * 2f))
         drawPath(
@@ -949,187 +701,206 @@ private fun DrawScope.drawShip(
         )
         drawRect(HULL_LIGHT, topLeft = Offset(cx - ts * 0.7f, oy + shipH - ts * 0.2f), size = Size(ts * 1.4f, ts * 0.35f))
     }
-    // Wings.
     for (side in listOf(-1f, 1f)) {
         val edge = if (side < 0) ox else ox + shipW
         val wing = Path().apply {
-            moveTo(edge, oy + ts * 6f)
-            lineTo(edge + side * ts * 1.5f, oy + ts * 11f)
-            lineTo(edge + side * ts * 1.5f, oy + ts * 14.5f)
-            lineTo(edge, oy + ts * 14.5f)
+            moveTo(edge, oy + shipH * 0.4f)
+            lineTo(edge + side * ts * 1.5f, oy + shipH * 0.7f)
+            lineTo(edge + side * ts * 1.5f, oy + shipH * 0.92f)
+            lineTo(edge, oy + shipH * 0.92f)
             close()
         }
         drawPath(wing, HULL)
         drawPath(wing, DiamondCyan.copy(alpha = 0.5f), style = Stroke(ts * 0.06f))
-        // Blinking light at the wing tip.
-        drawCircle(if (side < 0) MeteorRed else SuccessGreen, radius = ts * 0.15f * (0.7f + 0.3f * sin(clock * 4f)), center = Offset(edge + side * ts * 1.5f, oy + ts * 11f))
+        drawCircle(if (side < 0) MeteorRed else SuccessGreen, radius = ts * 0.15f * (0.7f + 0.3f * sin(clock * 4f)), center = Offset(edge + side * ts * 1.5f, oy + shipH * 0.7f))
     }
-    // Nose with the cockpit window.
     drawOval(HULL, topLeft = Offset(ox, oy - ts * 1.5f), size = Size(shipW, ts * 3f))
-    drawOval(DiamondCyan.copy(alpha = 0.5f), topLeft = Offset(ox, oy - ts * 1.5f), size = Size(shipW, ts * 3f), style = Stroke(ts * 0.06f))
     drawOval(
         Brush.verticalGradient(listOf(DiamondCyan, ExplorerBlue), startY = oy - ts * 1.2f, endY = oy - ts * 0.4f),
         topLeft = Offset(ox + shipW / 2 - ts * 1.6f, oy - ts * 1.2f), size = Size(ts * 3.2f, ts * 0.9f)
     )
-    // Hull body.
     drawRoundRect(HULL, topLeft = Offset(ox, oy), size = Size(shipW, shipH), cornerRadius = CornerRadius(ts * 0.6f))
 
-    // Rooms you can reach are lit; rooms still behind locked doors stay dark.
-    val reached = next ?: EXIT_ROOM
-    fun roomColor(room: Int): Color = when (room) {
-        START_ROOM -> DiamondCyan
-        EXIT_ROOM -> SolarGold
-        else -> Station.entries[room].color
+    val next = state.solved
+    val gateOpen = ShipRules.gateOpen(level, state)
+    fun bevel(tl: Offset, base: Color, light: Color, shade: Color) {
+        val tile = Size(ts, ts)
+        drawRect(base, tl, tile)
+        val b = ts * 0.1f
+        drawRect(light, tl, Size(ts, b))
+        drawRect(light, tl, Size(b, ts))
+        drawRect(shade, tl + Offset(0f, ts - b), Size(ts, b))
+        drawRect(shade, tl + Offset(ts - b, 0f), Size(b, ts))
     }
-    fun walkable(p: IntOffset) = ship.at(p) != '#'
 
-    ship.tiles.forEach { (p, c) ->
+    level.cells().forEach { p ->
+        val c = level.at(p)
         val tl = topLeft(p.x, p.y)
         val tile = Size(ts, ts)
         if (c == '#') {
-            // Hull wall: dark metal with a glowing edge where it meets a room.
-            drawRect(HULL, tl, tile)
-            drawRect(HULL_LIGHT, tl + Offset(ts * 0.12f, ts * 0.12f), Size(ts * 0.76f, ts * 0.76f))
-            val glow = DiamondCyan.copy(alpha = 0.55f)
-            val w = ts * 0.06f
-            if (walkable(p + IntOffset(0, -1))) drawRect(glow, tl, Size(ts, w))
-            if (walkable(p + IntOffset(0, 1))) drawRect(glow, tl + Offset(0f, ts - w), Size(ts, w))
-            if (walkable(p + IntOffset(-1, 0))) drawRect(glow, tl, Size(w, ts))
-            if (walkable(p + IntOffset(1, 0))) drawRect(glow, tl + Offset(ts - w, 0f), Size(w, ts))
-            // Portholes along the outer hull.
-            val outer = p.x == 0 || p.x == MAP_W - 1
-            if (outer && p.y % 3 == 1 && p.y in 1 until MAP_H - 1) {
-                drawCircle(SpaceDeep, radius = ts * 0.3f, center = center(p))
-                drawCircle(DiamondCyan.copy(alpha = 0.35f), radius = ts * 0.22f, center = center(p))
-                drawCircle(StarWhite, radius = ts * 0.05f, center = center(p) + Offset(-ts * 0.08f, -ts * 0.08f))
-                drawCircle(HULL_LIGHT, radius = ts * 0.3f, center = center(p), style = Stroke(ts * 0.07f))
-            }
+            bevel(tl, WALL, WALL_LIGHT, WALL_SHADE)
             return@forEach
         }
-        // Floor plates with seams and rivets.
-        drawRect(FLOOR_PLATE, tl, tile)
-        drawRect(FLOOR_SEAM, tl, tile, style = Stroke(ts * 0.04f))
-        val rivet = ts * 0.035f
-        drawCircle(FLOOR_SEAM, rivet, tl + Offset(ts * 0.15f, ts * 0.15f))
-        drawCircle(FLOOR_SEAM, rivet, tl + Offset(ts * 0.85f, ts * 0.85f))
-        val room = ship.room(p)
-        if (room != null) {
-            drawRect(roomColor(room).copy(alpha = 0.30f), tl, tile)
-            if (room > reached || (room == EXIT_ROOM && next != null)) drawRect(Color.Black.copy(alpha = 0.45f), tl, tile)
+        // Floor plate, tinted with its room's colour (rooms not reached yet are a little darker).
+        bevel(tl, FLOOR, FLOOR_LIGHT, FLOOR_SHADE)
+        rooms[p]?.let { room ->
+            drawRect(Station.entries[room].color.copy(alpha = 0.22f), tl, tile)
+            if (room > next) drawRect(SpaceNavy.copy(alpha = 0.12f), tl, tile)
         }
         when (c) {
-            in 'a'..'g', 'X' -> {
-                val color = if (c == 'X') SolarGold else Station.entries[c - 'a'].color
-                val acrossX = walkable(p + IntOffset(-1, 0)) && walkable(p + IntOffset(1, 0))
-                if (isOpen(c)) {
-                    // Open sliding door: only the glowing frame is left.
-                    if (acrossX) {
-                        drawRect(color, tl, Size(ts, ts * 0.1f))
-                        drawRect(color, tl + Offset(0f, ts * 0.9f), Size(ts, ts * 0.1f))
-                    } else {
-                        drawRect(color, tl, Size(ts * 0.1f, ts))
-                        drawRect(color, tl + Offset(ts * 0.9f, 0f), Size(ts * 0.1f, ts))
+            in DOOR_COLORS -> if (p !in state.opened) {
+                val color = KEY_TINTS[DOOR_COLORS.indexOf(c)]
+                bevel(tl, color, color.copy(alpha = 0.6f).compositeOver(Color.White), color.copy(alpha = 0.7f).compositeOver(Color.Black))
+                // Keyhole.
+                drawCircle(Color.Black.copy(alpha = 0.7f), radius = ts * 0.11f, center = center(p) - Offset(0f, ts * 0.06f))
+                drawRect(Color.Black.copy(alpha = 0.7f), topLeft = center(p) + Offset(-ts * 0.05f, -ts * 0.04f), size = Size(ts * 0.1f, ts * 0.22f))
+            }
+            in KEY_COLORS -> if (p !in state.takenKeys) {
+                val bob = sin(clock * 3f + p.x) * ts * 0.04f
+                drawKeyIcon(KEY_TINTS[KEY_COLORS.indexOf(c)], center(p) + Offset(0f, bob), ts * 0.8f)
+            }
+            'o' -> {
+                drawCircle(DiamondCyan, radius = ts * 0.36f, center = center(p), style = Stroke(ts * 0.08f, pathEffect = PathEffect.dashPathEffect(floatArrayOf(ts * 0.12f, ts * 0.08f))))
+                text("⚡", center(p), 0.32f)
+            }
+            'H' -> if (!gateOpen) {
+                // Closed gate: yellow and black stripes.
+                drawRect(SolarGold, tl, tile)
+                clipRect(tl.x, tl.y, tl.x + ts, tl.y + ts) {
+                    for (k in -2..4) {
+                        val x0 = tl.x + k * ts * 0.3f
+                        drawLine(Color(0xFF222222), Offset(x0, tl.y + ts), Offset(x0 + ts * 0.6f, tl.y), strokeWidth = ts * 0.12f)
                     }
-                } else {
-                    // Closed: two door halves meeting in the middle, with a lock.
-                    drawRect(color, tl, tile)
-                    drawRect(color.copy(alpha = 0.6f), tl + Offset(ts * 0.1f, ts * 0.1f), Size(ts * 0.8f, ts * 0.8f))
-                    if (acrossX) drawLine(HULL, tl + Offset(0f, ts / 2), tl + Offset(ts, ts / 2), strokeWidth = ts * 0.05f)
-                    else drawLine(HULL, tl + Offset(ts / 2, 0f), tl + Offset(ts / 2, ts), strokeWidth = ts * 0.05f)
-                    text(if (c == 'X') "🔑" else "🔒", center(p), 0.4f)
                 }
+            } else {
+                drawRect(SolarGold.copy(alpha = 0.5f), tl, tile, style = Stroke(ts * 0.06f))
+            }
+            'T', 'U' -> {
+                val color = if (c == 'T') ExplorerBlue else NebulaPurple
+                val pulse = 0.5f + 0.5f * sin(clock * 4f)
+                for (k in 0..2) {
+                    val inset = ts * (0.1f + k * 0.13f + 0.03f * pulse)
+                    drawRect(color.copy(alpha = 0.9f - k * 0.2f), tl + Offset(inset, inset), Size(ts - inset * 2, ts - inset * 2), style = Stroke(ts * 0.07f))
+                }
+            }
+            'x' -> {
+                drawCircle(Color(0xFF555F73), radius = ts * 0.36f, center = center(p))
+                drawCircle(if (state.toggled) SuccessGreen else MeteorRed, radius = ts * 0.26f, center = center(p))
+                drawCircle(Color.White.copy(alpha = 0.5f), radius = ts * 0.1f, center = center(p) - Offset(ts * 0.08f, ts * 0.08f))
+            }
+            '=', '-' -> if (ShipRules.fieldOn(level, state, p)) {
+                // Force field: glowing violet bars.
+                drawRect(NebulaPurple.copy(alpha = 0.55f), tl, tile)
+                for (k in 0..3) {
+                    val x = tl.x + ts * (0.15f + k * 0.23f) + sin(clock * 6f + k) * ts * 0.03f
+                    drawLine(Color.White.copy(alpha = 0.8f), Offset(x, tl.y + ts * 0.08f), Offset(x, tl.y + ts * 0.92f), strokeWidth = ts * 0.05f)
+                }
+            } else {
+                drawRect(NebulaPurple.copy(alpha = 0.6f), tl + Offset(ts * 0.08f, ts * 0.08f), Size(ts * 0.84f, ts * 0.84f), style = Stroke(ts * 0.04f, pathEffect = PathEffect.dashPathEffect(floatArrayOf(ts * 0.1f, ts * 0.08f))))
+            }
+            'f' -> {
+                val i = level.fetchSpots.indexOf(p)
+                if (i in state.items) {
+                    val bob = sin(clock * 2.5f + p.x) * ts * 0.04f
+                    drawCircle(Color.White, radius = ts * 0.38f, center = center(p) + Offset(0f, bob))
+                    drawCircle(SolarGold, radius = ts * 0.38f, center = center(p) + Offset(0f, bob), style = Stroke(ts * 0.05f))
+                    text(thingEmoji(i), center(p) + Offset(0f, bob), 0.46f)
+                }
+            }
+            '*' -> if (p !in state.diamonds) {
+                val bob = sin(clock * 3f + p.x + p.y) * ts * 0.05f
+                val cc = center(p) + Offset(0f, bob)
+                drawCircle(SolarGold.copy(alpha = 0.3f), radius = ts * 0.3f, center = cc)
+                rotate(45f, pivot = cc) { drawRect(SolarGold, cc - Offset(ts * 0.15f, ts * 0.15f), Size(ts * 0.3f, ts * 0.3f)) }
+                rotate(45f, pivot = cc) { drawRect(Color.White.copy(alpha = 0.8f), cc - Offset(ts * 0.15f, ts * 0.15f), Size(ts * 0.3f, ts * 0.3f), style = Stroke(ts * 0.04f)) }
             }
             in '0'..'6' -> {
                 val i = c - '0'
                 val st = Station.entries[i]
-                val done = i in solved
+                val done = i < next
                 val active = i == next
                 if (active) {
                     val pulse = 0.5f + 0.5f * sin(clock * 4f)
-                    drawCircle(st.color.copy(alpha = 0.25f + 0.25f * pulse), radius = ts * (0.55f + 0.12f * pulse), center = center(p))
+                    drawCircle(st.color.copy(alpha = 0.3f + 0.3f * pulse), radius = ts * (0.55f + 0.12f * pulse), center = center(p))
                 }
                 val age = clock - (solvedAt[i] ?: -10f)
                 if (done && age < 1.2f) {
                     drawCircle(SolarGold.copy(alpha = (1.2f - age) / 1.2f), radius = ts * (0.5f + age * 2.5f), center = center(p), style = Stroke(ts * 0.08f))
                 }
-                drawCircle(st.color.copy(alpha = if (done || active) 1f else 0.4f), radius = ts * 0.42f, center = center(p))
+                drawCircle(st.color.copy(alpha = if (done || active) 1f else 0.45f), radius = ts * 0.42f, center = center(p))
                 drawCircle(Color.White, radius = ts * 0.42f, center = center(p), style = Stroke(ts * 0.06f))
                 text(if (done) "✓" else st.emoji, center(p), 0.38f)
-                // The room's puzzle comes first: show what it needs on the pad.
-                ship.challenges[i]?.let { ch ->
-                    if (!done && !puzzleDone(i) && (ch == Challenge.KEY || ch == Challenge.BOXES || ch == Challenge.FETCH)) {
-                        // For a fetch quest, the picture of the thing this room needs.
-                        val icon = if (ch == Challenge.FETCH) ship.fetches[i]?.wanted?.emoji ?: ch.icon else ch.icon
-                        drawCircle(StarWhite, radius = ts * 0.24f, center = center(p) + Offset(ts * 0.36f, -ts * 0.36f))
-                        text(icon, center(p) + Offset(ts * 0.36f, -ts * 0.36f), 0.28f)
+                // What this room gives (its key colour) or needs (the fetch thing).
+                val corner = center(p) + Offset(ts * 0.38f, -ts * 0.38f)
+                if (!done && i == level.fetchPad && wantedEmoji != null) {
+                    drawCircle(Color.White, radius = ts * 0.24f, center = corner)
+                    text(wantedEmoji, corner, 0.28f)
+                } else if (!done) {
+                    level.rewards.getOrNull(i)?.takeIf { it in KEY_COLORS }?.let { r ->
+                        drawCircle(Color.White, radius = ts * 0.24f, center = corner)
+                        drawKeyIcon(KEY_TINTS[KEY_COLORS.indexOf(r)], corner, ts * 0.42f)
                     }
                 }
             }
-            '*' -> if (p !in collected) {
-                val bob = sin(clock * 3f + p.x + p.y) * ts * 0.05f
-                val cc = center(p) + Offset(0f, bob)
-                drawCircle(SolarGold.copy(alpha = 0.3f), radius = ts * 0.3f, center = cc)
-                rotate(45f, pivot = cc) { drawRect(SolarGold, cc - Offset(ts * 0.15f, ts * 0.15f), Size(ts * 0.3f, ts * 0.3f)) }
-                rotate(45f, pivot = cc) { drawRect(Color.White.copy(alpha = 0.7f), cc - Offset(ts * 0.15f, ts * 0.15f), Size(ts * 0.3f, ts * 0.3f), style = Stroke(ts * 0.04f)) }
-            }
-            'T' -> {
-                // Charger: where a battery must go.
-                drawCircle(DiamondCyan, radius = ts * 0.34f, center = center(p), style = Stroke(ts * 0.07f, pathEffect = PathEffect.dashPathEffect(floatArrayOf(ts * 0.12f, ts * 0.08f))))
-                text("⚡", center(p), 0.3f)
-            }
-            'k' -> if (ship.room(p)?.let { it in roomKeys } != true) {
-                val bob = sin(clock * 3f + p.x) * ts * 0.05f
-                val room = ship.room(p) ?: 0
-                drawCircle(Station.entries[room.coerceIn(0, 6)].color.copy(alpha = 0.5f), radius = ts * 0.34f, center = center(p) + Offset(0f, bob))
-                text("💳", center(p) + Offset(0f, bob), 0.42f)
-            }
-            'K' -> if (next == null && !hasKey) {
-                val pulse = 0.5f + 0.5f * sin(clock * 5f)
-                drawCircle(SolarGold.copy(alpha = 0.3f + 0.3f * pulse), radius = ts * (0.45f + 0.1f * pulse), center = center(p))
-                text("🔑", center(p), 0.55f)
-            }
             'E' -> {
-                drawRoundRect(if (hasKey) SolarGold else Color(0xFF8B93A6), tl + Offset(ts * 0.08f, ts * 0.08f), Size(ts * 0.84f, ts * 0.84f), CornerRadius(ts * 0.2f))
-                text("🚪", center(p), 0.5f)
+                val open = next >= 7
+                drawRoundRect(if (open) SolarGold else Color(0xFF8B93A6), tl + Offset(ts * 0.08f, ts * 0.08f), Size(ts * 0.84f, ts * 0.84f), CornerRadius(ts * 0.2f))
+                text(if (open) "🚪" else "🔒", center(p), 0.42f)
             }
+            'P' -> drawCircle(DiamondCyan.copy(alpha = 0.5f), radius = ts * 0.3f, center = center(p), style = Stroke(ts * 0.05f))
         }
     }
 
-
-    // Batteries: empty until pushed onto a charger, then they fill up green.
-    crates.forEach { p ->
+    // Batteries: one red bar while empty, full and green on a charger.
+    state.crates.forEach { p ->
         val tl = topLeft(p.x, p.y) + Offset(ts * 0.18f, ts * 0.14f)
-        val charging = ship.at(p) == 'T'
+        val charging = level.at(p) == 'o'
         val body = Size(ts * 0.64f, ts * 0.76f)
-        drawRect(HULL_LIGHT, tl + Offset(ts * 0.22f, -ts * 0.08f), Size(ts * 0.2f, ts * 0.1f))   // terminal
+        drawRect(HULL_LIGHT, tl + Offset(ts * 0.22f, -ts * 0.08f), Size(ts * 0.2f, ts * 0.1f))
         drawRoundRect(Color(0xFF2B2F3A), tl, body, CornerRadius(ts * 0.1f))
-        val bars = if (charging) 3 else 1
-        repeat(bars) { k ->
-            drawRoundRect(
-                if (charging) SuccessGreen else MeteorRed,
-                tl + Offset(ts * 0.1f, ts * (0.54f - k * 0.2f)),
-                Size(ts * 0.44f, ts * 0.14f),
-                CornerRadius(ts * 0.04f)
-            )
+        repeat(if (charging) 3 else 1) { k ->
+            drawRoundRect(if (charging) SuccessGreen else MeteorRed, tl + Offset(ts * 0.1f, ts * (0.54f - k * 0.2f)), Size(ts * 0.44f, ts * 0.14f), CornerRadius(ts * 0.04f))
         }
         drawRoundRect(if (charging) SuccessGreen else StarWhite, tl, body, CornerRadius(ts * 0.1f), style = Stroke(ts * 0.05f))
     }
-    // Things for the fetch quests.
-    things.forEach { (p, thing) ->
-        val c = center(p) + Offset(0f, sin(clock * 2.5f + p.x) * ts * 0.04f)
-        drawCircle(StarWhite.copy(alpha = 0.35f), radius = ts * 0.36f, center = c)
-        text(thing.emoji, c, 0.5f)
-    }
-    // Patrolling security robots.
-    ship.robots.forEach { r ->
-        val pos = r.at(clock)
+    // Security robots, with an arrow showing where they go next.
+    robots.forEachIndexed { i, pos ->
         val c = topLeft(pos.x + 0.5f, pos.y + 0.5f)
-        drawCircle(MeteorRed.copy(alpha = 0.3f + 0.2f * sin(clock * 8f)), radius = ts * 0.48f, center = c)
+        drawCircle(MeteorRed.copy(alpha = 0.25f), radius = ts * 0.46f, center = c)
         text("🤖", c, 0.55f)
+        state.robots.getOrNull(i)?.dir?.let { d ->
+            val tip = c + Offset(d.x * ts * 0.55f, d.y * ts * 0.55f)
+            val side = Offset(-d.y * ts * 0.12f, d.x * ts * 0.12f)
+            val back = tip - Offset(d.x * ts * 0.18f, d.y * ts * 0.18f)
+            drawPath(Path().apply {
+                moveTo(tip.x, tip.y); lineTo(back.x + side.x, back.y + side.y); lineTo(back.x - side.x, back.y - side.y); close()
+            }, MeteorRed)
+        }
+    }
+
+    // Room names under the pads of the rooms you can reach, on a dark label.
+    Station.entries.forEachIndexed { i, st ->
+        if (i > next) return@forEachIndexed
+        val c = center(level.pads[i]) + Offset(0f, ts * 0.8f)
+        val layout = textMeasurer.measure(
+            st.es,
+            TextStyle(color = StarWhite, fontSize = (ts * 0.26f).toSp(), fontWeight = FontWeight.Bold, textAlign = TextAlign.Center),
+            constraints = Constraints(maxWidth = (ts * 3f).toInt())
+        )
+        val pad = ts * 0.08f
+        drawRoundRect(
+            SpaceNavy.copy(alpha = 0.85f),
+            topLeft = Offset(c.x - layout.size.width / 2f - pad * 2, c.y - layout.size.height / 2f - pad),
+            size = Size(layout.size.width + pad * 4, layout.size.height + pad * 2),
+            cornerRadius = CornerRadius(ts * 0.2f)
+        )
+        drawText(layout, topLeft = Offset(c.x - layout.size.width / 2f, c.y - layout.size.height / 2f))
     }
 
     // Characters: whoever is lower on the screen is drawn last, in front.
     val spriteH = ts * 1.45f
+    val facing = state.facing.x.toFloat().takeIf { it != 0f } ?: 1f
+    val niloFacing = if (lia.x >= nilo.x) 1f else -1f
     val drawNilo = {
         val feet = topLeft(nilo.x + 0.5f, nilo.y + 0.9f)
         drawOval(Color(0x55000000), topLeft = feet - Offset(ts * 0.25f, ts * 0.07f), size = Size(ts * 0.5f, ts * 0.14f))
@@ -1157,30 +928,11 @@ private fun DrawScope.drawShip(
         }
     }
     if (nilo.y <= lia.y) { drawNilo(); drawLia() } else { drawLia(); drawNilo() }
-    // Room names under the pads of the rooms you can reach, on a dark label drawn above everything
-    // else so they stay readable when Lía and Nilo walk past.
-    Station.entries.forEachIndexed { i, st ->
-        if (i > reached) return@forEachIndexed
-        val c = center(ship.pads[i]) + Offset(0f, ts * 0.8f)
-        val layout = textMeasurer.measure(
-            st.es,
-            TextStyle(color = StarWhite, fontSize = (ts * 0.26f).toSp(), fontWeight = FontWeight.Bold, textAlign = TextAlign.Center),
-            constraints = Constraints(maxWidth = (ts * 3f).toInt())
-        )
-        val pad = ts * 0.08f
-        drawRoundRect(
-            SpaceNavy.copy(alpha = 0.85f),
-            topLeft = Offset(c.x - layout.size.width / 2f - pad * 2, c.y - layout.size.height / 2f - pad),
-            size = Size(layout.size.width + pad * 4, layout.size.height + pad * 2),
-            cornerRadius = CornerRadius(ts * 0.2f)
-        )
-        drawText(layout, topLeft = Offset(c.x - layout.size.width / 2f, c.y - layout.size.height / 2f))
-    }
     // What Lía is carrying floats above her head.
-    carrying?.let { thing ->
+    if (state.carry >= 0) {
         val head = topLeft(lia.x + 0.5f, lia.y + 0.9f) - Offset(0f, spriteH + ts * 0.15f)
         drawCircle(SolarGold.copy(alpha = 0.5f), radius = ts * 0.3f, center = head)
-        text(thing.emoji, head, 0.42f)
+        text(thingEmoji(state.carry), head, 0.42f)
     }
     niloSays?.let {
         val head = topLeft(nilo.x + 0.5f, nilo.y + 0.9f) - Offset(0f, spriteH + 4f)
@@ -1201,10 +953,9 @@ private fun DrawScope.drawBubble(textMeasurer: TextMeasurer, text: String, cente
     val h = layout.size.height + 10.dp.toPx()
     val left = (centerX - w / 2).coerceIn(margin, (size.width - w - margin).coerceAtLeast(margin))
     val top = (bottomY - h).coerceAtLeast(margin)
-    @Suppress("NAME_SHADOWING") val centerX = left + w / 2
     drawRoundRect(AdventureSurface, topLeft = Offset(left, top), size = Size(w, h), cornerRadius = CornerRadius(9.dp.toPx()))
     drawRoundRect(SolarAmber, topLeft = Offset(left, top), size = Size(w, h), cornerRadius = CornerRadius(9.dp.toPx()), style = Stroke(2.dp.toPx()))
-    drawText(layout, topLeft = Offset(centerX - layout.size.width / 2f, top + h / 2 - layout.size.height / 2f))
+    drawText(layout, topLeft = Offset(left + w / 2 - layout.size.width / 2f, top + h / 2 - layout.size.height / 2f))
 }
 
 // --------------------------------------------------------------------------- Panels
@@ -1463,6 +1214,7 @@ private fun TappableSentence(text: String, data: SpanishContent, viewModel: Blas
 private fun MissionBriefing(
     tablet: ReadingTablet,
     level: Int,
+    ship: ShipLevel,
     data: SpanishContent,
     viewModel: BlasterViewModel,
     language: HelperLanguage,
@@ -1557,15 +1309,24 @@ private fun MissionBriefing(
                     }
                 }
 
-                // 3. How the ship works.
+                // 3. What's new on this ship (one new idea per level).
+                if (ship.newEn.isNotBlank()) {
+                    AdventureCard(borderColor = NebulaPurple) {
+                        Text(language.pick("🆕 جديد في هذا المستوى", "🆕 New in this level"), color = NebulaPurple, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp)
+                        Text(language.pick(bidiSafe(ship.newAr), ship.newEn), color = TextPrimary, fontSize = 15.sp, lineHeight = 22.sp)
+                    }
+                }
+
+                // 4. How the ship works.
                 AdventureCard(borderColor = SolarGold) {
                     Text(language.pick("🎮 كيف تلعبين", "🎮 How to play"), color = SolarAmber, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp)
                     listOf(
-                        language.pick("1. حرّكي ليا بالأسهم ▲ ◀ ▼ ▶.", "1. Move Lía with the arrows ▲ ◀ ▼ ▶."),
-                        language.pick("2. ادخلي الغرفة المضيئة وقفي على دائرتها لتبدأ اللعبة.", "2. Walk into the glowing room and step on its circle to start its game."),
-                        language.pick("3. كل غرفة تنجحين فيها تفتح باب الغرفة التالية.", "3. Every room you finish opens the door to the next one."),
-                        language.pick("4. بعد الغرفة الأخيرة خذي المفتاح 🔑 واخرجي من الباب 🚪.", "4. After the last room, take the key 🔑 and leave through the door 🚪."),
-                        language.pick("💎 الإجابة الخاطئة تكلّف ماسة.", "💎 A wrong answer costs a diamond.")
+                        language.pick("1. حرّكي ليا بالأسهم ▲ ◀ ▼ ▶. لا يوجد وقت: الروبوتات تتحرك فقط عندما تتحركين.", "1. Move Lía with the arrows ▲ ◀ ▼ ▶. No timer: robots only move when you move."),
+                        language.pick("2. قفي على دائرة الغرفة المضيئة لتبدأ لعبتها.", "2. Step on the glowing room's circle to start its game."),
+                        language.pick("3. كل غرفة تنجحين فيها تعطيك مفتاحًا ملوّنًا يفتح الباب الذي بلونه.", "3. Every room you finish gives a coloured key for the door of the same colour."),
+                        language.pick("4. بعد الغرفة الأخيرة اخرجي من الباب 🚪.", "4. After the last room, leave through the door 🚪."),
+                        language.pick("↶ تراجعي خطوة · ↺ عودي إلى آخر غرفة · 💡 تلميح", "↶ undo a step · ↺ back to the last room · 💡 tip"),
+                        language.pick("💎 الإجابة الخاطئة أو الروبوت يكلّفانك ماسة.", "💎 A wrong answer or a robot costs a diamond.")
                     ).forEach { Text(it, color = TextPrimary, fontSize = 14.sp, lineHeight = 20.sp) }
                 }
             }
