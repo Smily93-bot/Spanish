@@ -43,7 +43,7 @@ class SpanishContent(
     }
 
     /** Tap-to-choose answers for the expedition questions. */
-    val answerChoices: AnswerChoices by lazy { AnswerChoices(tablets) }
+    val answerChoices: AnswerChoices by lazy { AnswerChoices(tablets) { glossary(it) != null } }
 
     /** Word Galaxy lessons over the 5000 frequency words. */
     val galaxy: GalaxyQuiz by lazy { GalaxyQuiz(frequency) }

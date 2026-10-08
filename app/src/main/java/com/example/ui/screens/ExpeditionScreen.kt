@@ -352,7 +352,13 @@ private class ShipMap(level: Int, private val things: List<CourseWord>) {
             // The whole room is affected; nothing to place.
             Challenge.REVERSE -> return true
             Challenge.FETCH -> {
-                val picks = things.distinctBy { it.emoji }.shuffled(random).take(3)
+                // Only things you can carry: nouns (taught with their article), not "hello" or "sad".
+                val articles = setOf("el", "la", "los", "las", "il", "lo", "i", "gli", "le")
+                val nouns = things.filter { w ->
+                    val first = w.word.lowercase().substringBefore(' ')
+                    (w.word.contains(' ') && first in articles) || w.word.lowercase().startsWith("l'")
+                }
+                val picks = nouns.distinctBy { it.emoji }.shuffled(random).take(3)
                 if (picks.size < 3) return false
                 // The thing waits in a room Lía has already passed, so she has to walk back for it.
                 val source = (START_ROOM until room).shuffled(random).firstOrNull { freeTiles(it).size >= 3 } ?: return false
@@ -403,7 +409,11 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
     val niloSprite = ImageBitmap.imageResource(R.drawable.nilo_walk)
     val textMeasurer = rememberTextMeasurer()
     val chapterNumber = data.tablets.indexOf(tablet) + 1
-    val ship = remember(tablet.id) { ShipMap(level = chapterNumber, things = data.courseWords) }
+    val ship = remember(tablet.id) {
+        // Things to fetch come from the units with objects you can pick up (school, food, animals, clothes, space).
+        val carryable = data.course.filter { it.id in setOf("u6", "u7", "u8", "u10", "u12") }.flatMap { it.words }
+        ShipMap(level = chapterNumber, things = carryable.ifEmpty { data.courseWords })
+    }
 
     // Lía walks tile by tile: from → to, progress 0..1.
     var liaFrom by remember { mutableStateOf(ship.start) }
@@ -742,7 +752,7 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
                         if (request != null) {
                             Text("🛰️ ${tl("Necesito")}: ${request.wanted.word} 🔊", color = StarWhite, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                         }
-                        carrying?.let { Text("   🎒 ${it.emoji}", color = SolarGold, fontWeight = FontWeight.Bold, fontSize = 14.sp) }
+                        carrying?.let { Text("   🙌 ${it.emoji}", color = SolarGold, fontWeight = FontWeight.Bold, fontSize = 14.sp) }
                     }
                 }
                 // Battery rooms (Sokoban): put the batteries back if one gets stuck.
@@ -1101,12 +1111,6 @@ private fun DrawScope.drawShip(
         }
     }
 
-    // Room names next to the pads of the rooms you can reach.
-    Station.entries.forEachIndexed { i, st ->
-        if (i > reached) return@forEachIndexed
-        val p = ship.pads[i]
-        text(st.es, center(p) + Offset(0f, ts * 0.78f), 0.24f, StarWhite, maxWidth = ts * 3f)
-    }
 
     // Batteries: empty until pushed onto a charger, then they fill up green.
     crates.forEach { p ->
@@ -1169,6 +1173,25 @@ private fun DrawScope.drawShip(
         }
     }
     if (nilo.y <= lia.y) { drawNilo(); drawLia() } else { drawLia(); drawNilo() }
+    // Room names under the pads of the rooms you can reach, on a dark label drawn above everything
+    // else so they stay readable when Lía and Nilo walk past.
+    Station.entries.forEachIndexed { i, st ->
+        if (i > reached) return@forEachIndexed
+        val c = center(ship.pads[i]) + Offset(0f, ts * 0.8f)
+        val layout = textMeasurer.measure(
+            st.es,
+            TextStyle(color = StarWhite, fontSize = (ts * 0.26f).toSp(), fontWeight = FontWeight.Bold, textAlign = TextAlign.Center),
+            constraints = Constraints(maxWidth = (ts * 3f).toInt())
+        )
+        val pad = ts * 0.08f
+        drawRoundRect(
+            SpaceNavy.copy(alpha = 0.85f),
+            topLeft = Offset(c.x - layout.size.width / 2f - pad * 2, c.y - layout.size.height / 2f - pad),
+            size = Size(layout.size.width + pad * 4, layout.size.height + pad * 2),
+            cornerRadius = CornerRadius(ts * 0.2f)
+        )
+        drawText(layout, topLeft = Offset(c.x - layout.size.width / 2f, c.y - layout.size.height / 2f))
+    }
     // What Lía is carrying floats above her head.
     carrying?.let { thing ->
         val head = topLeft(lia.x + 0.5f, lia.y + 0.9f) - Offset(0f, spriteH + ts * 0.15f)
@@ -1261,11 +1284,11 @@ private fun buildSteps(
         Station.CONSOLE -> listOf(Step.Lesson, Step.Table)
         Station.ORDER -> listOf(Step.Order)
         Station.MISSION -> listOf(Step.Note("🛰️", language.pick(tablet.missionAr, tablet.mission))) +
-            tablet.fields.mapIndexed { i, f -> Step.Choice("fields-$i", f.label, f.answers, language.pick(f.hintAr, f.hint), choices.options(f.answers)) }
+            tablet.fields.mapIndexed { i, f -> Step.Choice("fields-$i", f.label, f.answers, language.pick(f.hintAr, f.hint), choices.options(f.answers, tablet)) }
         Station.PORTAL -> storySentences(tablet.ending).let { s ->
             s.mapIndexed { i, line -> Step.Sentence(line, i + 1, s.size, null) }
         } + tablet.gate.mapIndexed { i, f ->
-            Step.Falling("gate-$i", f.label, f.answers, language.pick(f.hintAr, f.hint), choices.options(f.answers))
+            Step.Falling("gate-$i", f.label, f.answers, language.pick(f.hintAr, f.hint), choices.options(f.answers, tablet))
         } + Step.Note("🏁", tablet.expeditionPayoff(language) + "\n" + language.pick("المكافأة: ", tl("Recompensa: ")) + tablet.reward(language))
     }
 }
@@ -1342,7 +1365,12 @@ private fun MissionPanel(
         Box(Modifier.weight(1f).fillMaxWidth()) {
             key(station, index) {
                 val scroll = rememberScrollState()
-                Column(Modifier.fillMaxSize().verticalScroll(scroll), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                // Word Jump fills the space itself (no scrolling, so nothing covers its buttons).
+                if (step is Step.Choice) {
+                    Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        ChoiceCard(step, results, viewModel, language)
+                    }
+                } else Column(Modifier.fillMaxSize().verticalScroll(scroll), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     when (step) {
                         is Step.Sentence -> SentenceCard(step, data, viewModel, language)
                         is Step.Write -> QuestionCard(step.field, step.key, results, viewModel, language)
@@ -1358,7 +1386,7 @@ private fun MissionPanel(
                         }
                     }
                 }
-                ScrollMoreHint(scroll, language, AdventureBg)
+                if (step !is Step.Choice) ScrollMoreHint(scroll, language, AdventureBg)
             }
         }
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(top = 6.dp)) {
@@ -1550,18 +1578,19 @@ private fun SentenceCard(step: Step.Sentence, data: SpanishContent, viewModel: B
 
 /** A question answered by jumping onto the right word bubble (Word Jump). Wrong jumps cost a diamond. */
 @Composable
-private fun ChoiceCard(step: Step.Choice, results: MutableMap<String, Boolean>, viewModel: BlasterViewModel, language: HelperLanguage) {
+private fun ColumnScope.ChoiceCard(step: Step.Choice, results: MutableMap<String, Boolean>, viewModel: BlasterViewModel, language: HelperLanguage) {
     val onMistake = LocalOnMistake.current
     val wrong = remember { mutableStateListOf<String>() }
     val accepted = remember(step) { step.answers.flatMap { it.split("/") }.map { normalizeAnswer(it) } }
     val solved = step.key in results
     AdventureCard(borderColor = if (solved) SuccessGreen else ExplorerBlue) {
-        Text(step.prompt, color = TextPrimary, fontSize = 19.sp, lineHeight = 26.sp, fontWeight = FontWeight.Bold, modifier = Modifier.fillMaxWidth())
+        Text(step.prompt, color = TextPrimary, fontSize = 18.sp, lineHeight = 24.sp, fontWeight = FontWeight.Bold, modifier = Modifier.fillMaxWidth())
     }
-    Text(
-        language.pick("اضغطي على الإجابة الصحيحة لتقفز ليا إليها!", "Tap the right answer and Lía jumps onto it!"),
-        color = TextSecondary, fontSize = 13.sp, fontWeight = FontWeight.SemiBold
-    )
+    // The tip is shown from the start: it explains the question in the helper language.
+    if (step.hint.isNotBlank()) {
+        Text("💡 " + step.hint, color = SolarAmber, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, maxLines = 2, modifier = Modifier.fillMaxWidth())
+    }
+    BoxWithConstraints(Modifier.weight(1f).fillMaxWidth()) {
     WordJump(
         options = step.options,
         language = language,
@@ -1582,11 +1611,9 @@ private fun ChoiceCard(step: Step.Choice, results: MutableMap<String, Boolean>, 
                     if (wrong.size >= 2) results[step.key] = false
                 }
             }
-        }
+        },
+        boardHeight = maxHeight
     )
-    // The tip is shown from the start: it explains the question in the helper language.
-    if (step.hint.isNotBlank()) {
-        Text("💡 " + step.hint, color = SolarAmber, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.fillMaxWidth())
     }
 }
 
