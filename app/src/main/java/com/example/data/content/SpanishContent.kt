@@ -36,10 +36,14 @@ class SpanishContent(
 
     fun lookup(spanish: String): VocabWord? = bySpanish[normalizeAnswer(spanish)]
 
+    /** Exact spelling (accents and ñ count), so "una" never finds "uña". */
+    private val byExact: Map<String, VocabWord> = (topicWords + frequency).associateBy { it.shortSpanish.lowercase() }
+
     /** Dictionary entry for a word as it appears in a sentence: the word itself, else its likely base forms. */
     fun glossary(word: String): VocabWord? {
         val w = word.lowercase().trim()
-        return lookup(w) ?: lemmaCandidates(w).firstNotNullOfOrNull { lookup(it) }
+        val candidates = listOf(w) + lemmaCandidates(w)
+        return candidates.firstNotNullOfOrNull { byExact[it] } ?: candidates.firstNotNullOfOrNull { lookup(it) }
     }
 
     /** Tap-to-choose answers for the expedition questions. */
@@ -349,7 +353,9 @@ class SpanishContent(
                     expeditionPayoff = expedition?.optString("payoff").orEmpty(),
                     expeditionPayoffAr = expedition?.optString("payoffAr").orEmpty(),
                     scene = l.optString("scene", "cabin"),
-                    targets = l.optJSONArray("targets")?.strings().orEmpty()
+                    targets = l.optJSONArray("targets")?.strings().orEmpty(),
+                    storyLines = l.optJSONArray("storyLines")?.lines().orEmpty(),
+                    endingLines = l.optJSONArray("endingLines")?.lines().orEmpty()
                 )
             }
             val scenesJson = campaign.optJSONObject("scenes") ?: JSONObject()
@@ -377,6 +383,7 @@ class SpanishContent(
 
         private fun JSONArray.objects(): List<JSONObject> = (0 until length()).map { getJSONObject(it) }
         private fun JSONArray.strings(): List<String> = (0 until length()).map { getString(it) }
+        private fun JSONArray.lines(): List<LineTranslation> = objects().map { LineTranslation(it.optString("en"), it.optString("ar")) }
         private fun JSONArray.floats(): List<Float> = (0 until length()).map { getDouble(it).toFloat() }
         private fun JSONArray.fields(): List<TabletField> = objects().map { f ->
             TabletField(

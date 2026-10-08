@@ -228,7 +228,7 @@ private fun TipCard(unit: CourseUnit, language: HelperLanguage) {
         AdventureCard(borderColor = SolarGold) {
             Text(language.pick("💡 قاعدة صغيرة", "💡 A small rule"), color = SolarAmber, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp)
             Spacer(Modifier.height(6.dp))
-            Text(unit.tip(language), color = TextPrimary, fontSize = 17.sp, lineHeight = 26.sp)
+            Text(if (language == HelperLanguage.ARABIC) bidiSafe(unit.tip(language)) else unit.tip(language), color = TextPrimary, fontSize = 17.sp, lineHeight = 26.sp)
         }
         Spacer(Modifier.height(12.dp))
         Text(language.pick("والآن… لنلعب! 🎮", "Now… let's play! 🎮"), color = ExplorerBlue, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp, modifier = Modifier.align(Alignment.CenterHorizontally))

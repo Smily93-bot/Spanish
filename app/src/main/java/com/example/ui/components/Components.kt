@@ -410,3 +410,10 @@ fun ArcadeHighScoresDialog(
         }
     )
 }
+
+/**
+ * In Arabic text, wraps every run of Latin words (Spanish/Italian examples such as "soy, eres") in a
+ * left-to-right isolate so it reads in the right order instead of being scrambled by the RTL layout.
+ */
+fun bidiSafe(text: String): String =
+    Regex("[A-Za-zÀ-ÿ'’¿¡]+(?:[ ,/·-]+[A-Za-zÀ-ÿ'’¿¡!?.]+)*").replace(text) { "⁦${it.value}⁩" }

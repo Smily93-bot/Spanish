@@ -96,6 +96,10 @@ data class TabletField(
 
 data class GrammarTable(val headers: List<String>, val rows: List<List<String>>)
 
+data class LineTranslation(val english: String, val arabic: String) {
+    fun meaning(language: HelperLanguage) = language.pick(arabic, english)
+}
+
 data class TabletLesson(val title: String, val titleAr: String, val english: String, val arabic: String, val example: String)
 
 /** A tappable object in a hidden-object scene. Boxes are (x, y, width, height) as fractions of the image. */
@@ -144,7 +148,10 @@ data class ReadingTablet(
     val expeditionPayoffAr: String,
     /** Hidden-object scene id (cabin, lab, archive) and the Spanish objects to find in it. */
     val scene: String,
-    val targets: List<String>
+    val targets: List<String>,
+    /** Translation of each sentence of [story] and [ending] (same split as the app uses); may be empty. */
+    val storyLines: List<LineTranslation> = emptyList(),
+    val endingLines: List<LineTranslation> = emptyList()
 ) {
     fun title(language: HelperLanguage) = language.pick(titleAr, title)
     fun reward(language: HelperLanguage) = language.pick(rewardAr, reward)

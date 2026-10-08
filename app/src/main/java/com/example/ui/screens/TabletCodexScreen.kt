@@ -194,7 +194,7 @@ internal fun LessonCard(tablet: ReadingTablet, viewModel: BlasterViewModel, lang
         Text(language.pick("📘 القاعدة", "📘 The rule"), color = ExplorerBlue, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
         Text(language.pick(tablet.lesson.titleAr, tablet.lesson.title), color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp)
         Spacer(Modifier.height(6.dp))
-        Text(language.pick(tablet.lesson.arabic, tablet.lesson.english), color = TextPrimary, fontSize = 15.sp, lineHeight = 24.sp, modifier = Modifier.fillMaxWidth())
+        Text(language.pick(bidiSafe(tablet.lesson.arabic), tablet.lesson.english), color = TextPrimary, fontSize = 15.sp, lineHeight = 24.sp, modifier = Modifier.fillMaxWidth())
         Spacer(Modifier.height(10.dp))
         Text(language.pick("💬 مثال", "💬 Example"), color = NebulaPurple, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
         examples.forEach { sentence ->
@@ -379,7 +379,7 @@ internal fun QuestionCard(
         // The tip explains the question in the helper language, so it's there from the start.
         if (!solved) {
             Spacer(Modifier.height(6.dp))
-            Text("💡 " + language.pick(field.hintAr, field.hint), color = SolarAmber, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+            Text("💡 " + language.pick(bidiSafe(field.hintAr), field.hint), color = SolarAmber, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
         }
     }
 }

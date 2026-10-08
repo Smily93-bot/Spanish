@@ -13,8 +13,8 @@ android {
         applicationId = "com.bluediamond.spanishblaster.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 31
-        versionName = "1.21.0"
+        versionCode = 32
+        versionName = "1.22.0"
     }
 
     signingConfigs {
@@ -51,8 +51,8 @@ android {
         create("italian") {
             dimension = "language"
             applicationId = "com.bluediamond.italianblaster.app"
-            versionCode = 12
-            versionName = "1.11.0"
+            versionCode = 13
+            versionName = "1.12.0"
         }
     }
 
