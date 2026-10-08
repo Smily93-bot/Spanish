@@ -178,6 +178,17 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
     var state by remember(tablet.id) { mutableStateOf(ShipRules.start(level)) }
     val history = remember(tablet.id) { mutableStateListOf<ShipState>() }
     var checkpoint by remember(tablet.id) { mutableStateOf(state) }
+    // Fog: the ship is dark until Lía goes there; a room lights up whole when she walks in.
+    var seen by remember(tablet.id) { mutableStateOf(emptySet<Cell>()) }
+    LaunchedEffect(state.pos, level) {
+        val here = state.pos
+        val lit = HashSet<Cell>()
+        for (dy in -2..2) for (dx in -2..2) lit += Cell(here.x + dx, here.y + dy)
+        rooms[here]?.let { room ->
+            rooms.forEach { (p, r) -> if (r == room) for (dy in -1..1) for (dx in -1..1) lit += Cell(p.x + dx, p.y + dy) }
+        }
+        if (!seen.containsAll(lit)) seen = seen + lit
+    }
     // Animation between tiles.
     var fromPos by remember(tablet.id) { mutableStateOf(level.start) }
     var fromRobots by remember(tablet.id) { mutableStateOf(level.robots.map { it.at }) }
@@ -429,6 +440,7 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
                         robots = state.robots.mapIndexed { i, r -> lerpCell(fromRobots.getOrElse(i) { r.at }, r.at, t) },
                         niloSays = niloLine?.es,
                         solvedAt = solvedAt,
+                        seen = seen,
                         thingEmoji = { things.getOrNull(it)?.emoji ?: "🎁" },
                         wantedEmoji = things.getOrNull(wanted)?.emoji
                     )
@@ -590,10 +602,8 @@ private fun ShipControls(canUndo: Boolean, onHold: (Cell?) -> Unit, onUndo: () -
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            modifier = Modifier.fillMaxWidth().background(AdventureBg).padding(vertical = 6.dp)
+            modifier = Modifier.fillMaxWidth().background(AdventureBg).padding(horizontal = 14.dp, vertical = 6.dp)
         ) {
-            PadButton("↶", if (canUndo) NebulaPurple else NebulaPurple.copy(alpha = 0.35f), size = 50.dp, onPress = { if (canUndo) onUndo() })
             Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 PadButton("▲", ExplorerBlue, size = 54.dp, onPress = { onHold(UP) }, onRelease = { onHold(null) })
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -602,9 +612,14 @@ private fun ShipControls(canUndo: Boolean, onHold: (Cell?) -> Unit, onUndo: () -
                     PadButton("▶", ExplorerBlue, size = 54.dp, onPress = { onHold(RIGHT) }, onRelease = { onHold(null) })
                 }
             }
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Spacer(Modifier.weight(1f))
+            // Undo, tip and restart sit on the right, away from the arrows.
+            Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 PadButton("💡", SolarGold, size = 46.dp, onPress = onTip)
-                PadButton("↺", MeteorRed, size = 46.dp, onPress = onRestart)
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    PadButton("↶", if (canUndo) NebulaPurple else NebulaPurple.copy(alpha = 0.35f), size = 50.dp, onPress = { if (canUndo) onUndo() })
+                    PadButton("↺", MeteorRed, size = 46.dp, onPress = onRestart)
+                }
             }
         }
     }
@@ -653,6 +668,7 @@ private fun DrawScope.drawShip(
     robots: List<Offset>,
     niloSays: String?,
     solvedAt: Map<Int, Float>,
+    seen: Set<Cell>,
     thingEmoji: (Int) -> String,
     wantedEmoji: String?
 ) {
@@ -894,9 +910,18 @@ private fun DrawScope.drawShip(
         }
     }
 
+    // Fog over the parts of the ship Lía hasn't explored yet, with a ❓ where a room waits.
+    for (p in level.cells()) {
+        if (p in seen) continue
+        drawRect(SpaceDeep.copy(alpha = 0.94f), topLeft(p.x, p.y), Size(ts + 1f, ts + 1f))
+    }
+    level.pads.forEach { pad ->
+        if (pad !in seen) text("❓", center(pad), 0.5f, StarWhite.copy(alpha = 0.35f + 0.25f * sin(clock * 2f)))
+    }
+
     // Room names under the pads of the rooms you can reach, on a dark label.
     Station.entries.forEachIndexed { i, st ->
-        if (i > next) return@forEachIndexed
+        if (i > next || level.pads[i] !in seen) return@forEachIndexed
         val c = center(level.pads[i]) + Offset(0f, ts * 0.8f)
         val layout = textMeasurer.measure(
             st.es,
