@@ -167,12 +167,15 @@ private const val ZOOM = 1.3f         // how much closer than "whole ship on scr
 private val DOORS = "abcdefgX"
 private val SIDES = listOf(IntOffset(1, 0), IntOffset(-1, 0), IntOffset(0, 1), IntOffset(0, -1))
 
-/** Extra puzzles some rooms get before their game opens, after the old PC games Chip's Challenge and Sokoban. */
+/**
+ * Spaceship puzzles some rooms get before their game opens (after the old PC games Chip's Challenge
+ * and Sokoban). The names in code stay simple; on screen they are ship things.
+ */
 private enum class Challenge(val icon: String) {
-    KEY("🗝️"),      // find the room's key first
-    BOXES("📦"),    // push the boxes onto the circles (Sokoban)
-    ICE("🧊"),      // ice floor: Lía slides until something stops her
-    ROBOT("🤖")     // a patrolling robot: touching it costs a diamond
+    KEY("💳"),      // find the room's access card first
+    BOXES("🔋"),    // push the batteries onto the chargers (Sokoban)
+    ICE("🌌"),      // zero-gravity floor: Lía floats on until something stops her
+    ROBOT("🤖")     // a patrolling security robot: touching it costs a diamond
 }
 
 /** A robot walking back and forth over [length] tiles from [from] in direction [dir]. */
@@ -659,7 +662,7 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
                         puzzleDone = ::puzzleDone
                     )
                 }
-                // Sokoban rooms: put the boxes back if one gets stuck.
+                // Battery rooms (Sokoban): put the batteries back if one gets stuck.
                 val hereRoom = ship.room(liaTo)
                 if (hereRoom != null && ship.challenges[hereRoom] == Challenge.BOXES && !puzzleDone(hereRoom) && hereRoom == nextStation) {
                     Surface(
@@ -679,7 +682,7 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
                         modifier = Modifier.align(Alignment.TopEnd).padding(8.dp)
                     ) {
                         Text(
-                            language.pick("↺ أعيدي الصناديق", "↺ Reset boxes"),
+                            language.pick("↺ أعيدي البطاريات", "↺ Reset batteries"),
                             color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 14.sp,
                             modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                         )
@@ -997,20 +1000,23 @@ private fun DrawScope.drawShip(
                 rotate(45f, pivot = cc) { drawRect(Color.White.copy(alpha = 0.7f), cc - Offset(ts * 0.15f, ts * 0.15f), Size(ts * 0.3f, ts * 0.3f), style = Stroke(ts * 0.04f)) }
             }
             'I' -> {
-                // Ice: pale blue with a few shiny streaks.
-                drawRect(Color(0xFFBFE9FF).copy(alpha = 0.75f), tl, tile)
-                drawLine(Color.White.copy(alpha = 0.8f), tl + Offset(ts * 0.2f, ts * 0.65f), tl + Offset(ts * 0.5f, ts * 0.35f), strokeWidth = ts * 0.05f)
-                drawLine(Color.White.copy(alpha = 0.6f), tl + Offset(ts * 0.5f, ts * 0.8f), tl + Offset(ts * 0.8f, ts * 0.5f), strokeWidth = ts * 0.04f)
+                // Zero-gravity floor: deep violet with little sparks drifting about.
+                drawRect(NebulaPurple.copy(alpha = 0.55f), tl, tile)
+                repeat(3) { k ->
+                    val drift = (clock * 0.4f + k * 0.33f + (p.x + p.y) * 0.17f) % 1f
+                    drawCircle(StarWhite.copy(alpha = 0.7f), radius = ts * 0.04f, center = tl + Offset(ts * (0.2f + 0.3f * k), ts * (1f - drift)))
+                }
             }
             'T' -> {
-                // Where a box must go.
-                drawCircle(SolarGold, radius = ts * 0.32f, center = center(p), style = Stroke(ts * 0.07f, pathEffect = PathEffect.dashPathEffect(floatArrayOf(ts * 0.12f, ts * 0.08f))))
+                // Charger: where a battery must go.
+                drawCircle(DiamondCyan, radius = ts * 0.34f, center = center(p), style = Stroke(ts * 0.07f, pathEffect = PathEffect.dashPathEffect(floatArrayOf(ts * 0.12f, ts * 0.08f))))
+                text("⚡", center(p), 0.3f)
             }
             'k' -> if (ship.room(p)?.let { it in roomKeys } != true) {
                 val bob = sin(clock * 3f + p.x) * ts * 0.05f
                 val room = ship.room(p) ?: 0
                 drawCircle(Station.entries[room.coerceIn(0, 6)].color.copy(alpha = 0.5f), radius = ts * 0.34f, center = center(p) + Offset(0f, bob))
-                text("🗝️", center(p) + Offset(0f, bob), 0.45f)
+                text("💳", center(p) + Offset(0f, bob), 0.42f)
             }
             'K' -> if (next == null && !hasKey) {
                 val pulse = 0.5f + 0.5f * sin(clock * 5f)
@@ -1031,17 +1037,25 @@ private fun DrawScope.drawShip(
         text(st.es, center(p) + Offset(0f, ts * 0.78f), 0.24f, StarWhite, maxWidth = ts * 3f)
     }
 
-    // Boxes (green when on a circle).
+    // Batteries: empty until pushed onto a charger, then they fill up green.
     crates.forEach { p ->
-        val tl = topLeft(p.x, p.y) + Offset(ts * 0.1f, ts * 0.1f)
-        val onTarget = ship.at(p) == 'T'
-        val wood = if (onTarget) SuccessGreen else Color(0xFFB07A3E)
-        drawRoundRect(wood, tl, Size(ts * 0.8f, ts * 0.8f), CornerRadius(ts * 0.1f))
-        drawRoundRect(Color(0xFF6B4423), tl, Size(ts * 0.8f, ts * 0.8f), CornerRadius(ts * 0.1f), style = Stroke(ts * 0.06f))
-        drawLine(Color(0xFF6B4423), tl, tl + Offset(ts * 0.8f, ts * 0.8f), strokeWidth = ts * 0.05f)
-        drawLine(Color(0xFF6B4423), tl + Offset(ts * 0.8f, 0f), tl + Offset(0f, ts * 0.8f), strokeWidth = ts * 0.05f)
+        val tl = topLeft(p.x, p.y) + Offset(ts * 0.18f, ts * 0.14f)
+        val charging = ship.at(p) == 'T'
+        val body = Size(ts * 0.64f, ts * 0.76f)
+        drawRect(HULL_LIGHT, tl + Offset(ts * 0.22f, -ts * 0.08f), Size(ts * 0.2f, ts * 0.1f))   // terminal
+        drawRoundRect(Color(0xFF2B2F3A), tl, body, CornerRadius(ts * 0.1f))
+        val bars = if (charging) 3 else 1
+        repeat(bars) { k ->
+            drawRoundRect(
+                if (charging) SuccessGreen else MeteorRed,
+                tl + Offset(ts * 0.1f, ts * (0.54f - k * 0.2f)),
+                Size(ts * 0.44f, ts * 0.14f),
+                CornerRadius(ts * 0.04f)
+            )
+        }
+        drawRoundRect(if (charging) SuccessGreen else StarWhite, tl, body, CornerRadius(ts * 0.1f), style = Stroke(ts * 0.05f))
     }
-    // Patrolling robots.
+    // Patrolling security robots.
     ship.robots.forEach { r ->
         val pos = r.at(clock)
         val c = topLeft(pos.x + 0.5f, pos.y + 0.5f)
