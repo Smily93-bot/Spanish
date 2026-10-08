@@ -82,23 +82,30 @@ import kotlin.math.sin
 /** The seven rooms of the ship. Each room has its own colour and its own kind of game. */
 private enum class Station(
     val emoji: String, val es: String, val ar: String, val en: String, val color: Color,
-    /** What to do in this room, in the helper language, shown under the room's title. */
-    val howAr: String, val howEn: String
+    /** What to do in this room: in the helper language at first, in the target language later on. */
+    val howAr: String, val howEn: String, val howEs: String
 ) {
     STORY("📡", tl("Sala de radio"), "غرفة الراديو", "Radio room", DiamondCyan,
-        "استمعي إلى القصة جملةً جملة. اضغطي على أي كلمة لتعرفي معناها.", "Listen to the story one sentence at a time. Tap any word to see what it means."),
+        "استمعي إلى القصة جملةً جملة. اضغطي على أي كلمة لتعرفي معناها.", "Listen to the story one sentence at a time. Tap any word to see what it means.",
+        tl("Escucha la historia frase por frase. Toca una palabra para ver qué significa.")),
     OPENING("✏️", tl("Primeras preguntas"), "الأسئلة الأولى", "First questions", ExplorerBlue,
-        "اكتبي الكلمة الناقصة. التلميح تحت السؤال يساعدك.", "Type the missing word. The tip under the question helps you."),
+        "اكتبي الكلمة الناقصة. التلميح تحت السؤال يساعدك.", "Type the missing word. The tip under the question helps you.",
+        tl("Escribe la palabra que falta. La pista te ayuda.")),
     SEARCH("🔍", tl("Bodega"), "المخزن", "Cargo hold", SolarAmber,
-        "اسمعي اسم كل شيء ثم ابحثي عنه في الصورة واضغطي عليه.", "Listen to each word, then find it in the picture and tap it."),
+        "اسمعي اسم كل شيء ثم ابحثي عنه في الصورة واضغطي عليه.", "Listen to each word, then find it in the picture and tap it.",
+        tl("Escucha cada palabra y búscala en la imagen.")),
     CONSOLE("🔧", tl("Sala de máquinas"), "غرفة المحركات", "Engine room", MeteorRed,
-        "اقرئي القاعدة أولًا، ثم أكملي الجدول.", "Read the rule first, then fill in the table."),
+        "اقرئي القاعدة أولًا، ثم أكملي الجدول.", "Read the rule first, then fill in the table.",
+        tl("Lee la regla y completa la tabla.")),
     ORDER("🧩", tl("Mensaje roto"), "الرسالة المبعثرة", "Broken message", NebulaPurple,
-        "رتّبي الكلمات لتكوّني الجملة. المعنى مكتوب فوقها.", "Put the words in order to build the sentence. Its meaning is shown above."),
+        "رتّبي الكلمات لتكوّني الجملة. المعنى مكتوب فوقها.", "Put the words in order to build the sentence. Its meaning is shown above.",
+        tl("Ordena las palabras para formar la frase.")),
     MISSION("🛰️", tl("Puente de mando"), "غرفة القيادة", "Bridge", SuccessGreen,
-        "امشي بالأسهم واقفزي على الإجابة الصحيحة ثم اضغطي اختيار.", "Walk with the arrows, jump onto the right answer and press Choose."),
+        "امشي بالأسهم واقفزي على الإجابة الصحيحة ثم اضغطي اختيار.", "Walk with the arrows, jump onto the right answer and press Choose.",
+        tl("Camina con las flechas, salta a la respuesta correcta y pulsa Elegir.")),
     PORTAL("☄️", tl("Lluvia de palabras"), "مطر الكلمات", "Word shower", SolarGold,
-        "اضغطي على النيزك الذي يحمل الإجابة الصحيحة قبل أن يسقط.", "Tap the meteor with the right answer before it lands.");
+        "اضغطي على النيزك الذي يحمل الإجابة الصحيحة قبل أن يسقط.", "Tap the meteor with the right answer before it lands.",
+        tl("Toca el meteorito con la respuesta correcta antes de que caiga."));
 
     fun label(language: HelperLanguage) = language.pick(ar, en)
     fun how(language: HelperLanguage) = language.pick(howAr, howEn)
@@ -188,8 +195,12 @@ private enum class Challenge(val icon: String) {
     KEY("💳"),      // find the room's access card first
     BOXES("🔋"),    // push the batteries onto the chargers (Sokoban)
     REVERSE("🔄"),  // broken gravity magnets: the arrows push Lía the opposite way
-    ROBOT("🤖")     // a patrolling security robot: touching it costs a diamond
+    ROBOT("🤖"),    // a patrolling security robot: touching it costs a diamond
+    FETCH("🎁")     // a crew member asks (in the target language) for a thing kept in an earlier room
 }
+
+/** Fetch quest: the crew in [room] needs [wanted]; it lies in an earlier room next to two decoys. */
+private class Fetch(val room: Int, val wanted: CourseWord, val items: List<Pair<IntOffset, CourseWord>>)
 
 /** A robot walking back and forth over [length] tiles from [from] in direction [dir]. */
 private class Robot(val room: Int, val from: IntOffset, val dir: IntOffset, val length: Int) {
@@ -206,7 +217,7 @@ private class Robot(val room: Int, val from: IntOffset, val dir: IntOffset, val 
  * The ship for one level: the floor plans take turns (and are mirrored on the next round), each
  * level scatters its own diamonds, and from level to level more rooms get a puzzle.
  */
-private class ShipMap(level: Int) {
+private class ShipMap(level: Int, private val things: List<CourseWord>) {
     private val grid: Array<CharArray>
     private val roomOf = HashMap<IntOffset, Int>()
     val challenges = HashMap<Int, Challenge>()
@@ -214,6 +225,7 @@ private class ShipMap(level: Int) {
     val crateStarts = mutableListOf<Pair<Int, IntOffset>>()
     val targets = HashMap<Int, MutableList<IntOffset>>()
     val robots = mutableListOf<Robot>()
+    val fetches = HashMap<Int, Fetch>()
     /** Tiles taken by a puzzle, kept free of diamonds (declared before init, which fills it). */
     private val used = hashSetOf<IntOffset>()
 
@@ -283,11 +295,15 @@ private class ShipMap(level: Int) {
     }
 
     private fun placeChallenges(level: Int, random: kotlin.random.Random) {
+        // More rooms get a puzzle as the levels go on; fetch quests send Lía back to earlier rooms.
         val kinds = when (level) {
-            1 -> listOf(Challenge.KEY)
-            2 -> listOf(Challenge.KEY, Challenge.BOXES)
-            3 -> listOf(Challenge.REVERSE, Challenge.BOXES)
-            else -> Challenge.entries.shuffled(random).take(minOf(4, 2 + level / 3))
+            1 -> listOf(Challenge.FETCH, Challenge.KEY)
+            2 -> listOf(Challenge.FETCH, Challenge.BOXES, Challenge.KEY)
+            3 -> listOf(Challenge.FETCH, Challenge.BOXES, Challenge.REVERSE, Challenge.FETCH)
+            else -> listOf(
+                Challenge.FETCH, Challenge.FETCH, Challenge.BOXES, Challenge.BOXES,
+                Challenge.KEY, Challenge.REVERSE, Challenge.ROBOT
+            ).shuffled(random).take(minOf(7, 3 + level / 2))
         }
         val rooms = (0..6).shuffled(random).toMutableList()
         for (kind in kinds) {
@@ -313,7 +329,7 @@ private class ShipMap(level: Int) {
                 val pushes = if (level >= 4) 2 else 1
                 var placed = 0
                 for (start in tiles.shuffled(random)) {
-                    if (placed == 2) break
+                    if (placed == 3) break
                     for (d in SIDES.shuffled(random)) {
                         val line = (0..pushes + 1).map { IntOffset(start.x + d.x * it, start.y + d.y * it) }
                         if (!line.all { free(it, room) }) continue
@@ -335,6 +351,16 @@ private class ShipMap(level: Int) {
             }
             // The whole room is affected; nothing to place.
             Challenge.REVERSE -> return true
+            Challenge.FETCH -> {
+                val picks = things.distinctBy { it.emoji }.shuffled(random).take(3)
+                if (picks.size < 3) return false
+                // The thing waits in a room Lía has already passed, so she has to walk back for it.
+                val source = (START_ROOM until room).shuffled(random).firstOrNull { freeTiles(it).size >= 3 } ?: return false
+                val spots = freeTiles(source).shuffled(random).take(3)
+                fetches[room] = Fetch(room, picks[0], spots.zip(picks.shuffled(random)))
+                used += spots
+                return true
+            }
             Challenge.ROBOT -> {
                 for (start in tiles.shuffled(random)) {
                     for (d in listOf(IntOffset(1, 0), IntOffset(0, 1))) {
@@ -377,7 +403,7 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
     val niloSprite = ImageBitmap.imageResource(R.drawable.nilo_walk)
     val textMeasurer = rememberTextMeasurer()
     val chapterNumber = data.tablets.indexOf(tablet) + 1
-    val ship = remember(tablet.id) { ShipMap(level = chapterNumber) }
+    val ship = remember(tablet.id) { ShipMap(level = chapterNumber, things = data.courseWords) }
 
     // Lía walks tile by tile: from → to, progress 0..1.
     var liaFrom by remember { mutableStateOf(ship.start) }
@@ -390,6 +416,10 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
     // Puzzles: where the batteries are now, access cards picked up, robot bumps.
     val crates = remember(tablet.id) { ship.crateStarts.map { it.second }.toMutableStateList() }
     val roomKeys = remember { mutableStateListOf<Int>() }
+    // Fetch quests: things lying around, the one Lía carries, and rooms that got what they needed.
+    val things = remember(tablet.id) { ship.fetches.values.flatMap { it.items }.toMutableStateMap() }
+    var carrying by remember { mutableStateOf<CourseWord?>(null) }
+    val delivered = remember { mutableStateListOf<Int>() }
     var lastHintAt by remember { mutableFloatStateOf(-10f) }
     var lastRobotHit by remember { mutableFloatStateOf(-10f) }
     var clock by remember { mutableFloatStateOf(0f) }
@@ -449,6 +479,7 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
     fun puzzleDone(room: Int): Boolean = when (ship.challenges[room]) {
         Challenge.KEY -> room in roomKeys
         Challenge.BOXES -> ship.targets[room].orEmpty().all { it in crates }
+        Challenge.FETCH -> room in delivered
         else -> true
     }
 
@@ -462,6 +493,14 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
     /** Lía has just stepped onto [p]: pick things up, open the room's game, take the key, leave. */
     fun arrive(p: IntOffset) {
         if (ship.challenges[ship.room(p) ?: -1] == Challenge.REVERSE) hint(NiloLines.reversed)
+        things[p]?.let { thing ->
+            // Pick it up; whatever she was carrying is left here instead.
+            things.remove(p)
+            carrying?.let { things[p] = it }
+            carrying = thing
+            viewModel.soundEngine.click()
+            say(NiloLine("🎒 ${thing.word}", "🎒 ${thing.word}", "🎒 ${thing.word}"))
+        }
         when (val c = ship.at(p)) {
             'k' -> ship.room(p)?.let { room ->
                 if (room !in roomKeys) {
@@ -477,9 +516,27 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
             }
             in '0'..'6' -> {
                 val i = c - '0'
+                val fetch = ship.fetches[i]
+                if (fetch != null && i !in delivered && i == Station.entries.indices.firstOrNull { it !in solved }) {
+                    val inHand = carrying
+                    when {
+                        inHand == fetch.wanted -> {
+                            delivered += i
+                            carrying = null
+                            viewModel.soundEngine.powerUp()
+                            say(NiloLines.thanks)
+                        }
+                        inHand != null -> say(NiloLine("${tl("No, eso es")} ${inHand.word}. ${tl("Necesito")} ${fetch.wanted.word}.", "", ""))
+                        else -> say(NiloLine("${tl("Necesito")} ${fetch.wanted.word}.", "", ""))
+                    }
+                }
                 if (i == Station.entries.indices.firstOrNull { it !in solved } && !puzzleDone(i)) {
                     viewModel.soundEngine.error()
-                    hint(if (ship.challenges[i] == Challenge.KEY) NiloLines.findRoomKey else NiloLines.pushBoxes)
+                    when (ship.challenges[i]) {
+                        Challenge.KEY -> hint(NiloLines.findRoomKey)
+                        Challenge.BOXES -> hint(NiloLines.pushBoxes)
+                        else -> Unit
+                    }
                 } else if (i == Station.entries.indices.firstOrNull { it !in solved }) {
                     openStation = i
                     held = null
@@ -664,8 +721,29 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
                         isOpen = ::doorOpen,
                         crates = crates,
                         roomKeys = roomKeys,
-                        puzzleDone = ::puzzleDone
+                        puzzleDone = ::puzzleDone,
+                        things = things,
+                        carrying = carrying
                     )
+                }
+                // The current fetch request, in the target language (tap to hear it).
+                val request = nextStation?.let { ship.fetches[it] }?.takeIf { it.room !in delivered }
+                if (request != null || carrying != null) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .padding(8.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(SpaceNavy.copy(alpha = 0.85f))
+                            .clickable { request?.let { viewModel.speakSpanish(it.wanted.word) } }
+                            .padding(horizontal = 10.dp, vertical = 6.dp)
+                    ) {
+                        if (request != null) {
+                            Text("🛰️ ${tl("Necesito")}: ${request.wanted.word} 🔊", color = StarWhite, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        }
+                        carrying?.let { Text("   🎒 ${it.emoji}", color = SolarGold, fontWeight = FontWeight.Bold, fontSize = 14.sp) }
+                    }
                 }
                 // Battery rooms (Sokoban): put the batteries back if one gets stuck.
                 val hereRoom = ship.room(liaTo)
@@ -707,6 +785,7 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
                         results = results,
                         viewModel = viewModel,
                         language = language,
+                        level = chapterNumber,
                         onClose = { openStation = null },
                         onSolved = { solve(station) }
                     )
@@ -823,7 +902,9 @@ private fun DrawScope.drawShip(
     isOpen: (Char) -> Boolean,
     crates: List<IntOffset>,
     roomKeys: List<Int>,
-    puzzleDone: (Int) -> Boolean
+    puzzleDone: (Int) -> Boolean,
+    things: Map<IntOffset, CourseWord>,
+    carrying: CourseWord?
 ) {
     // Space all around the ship.
     drawRect(Brush.verticalGradient(listOf(SpaceDeep, SpaceNavy)))
@@ -984,7 +1065,7 @@ private fun DrawScope.drawShip(
                 text(if (done) "✓" else st.emoji, center(p), 0.38f)
                 // The room's puzzle comes first: show what it needs on the pad.
                 ship.challenges[i]?.let { ch ->
-                    if (!done && !puzzleDone(i) && (ch == Challenge.KEY || ch == Challenge.BOXES)) {
+                    if (!done && !puzzleDone(i) && (ch == Challenge.KEY || ch == Challenge.BOXES || ch == Challenge.FETCH)) {
                         drawCircle(HULL, radius = ts * 0.2f, center = center(p) + Offset(ts * 0.36f, -ts * 0.36f))
                         text(ch.icon, center(p) + Offset(ts * 0.36f, -ts * 0.36f), 0.22f)
                     }
@@ -1045,6 +1126,12 @@ private fun DrawScope.drawShip(
         }
         drawRoundRect(if (charging) SuccessGreen else StarWhite, tl, body, CornerRadius(ts * 0.1f), style = Stroke(ts * 0.05f))
     }
+    // Things for the fetch quests.
+    things.forEach { (p, thing) ->
+        val c = center(p) + Offset(0f, sin(clock * 2.5f + p.x) * ts * 0.04f)
+        drawCircle(StarWhite.copy(alpha = 0.35f), radius = ts * 0.36f, center = c)
+        text(thing.emoji, c, 0.5f)
+    }
     // Patrolling security robots.
     ship.robots.forEach { r ->
         val pos = r.at(clock)
@@ -1082,6 +1169,12 @@ private fun DrawScope.drawShip(
         }
     }
     if (nilo.y <= lia.y) { drawNilo(); drawLia() } else { drawLia(); drawNilo() }
+    // What Lía is carrying floats above her head.
+    carrying?.let { thing ->
+        val head = topLeft(lia.x + 0.5f, lia.y + 0.9f) - Offset(0f, spriteH + ts * 0.15f)
+        drawCircle(SolarGold.copy(alpha = 0.5f), radius = ts * 0.3f, center = head)
+        text(thing.emoji, head, 0.42f)
+    }
     niloSays?.let {
         val head = topLeft(nilo.x + 0.5f, nilo.y + 0.9f) - Offset(0f, spriteH + 4f)
         drawBubble(textMeasurer, it, head.x.coerceIn(size.width * 0.2f, size.width * 0.8f), head.y.coerceAtLeast(40f))
@@ -1188,6 +1281,7 @@ private fun MissionPanel(
     results: MutableMap<String, Boolean>,
     viewModel: BlasterViewModel,
     language: HelperLanguage,
+    level: Int,
     onClose: () -> Unit,
     onSolved: () -> Unit
 ) {
@@ -1233,7 +1327,18 @@ private fun MissionPanel(
             }
             TextButton(onClick = onClose) { Text("✕", color = TextSecondary, fontSize = 18.sp) }
         }
-        Text("👉 " + station.how(language), color = TextPrimary, fontSize = 13.sp, lineHeight = 18.sp, modifier = Modifier.padding(bottom = 6.dp))
+        // Instructions: translated in the first levels; later in the target language (words already learnt),
+        // with every word tappable and the translation one tap away.
+        if (level <= 3) {
+            Text("👉 " + station.how(language), color = TextPrimary, fontSize = 13.sp, lineHeight = 18.sp, modifier = Modifier.padding(bottom = 6.dp))
+        } else {
+            var translate by remember(station) { mutableStateOf(false) }
+            Row(verticalAlignment = Alignment.Top, modifier = Modifier.padding(bottom = 6.dp)) {
+                Box(Modifier.weight(1f)) { TappableSentence("👉 " + station.howEs, data, viewModel, language, fontSize = 13) }
+                Text("🌐", fontSize = 18.sp, modifier = Modifier.clickable { translate = !translate }.padding(start = 6.dp))
+            }
+            if (translate) Text(station.how(language), color = TextSecondary, fontSize = 12.sp, modifier = Modifier.padding(bottom = 6.dp))
+        }
         Box(Modifier.weight(1f).fillMaxWidth()) {
             key(station, index) {
                 val scroll = rememberScrollState()

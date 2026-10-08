@@ -187,6 +187,9 @@ fun MainAppContent(viewModel: BlasterViewModel) {
                 Screen.GrammarLab -> GrammarLabScreen(viewModel = viewModel)
                 Screen.WordJump -> WordJumpScreen(viewModel = viewModel)
                 Screen.Profile -> ProfileScreen(viewModel = viewModel)
+                Screen.Course -> CourseScreen(viewModel = viewModel)
+                Screen.MatchGame -> QuickWordGameScreen(viewModel = viewModel, crossword = false)
+                Screen.Crossword -> QuickWordGameScreen(viewModel = viewModel, crossword = true)
             }
             StreakCelebration(viewModel = viewModel, language = helperLanguage)
         }

@@ -51,6 +51,22 @@ class EngagementStore private constructor(context: Context) {
     /** Best stars (0–3) per grammar topic id. */
     val grammarStars: StateFlow<Map<String, Int>> = _grammarStars.asStateFlow()
 
+    private val _courseStars = MutableStateFlow(readStars(K_COURSE_STARS))
+    /** Stars (1–3) per finished beginner unit. */
+    val courseStars: StateFlow<Map<String, Int>> = _courseStars.asStateFlow()
+
+    fun saveCourseStars(unitId: String, stars: Int) {
+        val next = _courseStars.value + (unitId to maxOf(stars, _courseStars.value[unitId] ?: 0))
+        prefs.edit().putString(K_COURSE_STARS, next.entries.joinToString(",") { "${it.key}:${it.value}" }).apply()
+        _courseStars.value = next
+    }
+
+    private fun readStars(key: String): Map<String, Int> =
+        prefs.getString(key, "").orEmpty().split(',').mapNotNull { entry ->
+            val parts = entry.split(':')
+            if (parts.size == 2) parts[1].toIntOrNull()?.let { parts[0] to it } else null
+        }.toMap()
+
     private fun readGrammarStars(): Map<String, Int> =
         prefs.getString(K_GRAMMAR_STARS, "").orEmpty().split(',').mapNotNull { entry ->
             val i = entry.lastIndexOf(':')
@@ -144,6 +160,7 @@ class EngagementStore private constructor(context: Context) {
         _cards.value = emptyMap()
         _pathDone.value = emptySet()
         _grammarStars.value = emptyMap()
+        _courseStars.value = emptyMap()
         StreakWidget.requestUpdate(appContext)
     }
 
@@ -198,6 +215,7 @@ class EngagementStore private constructor(context: Context) {
         private const val K_PATH_DAY = "path_day"
         private const val K_PATH_DONE = "path_done"
         private const val K_GRAMMAR_STARS = "grammar_stars"
+        private const val K_COURSE_STARS = "course_stars"
         private const val K_HELPER_ARABIC = "helper_arabic"
 
         @Volatile private var instance: EngagementStore? = null

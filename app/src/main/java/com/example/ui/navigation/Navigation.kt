@@ -19,6 +19,11 @@ sealed class Screen(val route: String) {
     data object GrammarLab : Screen("grammar")
     data object WordJump : Screen("jump")
     data object Profile : Screen("profile")
+    /** Beginner course: the unit path and the unit lessons. */
+    data object Course : Screen("course")
+    /** Quick word games over the course words: matching pairs or a crossword. */
+    data object MatchGame : Screen("match")
+    data object Crossword : Screen("crossword")
 
     companion object {
         /** Bottom-bar destinations; opening one clears the back stack. */

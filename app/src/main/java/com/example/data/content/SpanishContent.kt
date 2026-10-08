@@ -23,8 +23,13 @@ class SpanishContent(
     val grammar: List<GrammarGuide>,
     val tablets: List<ReadingTablet>,
     val scenes: Map<String, HiddenScene>,
-    val grammarTopics: List<GrammarTopic> = emptyList()
+    val grammarTopics: List<GrammarTopic> = emptyList(),
+    /** The beginner course (course.json); empty if the file is missing. */
+    val course: List<CourseUnit> = emptyList()
 ) {
+    /** Every picture word of the course, for games that need things to show (fetch quests, matching). */
+    val courseWords: List<CourseWord> by lazy { course.flatMap { it.words } }
+
     val topicWords: List<VocabWord> = categories.flatMap { it.words }
     private val bySpanish: Map<String, VocabWord> =
         (topicWords + frequency).associateBy { normalizeAnswer(it.shortSpanish) }
@@ -161,6 +166,9 @@ class SpanishContent(
     private fun matchCase(word: String, model: String) =
         if (model.firstOrNull()?.isUpperCase() == true) word.replaceFirstChar { it.uppercase() } else word
 
+    fun copyWithCourse(units: List<CourseUnit>) =
+        SpanishContent(categories, frequency, phrases, grammar, tablets, scenes, grammarTopics, units)
+
     companion object {
         private val SKIPPED_PARTS = setOf("article", "punctuation", "number", "contraction")
 
@@ -182,7 +190,30 @@ class SpanishContent(
             vocabJson = context.assets.open("vocab.json").bufferedReader().use { it.readText() },
             campaignJson = context.assets.open("campaign.json").bufferedReader().use { it.readText() },
             grammarJson = runCatching { context.assets.open("grammar_lab.json").bufferedReader().use { it.readText() } }.getOrNull()
-        )
+        ).let { content ->
+            val course = runCatching { context.assets.open("course.json").bufferedReader().use { it.readText() } }.getOrNull()
+            if (course == null) content else content.copyWithCourse(parseCourse(course))
+        }
+
+        fun parseCourse(json: String): List<CourseUnit> = JSONObject(json).getJSONArray("units").objects().map { u ->
+            val title = u.getJSONObject("title")
+            val tip = u.getJSONObject("tip")
+            CourseUnit(
+                id = u.getString("id"),
+                emoji = u.optString("emoji"),
+                title = title.getString("t"),
+                titleEn = title.optString("en"),
+                titleAr = title.optString("ar"),
+                words = u.getJSONArray("words").objects().map { w ->
+                    CourseWord(w.getString("t"), w.getString("b"), w.optString("en"), w.optString("ar"), w.optString("e"))
+                },
+                phrases = u.getJSONArray("phrases").objects().map { p ->
+                    CoursePhrase(p.getString("t"), p.optString("en"), p.optString("ar"))
+                },
+                tipEn = tip.optString("en"),
+                tipAr = tip.optString("ar")
+            )
+        }
 
         fun parseGrammar(json: String): List<GrammarTopic> = JSONArray(json).objects().map { t ->
             GrammarTopic(

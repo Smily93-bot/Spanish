@@ -445,6 +445,17 @@ class BlasterViewModel(
         engagement.completeStep(PathStep.STORY)
     }
 
+    // ------------------------------------------------------------------ Beginner course
+
+    val courseStars: StateFlow<Map<String, Int>> = engagement.courseStars
+
+    /** A finished unit: stars for the path and XP toward today's goal. */
+    fun finishCourseUnit(unitId: String, stars: Int) = viewModelScope.launch {
+        soundEngine.fanfare()
+        engagement.saveCourseStars(unitId, stars)
+        earnXp(10 + 5 * stars)
+    }
+
     /** Saves a Quantum Cloze or Grammar Reactor run to the arcade table. */
     fun finishPracticeRun(gameMode: String, score: Int, correctCount: Int, bestStreak: Int) = viewModelScope.launch {
         soundEngine.fanfare()

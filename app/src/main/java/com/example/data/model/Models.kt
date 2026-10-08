@@ -293,3 +293,28 @@ fun normalizeAnswer(text: String): String =
         .replace(Regex("[¿?¡!.,;:«»\"“”]"), "")
         .replace(Regex("\\s+"), " ")
         .trim()
+
+/** One word of the beginner course: as taught ("el perro"), bare for spelling ("perro"), and a picture. */
+data class CourseWord(val word: String, val bare: String, val english: String, val arabic: String, val emoji: String) {
+    fun meaning(language: HelperLanguage) = language.pick(arabic, english)
+}
+
+data class CoursePhrase(val text: String, val english: String, val arabic: String) {
+    fun meaning(language: HelperLanguage) = language.pick(arabic, english)
+}
+
+/** A beginner unit: eight picture words, a few phrases and one small grammar tip. */
+data class CourseUnit(
+    val id: String,
+    val emoji: String,
+    val title: String,
+    val titleEn: String,
+    val titleAr: String,
+    val words: List<CourseWord>,
+    val phrases: List<CoursePhrase>,
+    val tipEn: String,
+    val tipAr: String
+) {
+    fun helperTitle(language: HelperLanguage) = language.pick(titleAr, titleEn)
+    fun tip(language: HelperLanguage) = language.pick(tipAr, tipEn)
+}

@@ -99,6 +99,38 @@ fun CommandBridgeScreen(viewModel: BlasterViewModel) {
 
         if (showTour) WelcomeTour(language) { viewModel.dismissTour() }
 
+        // The beginner course comes first: it teaches the words the games and the adventure use.
+        val courseStars by viewModel.courseStars.collectAsStateWithLifecycle()
+        if (data.course.isNotEmpty()) {
+            val unitIndex = nextCourseUnit(data.course, courseStars)
+            val unit = data.course[unitIndex]
+            val allDone = data.course.all { (courseStars[it.id] ?: 0) > 0 }
+            Surface(
+                onClick = { viewModel.navigateTo(Screen.Course) },
+                shape = RoundedCornerShape(22.dp),
+                color = SuccessGreen.copy(alpha = 0.12f),
+                border = BorderStroke(2.dp, SuccessGreen),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(14.dp)) {
+                    Text(if (allDone) "🎓" else unit.emoji, fontSize = 34.sp)
+                    Spacer(Modifier.width(12.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text(
+                            if (allDone) language.pick("📚 أنهيتِ الدورة! راجعي متى شئتِ", "📚 Course finished! Review any time")
+                            else language.pick("📚 الدورة · الوحدة ${unitIndex + 1}", "📚 Course · Unit ${unitIndex + 1}"),
+                            color = SuccessGreen, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp
+                        )
+                        if (!allDone) {
+                            Text(unit.title, color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
+                            Text(unit.helperTitle(language), color = TextSecondary, fontSize = 13.sp)
+                        }
+                    }
+                    Text("▶", color = SuccessGreen, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold)
+                }
+            }
+        }
+
         // Today's goal
         val xp = streak.xpOn(today)
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
