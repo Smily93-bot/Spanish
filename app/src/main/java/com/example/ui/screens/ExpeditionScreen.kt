@@ -614,13 +614,12 @@ private fun ShipControls(canUndo: Boolean, onHold: (Cell?) -> Unit, onUndo: () -
 
 private val HULL = Color(0xFF1E2A48)
 private val HULL_LIGHT = Color(0xFF2E3D63)
-// Bright, Chip's-Challenge-like tiles: light floor plates, strong blue walls with bevels.
-private val FLOOR = Color(0xFFE3E9F3)
-private val FLOOR_LIGHT = Color(0xFFFFFFFF)
-private val FLOOR_SHADE = Color(0xFFB4BED0)
-private val WALL = Color(0xFF3D5A99)
-private val WALL_LIGHT = Color(0xFF7193DC)
-private val WALL_SHADE = Color(0xFF263B68)
+// Spaceship tiles with strong contrast: bright steel floor plates you can walk on, dark hull walls
+// with glowing edges, so the way through is easy to see.
+private val FLOOR = Color(0xFF5D74A8)
+private val FLOOR_SEAM = Color(0xFF41588A)
+private val WALL = Color(0xFF111A30)
+private val WALL_INNER = Color(0xFF1E2B4D)
 
 /** Fixed star field (fractions of the view), so it doesn't flicker between frames. */
 private val SPACE_STARS: List<Offset> = List(80) { i ->
@@ -738,14 +737,31 @@ private fun DrawScope.drawShip(
         val tl = topLeft(p.x, p.y)
         val tile = Size(ts, ts)
         if (c == '#') {
-            bevel(tl, WALL, WALL_LIGHT, WALL_SHADE)
+            // Hull wall: dark metal, glowing cyan where it meets the floor.
+            drawRect(WALL, tl, tile)
+            drawRect(WALL_INNER, tl + Offset(ts * 0.14f, ts * 0.14f), Size(ts * 0.72f, ts * 0.72f))
+            val glow = DiamondCyan.copy(alpha = 0.8f)
+            val w = ts * 0.07f
+            if (level.at(p + UP) != '#' && p.y > 0) drawRect(glow, tl, Size(ts, w))
+            if (level.at(p + DOWN) != '#' && p.y < mapH - 1) drawRect(glow, tl + Offset(0f, ts - w), Size(ts, w))
+            if (level.at(p + LEFT) != '#' && p.x > 0) drawRect(glow, tl, Size(w, ts))
+            if (level.at(p + RIGHT) != '#' && p.x < mapW - 1) drawRect(glow, tl + Offset(ts - w, 0f), Size(w, ts))
+            // Portholes along the outer hull.
+            if ((p.x == 0 || p.x == mapW - 1) && p.y % 3 == 1 && p.y in 1 until mapH - 1) {
+                drawCircle(SpaceDeep, radius = ts * 0.28f, center = center(p))
+                drawCircle(DiamondCyan.copy(alpha = 0.35f), radius = ts * 0.2f, center = center(p))
+                drawCircle(StarWhite, radius = ts * 0.05f, center = center(p) + Offset(-ts * 0.07f, -ts * 0.07f))
+            }
             return@forEach
         }
-        // Floor plate, tinted with its room's colour (rooms not reached yet are a little darker).
-        bevel(tl, FLOOR, FLOOR_LIGHT, FLOOR_SHADE)
+        // Floor plate (bright steel with seams and rivets), tinted with its room's colour.
+        drawRect(FLOOR, tl, tile)
+        drawRect(FLOOR_SEAM, tl, tile, style = Stroke(ts * 0.05f))
+        drawCircle(FLOOR_SEAM, ts * 0.04f, tl + Offset(ts * 0.16f, ts * 0.16f))
+        drawCircle(FLOOR_SEAM, ts * 0.04f, tl + Offset(ts * 0.84f, ts * 0.84f))
         rooms[p]?.let { room ->
-            drawRect(Station.entries[room].color.copy(alpha = 0.22f), tl, tile)
-            if (room > next) drawRect(SpaceNavy.copy(alpha = 0.12f), tl, tile)
+            drawRect(Station.entries[room].color.copy(alpha = 0.32f), tl, tile)
+            if (room > next) drawRect(SpaceDeep.copy(alpha = 0.18f), tl, tile)
         }
         when (c) {
             in DOOR_COLORS -> if (p !in state.opened) {
