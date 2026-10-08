@@ -24,6 +24,8 @@ sealed class Screen(val route: String) {
     /** Quick word games over the course words: matching pairs or a crossword. */
     data object MatchGame : Screen("match")
     data object Crossword : Screen("crossword")
+    /** Word Munchers: eat only the words that fit the rule, while a robot chases Lía. */
+    data object Munchers : Screen("munchers")
 
     companion object {
         /** Bottom-bar destinations; opening one clears the back stack. */

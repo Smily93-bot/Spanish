@@ -39,6 +39,7 @@ private val TILES = listOf(
     PracticeTile("📚", "الدورة", "Course", "تعلّمي من الصفر", "Learn from zero", SuccessGreen) { it.navigateTo(Screen.Course) },
     PracticeTile("🔗", "التوصيل", "Matching", "صِلي الكلمة بصورتها", "Match words to pictures", ExplorerBlue) { it.navigateTo(Screen.MatchGame) },
     PracticeTile("🔠", "الكلمات المتقاطعة", "Crossword", "الصورة هي التلميح", "Pictures are the clues", NebulaPurple) { it.navigateTo(Screen.Crossword) },
+    PracticeTile("😋", "الملتهم", "Word Munchers", "كُلي الكلمات المناسبة فقط", "Eat only the words that fit", SuccessGreen) { it.navigateTo(Screen.Munchers) },
     PracticeTile("🌌", "الكلمات", "Words", "أهم 5000 كلمة", "Top 5000 words", DiamondCyan) { it.navigateTo(Screen.WordGalaxy) },
     PracticeTile("🕵️", "القواعد: لماذا؟", "Grammar: why?", "افهمي سبب كل إجابة", "The reason behind answers", NebulaPurple) { it.navigateTo(Screen.GrammarLab) },
     PracticeTile("🗺️", "المغامرة", "Adventure", "قصة ليا ومهماتها", "Lía's story missions", SolarAmber) { it.navigateTo(Screen.AdventureMap) },

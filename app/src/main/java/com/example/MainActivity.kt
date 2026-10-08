@@ -136,7 +136,7 @@ fun MainAppContent(viewModel: BlasterViewModel) {
         },
         bottomBar = {
             // Games with on-screen controls hide the tabs so Home isn't pressed by accident (the back arrow stays).
-            if (currentScreen !in setOf(Screen.WordJump, Screen.MeteorBlaster, Screen.TabletCodex)) NavigationBar(
+            if (currentScreen !in setOf(Screen.WordJump, Screen.MeteorBlaster, Screen.TabletCodex, Screen.Munchers)) NavigationBar(
                 containerColor = AdventureSurface,
                 tonalElevation = 2.dp
             ) {
@@ -190,6 +190,7 @@ fun MainAppContent(viewModel: BlasterViewModel) {
                 Screen.Course -> CourseScreen(viewModel = viewModel)
                 Screen.MatchGame -> QuickWordGameScreen(viewModel = viewModel, crossword = false)
                 Screen.Crossword -> QuickWordGameScreen(viewModel = viewModel, crossword = true)
+                Screen.Munchers -> MunchersScreen(viewModel = viewModel)
             }
             StreakCelebration(viewModel = viewModel, language = helperLanguage)
         }

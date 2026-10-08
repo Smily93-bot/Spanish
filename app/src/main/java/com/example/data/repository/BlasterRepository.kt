@@ -237,7 +237,7 @@ class BlasterRepository(private val dao: AppDao) {
     }
 
     companion object {
-        val MODES = listOf("TRANSLATION", "SYNONYM", "ANTONYM", "CLOZE", "REACTOR", "JUMP")
+        val MODES = listOf("TRANSLATION", "SYNONYM", "ANTONYM", "CLOZE", "REACTOR", "JUMP", "MUNCH")
 
         /** Arabic descriptions for [MILESTONES] (the stored description is English). */
         val MILESTONE_DESCRIPTIONS_AR = mapOf(
