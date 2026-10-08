@@ -39,14 +39,16 @@ fun WordJumpScreen(viewModel: BlasterViewModel) {
     val reward by viewModel.practiceReward.collectAsStateWithLifecycle()
     val data = content ?: return LoadingContent(language == HelperLanguage.ARABIC)
     var run by remember { mutableIntStateOf(0) }   // 0 = start card
+    var lost by remember { mutableStateOf(false) }
 
     if (run == 0) {
         JumpStart(language) { run++ }
     } else {
-        key(run) { JumpRun(data, viewModel, language) }
+        key(run) { JumpRun(data, viewModel, language) { lost = it } }
     }
     reward?.let {
-        RewardDialog(it, language == HelperLanguage.ARABIC, language.pick("🐸 قفزة رائعة!", "🐸 " + tl("¡Gran salto!"))) {
+        val title = if (lost) language.pick("💔 انتهت القلوب، حاولي مرة أخرى", "💔 Out of hearts, try again") else language.pick("🐸 قفزة رائعة!", "🐸 " + tl("¡Gran salto!"))
+        RewardDialog(it, language == HelperLanguage.ARABIC, title) {
             viewModel.dismissPracticeReward()
             run = 0
         }
@@ -79,7 +81,7 @@ private fun JumpStart(language: HelperLanguage, onStart: () -> Unit) {
 }
 
 @Composable
-private fun JumpRun(data: SpanishContent, viewModel: BlasterViewModel, language: HelperLanguage) {
+private fun JumpRun(data: SpanishContent, viewModel: BlasterViewModel, language: HelperLanguage, onOver: (lost: Boolean) -> Unit) {
     val level = viewModel.userProgress.collectAsStateWithLifecycle().value?.level ?: 1
     var round by remember { mutableIntStateOf(1) }
     var lives by remember { mutableIntStateOf(JUMP_LIVES) }
@@ -97,6 +99,7 @@ private fun JumpRun(data: SpanishContent, viewModel: BlasterViewModel, language:
     fun finish() {
         if (over) return
         over = true
+        onOver(lives <= 0)
         viewModel.finishPracticeRun("JUMP", score, correct, bestCombo)
     }
 

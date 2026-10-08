@@ -34,14 +34,16 @@ private const val HEARTS = 3
 
 /** One board: the rule (a unit's topic), and a word in every cell (null once eaten). */
 private class MunchBoard(val unit: CourseUnit, val cells: List<CourseWord?>) {
-    fun fits(w: CourseWord) = w in unit.words
+    private val words = unit.words.map { it.word }.toSet()
+    fun fits(w: CourseWord) = w.word in words
 }
 
 private fun newBoard(open: List<CourseUnit>, random: Random): MunchBoard {
     val unit = open.random(random)
     val right = unit.words.shuffled(random).take(6)
     val others = open.filter { it != unit }.flatMap { it.words }.ifEmpty { unit.words }
-    val wrong = others.filter { it !in unit.words }.shuffled(random).take(COLS * ROWS - right.size)
+    val rightWords = unit.words.map { it.word }.toSet()
+    val wrong = others.filter { it.word !in rightWords }.distinctBy { it.word }.shuffled(random).take(COLS * ROWS - right.size)
     val cells = (right + wrong).shuffled(random) + List((COLS * ROWS - right.size - wrong.size).coerceAtLeast(0)) { null }
     return MunchBoard(unit, cells.take(COLS * ROWS))
 }
@@ -63,9 +65,11 @@ fun MunchersScreen(viewModel: BlasterViewModel) {
         return
     }
     var game by remember { mutableIntStateOf(0) }
-    key(game) { MunchGame(open, viewModel, language) }
+    var lost by remember { mutableStateOf(false) }
+    key(game) { MunchGame(open, viewModel, language) { lost = it } }
     reward?.let {
-        RewardDialog(it, language == HelperLanguage.ARABIC, language.pick("😋 وجبة رائعة!", "😋 Great munching!")) {
+        val title = if (lost) language.pick("💔 انتهت القلوب، حاولي مرة أخرى", "💔 Out of hearts, try again") else language.pick("😋 وجبة رائعة!", "😋 Great munching!")
+        RewardDialog(it, language == HelperLanguage.ARABIC, title) {
             viewModel.dismissPracticeReward()
             game++
         }
@@ -73,7 +77,7 @@ fun MunchersScreen(viewModel: BlasterViewModel) {
 }
 
 @Composable
-private fun MunchGame(open: List<CourseUnit>, viewModel: BlasterViewModel, language: HelperLanguage) {
+private fun MunchGame(open: List<CourseUnit>, viewModel: BlasterViewModel, language: HelperLanguage, onOver: (lost: Boolean) -> Unit) {
     var round by remember { mutableIntStateOf(1) }
     var board by remember { mutableStateOf(newBoard(open, Random)) }
     val cells = remember(board) { board.cells.toMutableStateList() }
@@ -85,16 +89,26 @@ private fun MunchGame(open: List<CourseUnit>, viewModel: BlasterViewModel, langu
     var streak by remember { mutableIntStateOf(0) }
     var bestStreak by remember { mutableIntStateOf(0) }
     var flash by remember { mutableStateOf<String?>(null) }
+    /** Why the last eaten word was wrong: the word, its meaning and picture. */
+    var wrongWord by remember { mutableStateOf<CourseWord?>(null) }
     var over by remember { mutableStateOf(false) }
+    /** Lía's moves so far; the robot only steps on every second one, so she can get away. */
+    var moves by remember(board) { mutableIntStateOf(0) }
+    /** Turns the robot stays knocked out (a right word stuns it). */
+    var stunned by remember(board) { mutableIntStateOf(2) }
 
     fun finish() {
         if (over) return
         over = true
+        onOver(hearts <= 0)
         viewModel.finishPracticeRun("MUNCH", score, correct, bestStreak)
     }
 
-    /** After every action the robot steps towards Lía (along the longer distance first). */
+    /** After Lía moves, the robot steps towards her every second turn (along the longer distance first). */
     fun robotTurn() {
+        if (stunned > 0) { stunned--; return }
+        moves++
+        if (moves % 2 == 1) return
         val (lx, ly) = lia % COLS to lia / COLS
         val (rx, ry) = robot % COLS to robot / COLS
         val dx = (lx - rx).coerceIn(-1, 1)
@@ -105,8 +119,9 @@ private fun MunchGame(open: List<CourseUnit>, viewModel: BlasterViewModel, langu
             streak = 0
             flash = "🤖💥"
             viewModel.soundEngine.error()
-            // The robot goes back to the far corner.
+            // The robot goes back to the far corner and rests a moment.
             robot = if (lia < COLS * ROWS / 2) COLS * ROWS - 1 else 0
+            stunned = 3
             if (hearts <= 0) finish()
         }
     }
@@ -118,6 +133,7 @@ private fun MunchGame(open: List<CourseUnit>, viewModel: BlasterViewModel, langu
         if (x !in 0 until COLS || y !in 0 until ROWS) return
         lia = y * COLS + x
         flash = null
+        wrongWord = null
         robotTurn()
     }
 
@@ -132,11 +148,15 @@ private fun MunchGame(open: List<CourseUnit>, viewModel: BlasterViewModel, langu
             bestStreak = maxOf(bestStreak, streak)
             score += 10 + 2 * streak
             flash = "😋 ${w.emoji}"
+            wrongWord = null
+            // A right word knocks the robot out for a few turns.
+            stunned = 3
             viewModel.soundEngine.hit()
         } else {
             hearts--
             streak = 0
-            flash = "🤢 ${w.emoji} ≠ ${board.unit.emoji}"
+            flash = "🤢"
+            wrongWord = w
             viewModel.soundEngine.error()
             if (hearts <= 0) {
                 finish()
@@ -144,6 +164,7 @@ private fun MunchGame(open: List<CourseUnit>, viewModel: BlasterViewModel, langu
             }
         }
         if (cells.none { it != null && board.fits(it) }) {
+            wrongWord = null
             // Board cleared: next rule, or the end.
             viewModel.soundEngine.fanfare()
             if (round >= ROUNDS) finish() else {
@@ -152,7 +173,6 @@ private fun MunchGame(open: List<CourseUnit>, viewModel: BlasterViewModel, langu
             }
             return
         }
-        robotTurn()
     }
 
     Column(Modifier.fillMaxSize().padding(horizontal = 10.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -166,13 +186,21 @@ private fun MunchGame(open: List<CourseUnit>, viewModel: BlasterViewModel, langu
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(SpaceNavy).padding(horizontal = 14.dp, vertical = 10.dp)
         ) {
-            Text(board.unit.emoji, fontSize = 30.sp)
+            Text(board.unit.emoji, fontSize = 34.sp)
             Spacer(Modifier.width(10.dp))
             Column(Modifier.weight(1f)) {
-                Text(language.pick("كُلي كلمات فقط من:", "Eat only words about:"), color = StarWhite.copy(alpha = 0.7f), fontSize = 12.sp)
+                Text(language.pick("كُلي فقط كلمات:", "Eat only words about:"), color = StarWhite.copy(alpha = 0.7f), fontSize = 12.sp, maxLines = 1)
                 Text("${board.unit.title} · ${board.unit.helperTitle(language)}", color = StarWhite, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp)
             }
             flash?.let { Text(it, fontSize = 20.sp) }
+        }
+        // A wrong word: say what it means and that it is not from this topic.
+        wrongWord?.let { w ->
+            Text(
+                bidiSafe(language.pick("✗ ${w.word} ${w.emoji} = ${w.arabic} — ليست من ${board.unit.titleAr} ${board.unit.emoji}", "✗ ${w.word} ${w.emoji} = ${w.english}, not ${board.unit.titleEn} ${board.unit.emoji}")),
+                color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold,
+                modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(MeteorRed.copy(alpha = 0.85f)).padding(horizontal = 12.dp, vertical = 6.dp)
+            )
         }
         // The board.
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
@@ -194,7 +222,7 @@ private fun MunchGame(open: List<CourseUnit>, viewModel: BlasterViewModel, langu
                                 cells[i]?.let {
                                     Text(it.word, color = StarWhite, fontSize = 11.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, lineHeight = 13.sp, modifier = Modifier.padding(2.dp))
                                 }
-                                if (i == robot) Text("🤖", fontSize = 26.sp)
+                                if (i == robot) Text(if (stunned > 0) "😵" else "🤖", fontSize = 26.sp)
                                 if (here) Text("🐸", fontSize = 22.sp, modifier = Modifier.align(Alignment.TopEnd))
                             }
                         }
