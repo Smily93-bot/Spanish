@@ -104,4 +104,6 @@ dependencies {
     implementation(libs.play.services.ads)
     debugImplementation(libs.androidx.ui.tooling)
     testImplementation(libs.junit)
+    // Real org.json for unit tests (Android's copy is only a stub off-device).
+    testImplementation(libs.org.json)
 }
