@@ -11,3 +11,4 @@
 *.keystore
 !debug.keystore
 !app/signing.keystore
+__pycache__/
