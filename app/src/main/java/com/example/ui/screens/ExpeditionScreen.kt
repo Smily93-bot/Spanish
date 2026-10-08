@@ -53,6 +53,7 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Constraints
@@ -67,6 +68,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.R
+import com.example.ads.RewardedAds
 import com.example.data.content.SpanishContent
 import com.example.data.model.*
 import com.example.ui.components.*
@@ -88,71 +90,146 @@ private enum class Station(val emoji: String, val es: String, val ar: String, va
     fun label(language: HelperLanguage) = language.pick(ar, en)
 }
 
-// --------------------------------------------------------------------------- Ship floor plan
+// --------------------------------------------------------------------------- Ship floor plans
 
-/**
- * The ship seen from above, one character per tile:
+/*
+ * Ships seen from above, one character per tile:
  * `#` wall, `.` floor, `P` start, `0`–`6` the pad of each room, `a`–`g` the door into room 0–6
  * (it opens when the room before is solved), `X` the exit door (needs the key), `K` where the key
- * appears, `E` the exit hatch and `*` a diamond.
- *
- * Rooms snake upwards: start → 0 → 1 along the bottom, 2 → 3 → 4 back along the middle,
- * 5 → 6 → exit along the top.
+ * appears and `E` the exit hatch. Diamonds (`*`) and consoles (`o`) are added per level.
  */
-private val SHIP = listOf(
-    "#############",
-    "#*..#*..#..E#",
-    "#.5.g.6.X...#",
-    "#...#.K.#...#",
-    "#..*#*..#...#",
-    "##f##########",
-    "#*..#..*#*..#",
-    "#.4.e.3.d.2.#",
-    "#...#...#...#",
-    "#..*#*..#..*#",
-    "##########c##",
-    "#...#*..#*..#",
-    "#.P.a.0.b.1.#",
-    "#...#...#...#",
-    "#...#..*#..*#",
-    "#############"
+private val SHIP_PLANS = listOf(
+    // Three rows of three square rooms.
+    listOf(
+        "#############",
+        "#...#...#..E#",
+        "#.5.g.6.X...#",
+        "#...#.K.#...#",
+        "#...#...#...#",
+        "##f##########",
+        "#...#...#...#",
+        "#.4.e.3.d.2.#",
+        "#...#...#...#",
+        "#...#...#...#",
+        "##########c##",
+        "#...#...#...#",
+        "#.P.a.0.b.1.#",
+        "#...#...#...#",
+        "#...#...#...#",
+        "#############"
+    ),
+    // Long halls and small cabins.
+    listOf(
+        "#############",
+        "#..#....#...#",
+        "#E.X..6.g.5.#",
+        "#..#.K..#...#",
+        "##########f##",
+        "#.......#...#",
+        "#...3...e.4.#",
+        "#.......#...#",
+        "##d##########",
+        "#.....#.....#",
+        "#..2..c..1..#",
+        "#.....#.....#",
+        "##########b##",
+        "#.P.a..0....#",
+        "#...#.......#",
+        "#############"
+    ),
+    // Three tall decks side by side.
+    listOf(
+        "#############",
+        "#...#...#.E.#",
+        "#...c...#...#",
+        "#.1.#.2.##X##",
+        "#...#...#...#",
+        "##b##...#...#",
+        "#...##d##.6.#",
+        "#...#...#K..#",
+        "#.0.#.3.#...#",
+        "#...#...##g##",
+        "#...##e##...#",
+        "##a##...#.5.#",
+        "#...#...f...#",
+        "#.P.#.4.#...#",
+        "#...#...#...#",
+        "#############"
+    )
 )
 private const val MAP_W = 13
 private const val MAP_H = 16
 private const val START_ROOM = -1
 private const val EXIT_ROOM = 7
 private const val STEP_TIME = 0.17f   // seconds to walk one tile
+private const val ZOOM = 1.3f         // how much closer than "whole ship on screen"
+private val DOORS = "abcdefgX"
+private val SIDES = listOf(IntOffset(1, 0), IntOffset(-1, 0), IntOffset(0, 1), IntOffset(0, -1))
 
-/** Which room a tile is in, from its 3×3 block on the plan (walls and doors belong to none). */
-private fun roomAt(x: Int, y: Int): Int? {
-    if (x % 4 == 0 || y % 5 == 0) return null
-    return when (x / 4 to y / 5) {
-        0 to 2 -> START_ROOM
-        1 to 2 -> 0
-        2 to 2 -> 1
-        2 to 1 -> 2
-        1 to 1 -> 3
-        0 to 1 -> 4
-        0 to 0 -> 5
-        1 to 0 -> 6
-        else -> EXIT_ROOM
-    }
-}
+/**
+ * The ship for one level: the floor plans take turns (and are mirrored on the next round), and
+ * each level scatters its own consoles and diamonds through the rooms.
+ */
+private class ShipMap(level: Int) {
+    private val grid: Array<CharArray>
+    private val roomOf = HashMap<IntOffset, Int>()
 
-/** Every other chapter uses the mirrored ship, so the levels don't all look the same. */
-private class ShipMap(mirrored: Boolean) {
-    private val rows = if (mirrored) SHIP.map { it.reversed() } else SHIP
-    fun at(p: IntOffset): Char = rows.getOrNull(p.y)?.getOrNull(p.x) ?: '#'
-    fun find(c: Char): IntOffset {
-        rows.forEachIndexed { y, row -> val x = row.indexOf(c); if (x >= 0) return IntOffset(x, y) }
+    fun at(p: IntOffset): Char = grid.getOrNull(p.y)?.getOrNull(p.x) ?: '#'
+    private fun inside(p: IntOffset) = p.x in 0 until MAP_W && p.y in 0 until MAP_H
+    private fun find(c: Char): IntOffset {
+        grid.forEachIndexed { y, row -> val x = row.indexOf(c); if (x >= 0) return IntOffset(x, y) }
         return IntOffset(1, 1)
     }
+
+    /** True when every walkable tile can still be reached from the start (doors counted as open). */
+    private fun allReachable(): Boolean {
+        val start = find('P')
+        val seen = hashSetOf(start)
+        val queue = ArrayDeque(listOf(start))
+        while (queue.isNotEmpty()) {
+            val p = queue.removeFirst()
+            SIDES.map { p + it }.filter { inside(it) && at(it) != '#' && at(it) != 'o' && seen.add(it) }.forEach { queue.addLast(it) }
+        }
+        val walkable = (0 until MAP_H).sumOf { y -> (0 until MAP_W).count { x -> grid[y][x] != '#' && grid[y][x] != 'o' } }
+        return seen.size == walkable
+    }
+
+    init {
+        val plan = SHIP_PLANS[(level - 1).mod(SHIP_PLANS.size)]
+        val mirrored = ((level - 1) / SHIP_PLANS.size) % 2 == 1
+        grid = Array(MAP_H) { y -> (if (mirrored) plan[y].reversed() else plan[y]).toCharArray() }
+        val random = kotlin.random.Random(level * 7919 + 17)
+        // A few consoles and crates, never next to a door or a pad and never cutting a room off.
+        repeat(14) {
+            val p = IntOffset(random.nextInt(1, MAP_W - 1), random.nextInt(1, MAP_H - 1))
+            if (at(p) == '.' && SIDES.all { at(p + it) in ".#o" }) {
+                grid[p.y][p.x] = 'o'
+                if (!allReachable()) grid[p.y][p.x] = '.'
+            }
+        }
+        // Rooms: flood out from each pad (and the start and exit) without passing walls or doors.
+        val seeds = listOf(find('P') to START_ROOM, find('E') to EXIT_ROOM) + (0..6).map { find('0' + it) to it }
+        seeds.forEach { (seed, id) ->
+            val stack = ArrayDeque(listOf(seed))
+            while (stack.isNotEmpty()) {
+                val p = stack.removeLast()
+                if (!inside(p) || p in roomOf || at(p) == '#' || at(p) in DOORS) continue
+                roomOf[p] = id
+                SIDES.forEach { stack.addLast(p + it) }
+            }
+        }
+        // Diamonds in different places every level: two in each room, one in the start room.
+        (listOf(START_ROOM) + (0..6)).forEach { id ->
+            roomOf.filter { (p, r) -> r == id && at(p) == '.' }.keys.shuffled(random)
+                .take(if (id == START_ROOM) 1 else 2)
+                .forEach { grid[it.y][it.x] = '*' }
+        }
+    }
+
     val pads = (0..6).map { find('0' + it) }
     val start = find('P')
-    val key = find('K')
-    val tiles: List<Pair<IntOffset, Char>> = rows.flatMapIndexed { y, row -> row.mapIndexed { x, c -> IntOffset(x, y) to c } }
-    val mirror = mirrored
-    fun room(p: IntOffset): Int? = roomAt(if (mirror) MAP_W - 1 - p.x else p.x, p.y)
+    val tiles: List<Pair<IntOffset, Char>> = grid.flatMapIndexed { y, row -> row.mapIndexed { x, c -> IntOffset(x, y) to c } }
+    fun room(p: IntOffset): Int? = roomOf[p]
 }
 
 /** Walk-cycle frames inside explorer_walk.webp (x, y, width, height). */
@@ -174,8 +251,8 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
     val walkSprite = ImageBitmap.imageResource(R.drawable.explorer_walk)
     val niloSprite = ImageBitmap.imageResource(R.drawable.nilo_walk)
     val textMeasurer = rememberTextMeasurer()
-    val chapterNumber = tablet.id.substringAfter('-').toIntOrNull() ?: 1
-    val ship = remember(tablet.id) { ShipMap(mirrored = chapterNumber % 2 == 0) }
+    val chapterNumber = data.tablets.indexOf(tablet) + 1
+    val ship = remember(tablet.id) { ShipMap(level = chapterNumber) }
 
     // Lía walks tile by tile: from → to, progress 0..1.
     var liaFrom by remember { mutableStateOf(ship.start) }
@@ -194,6 +271,10 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
     // Each wrong answer costs one collected diamond, so diamonds are worth protecting.
     var lostDiamonds by remember { mutableIntStateOf(0) }
     var lostAt by remember { mutableFloatStateOf(-10f) }
+    // With no diamonds left, a mistake pauses the game until a short video earns one back.
+    var adDiamonds by remember { mutableIntStateOf(0) }
+    var outOfDiamonds by remember { mutableStateOf(false) }
+    var adMisses by remember { mutableIntStateOf(0) }
     var showStory by remember { mutableStateOf(false) }
     val results = remember { mutableStateMapOf<String, Boolean>() }
     var openStation by remember { mutableStateOf<Int?>(null) }
@@ -257,7 +338,7 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
                 finished = true
                 held = null
                 say(NiloLines.home)
-                val kept = (collected.size - lostDiamonds).coerceAtLeast(0)
+                val kept = (collected.size + adDiamonds - lostDiamonds).coerceAtLeast(0)
                 viewModel.completeTablet(tablet, results.values.count { it }, totalQuestions, bonusCredits = kept * 5)
             }
         }
@@ -291,7 +372,7 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
             val next = liaTo + dir
             val c = ship.at(next)
             when {
-                c == '#' -> Unit
+                c == '#' || c == 'o' -> Unit
                 !doorOpen(c) -> if (clock - lastBumpAt > 3f) {
                     lastBumpAt = clock
                     viewModel.soundEngine.error()
@@ -318,11 +399,13 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
         say(if (i == Station.entries.lastIndex) NiloLines.findKey else NiloLines.doorOpen)
     }
 
-    val diamonds = (collected.size - lostDiamonds).coerceAtLeast(0)
+    val diamonds = (collected.size + adDiamonds - lostDiamonds).coerceAtLeast(0)
     val onMistake: () -> Unit = {
-        if (collected.size - lostDiamonds > 0) {
+        if (collected.size + adDiamonds - lostDiamonds > 0) {
             lostDiamonds++
             lostAt = clock
+        } else {
+            outOfDiamonds = true
         }
     }
 
@@ -410,6 +493,45 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
         }
     }
 
+    if (outOfDiamonds) {
+        val context = LocalContext.current
+        AlertDialog(
+            onDismissRequest = {},
+            containerColor = AdventureSurface,
+            title = { Text(language.pick("💎 نفدت الماسات!", "💎 Out of diamonds!"), color = SolarAmber, fontWeight = FontWeight.ExtraBold) },
+            text = {
+                Text(
+                    if (adMisses == 0) language.pick("شاهدي فيديو قصيرًا لتحصلي على ماسة واحدة وتكملي.", "Watch a short video to get 1 diamond and keep playing.")
+                    else language.pick("الفيديو يُحمَّل… جرّبي مرة أخرى بعد لحظة.", "The video is loading… try again in a moment."),
+                    color = TextPrimary, fontSize = 16.sp
+                )
+            },
+            confirmButton = {
+                BlasterCyberButton(
+                    text = language.pick("▶ شاهدي الفيديو", "▶ Watch video"),
+                    onClick = {
+                        val shown = RewardedAds.show(context, onReward = {
+                            adDiamonds++
+                            outOfDiamonds = false
+                            adMisses = 0
+                            viewModel.soundEngine.powerUp()
+                        })
+                        if (!shown) {
+                            adMisses++
+                            // No video available (e.g. offline): don't leave the player stuck.
+                            if (adMisses >= 3) {
+                                adDiamonds++
+                                outOfDiamonds = false
+                                adMisses = 0
+                            }
+                        }
+                    },
+                    color = SuccessGreen
+                )
+            }
+        )
+    }
+
     if (showStory) {
         AlertDialog(
             onDismissRequest = { showStory = false },
@@ -484,10 +606,15 @@ private fun DrawScope.drawShip(
         drawCircle(StarWhite.copy(alpha = 0.35f + 0.3f * sin(clock * 1.5f + i)), radius = 1.6f + (i % 3), center = Offset(s.x * size.width, s.y * size.height))
     }
 
-    // Room for the nose on top, the engines below and the wings at the sides.
-    val ts = minOf(size.width / (MAP_W + 3f), size.height / (MAP_H + 2.4f))
-    val ox = (size.width - ts * MAP_W) / 2f
-    val oy = (size.height - ts * (MAP_H + 2.4f)) / 2f + ts * 1.5f
+    // A little closer than the whole ship: the camera follows Lía and stops at the ship's edges.
+    // (The extra 3 × 2.4 tiles leave room for the wings, the nose and the engines.)
+    val ts = minOf(size.width / (MAP_W + 3f), size.height / (MAP_H + 2.4f)) * ZOOM
+    fun follow(view: Float, total: Float, margin: Float, focus: Float): Float {
+        if (total <= view) return (view - total) / 2f + margin
+        return (view / 2f - focus).coerceIn(view - total + margin, margin)
+    }
+    val ox = follow(size.width, ts * (MAP_W + 3f), ts * 1.5f, (lia.x + 0.5f) * ts)
+    val oy = follow(size.height, ts * (MAP_H + 2.4f), ts * 1.5f, (lia.y + 0.5f) * ts)
     fun topLeft(x: Number, y: Number) = Offset(ox + x.toFloat() * ts, oy + y.toFloat() * ts)
     fun center(p: IntOffset) = topLeft(p.x + 0.5f, p.y + 0.5f)
     fun text(s: String, c: Offset, scale: Float, color: Color = Color.White, maxWidth: Float? = null) {
@@ -629,6 +756,14 @@ private fun DrawScope.drawShip(
                 drawCircle(SolarGold.copy(alpha = 0.3f), radius = ts * 0.3f, center = cc)
                 rotate(45f, pivot = cc) { drawRect(SolarGold, cc - Offset(ts * 0.15f, ts * 0.15f), Size(ts * 0.3f, ts * 0.3f)) }
                 rotate(45f, pivot = cc) { drawRect(Color.White.copy(alpha = 0.7f), cc - Offset(ts * 0.15f, ts * 0.15f), Size(ts * 0.3f, ts * 0.3f), style = Stroke(ts * 0.04f)) }
+            }
+            'o' -> {
+                // A console: a metal block with blinking lights.
+                drawRoundRect(HULL_LIGHT, tl + Offset(ts * 0.1f, ts * 0.1f), Size(ts * 0.8f, ts * 0.8f), CornerRadius(ts * 0.15f))
+                drawRoundRect(HULL, tl + Offset(ts * 0.22f, ts * 0.22f), Size(ts * 0.56f, ts * 0.32f), CornerRadius(ts * 0.08f))
+                val blink = sin(clock * 3f + p.x * 1.7f + p.y) > 0f
+                drawCircle(if (blink) SuccessGreen else MeteorRed, radius = ts * 0.07f, center = tl + Offset(ts * 0.33f, ts * 0.7f))
+                drawCircle(if (blink) SolarGold else DiamondCyan, radius = ts * 0.07f, center = tl + Offset(ts * 0.67f, ts * 0.7f))
             }
             'K' -> if (next == null && !hasKey) {
                 val pulse = 0.5f + 0.5f * sin(clock * 5f)
@@ -925,6 +1060,7 @@ private fun ChoiceCard(step: Step.Choice, results: MutableMap<String, Boolean>, 
     )
     WordJump(
         options = step.options,
+        language = language,
         solved = solved,
         wrong = wrong,
         check = { normalizeAnswer(it) in accepted },

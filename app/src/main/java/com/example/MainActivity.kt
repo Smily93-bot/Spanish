@@ -1,5 +1,6 @@
 package com.example
 
+import com.example.ads.RewardedAds
 import com.example.flavor.tl
 import android.content.Intent
 import android.os.Bundle
@@ -46,6 +47,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        RewardedAds.init(this)
         enableEdgeToEdge()
         handleOpenIntent(intent)
         setContent {

@@ -93,3 +93,20 @@ app/src/main/java/com/example/
     ├── navigation/  viewmodel/  components/  theme/
     └── screens/                     // The 8 screens listed above
 ```
+
+## Ads (watch a video for a diamond)
+
+When a player runs out of diamonds in an adventure, a wrong answer pauses the game and offers a short
+rewarded video that gives 1 diamond. This uses Google AdMob (`com.example.ads.RewardedAds`).
+
+`app/src/main/res/values/ads.xml` holds Google's **test** ids, which only show test ads. Before
+publishing:
+
+1. Create a free AdMob account and add each app (Spanish Blaster and Italian Blaster).
+2. In each app create a *Rewarded* ad unit.
+3. Put the Spanish ids in `app/src/main/res/values/ads.xml` and the Italian ones in a new
+   `app/src/italian/res/values/ads.xml` (same two string names).
+4. In Play Console declare that the app contains ads; because the app targets children, follow the
+   Families policy (ads are already requested as child-directed and rated G).
+
+If no video can load (for example offline), the third try gives the diamond anyway so nobody gets stuck.

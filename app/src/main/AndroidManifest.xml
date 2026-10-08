@@ -18,6 +18,10 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.SpanishBlaster">
+        <!-- AdMob app id (res/values/ads.xml): Google's test id until the real one is filled in. -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="@string/admob_app_id" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

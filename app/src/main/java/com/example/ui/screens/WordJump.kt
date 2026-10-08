@@ -33,6 +33,8 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.R
+import com.example.data.model.HelperLanguage
+import com.example.data.model.pick
 import com.example.ui.theme.*
 import kotlin.math.abs
 import kotlin.math.sin
@@ -52,7 +54,8 @@ fun WordJump(
     check: (String) -> Boolean,
     onLanded: (String) -> Unit,
     modifier: Modifier = Modifier,
-    boardHeight: Dp = 340.dp
+    boardHeight: Dp = 340.dp,
+    language: HelperLanguage = HelperLanguage.ENGLISH
 ) {
     val lia = ImageBitmap.imageResource(R.drawable.explorer_walk)
     val measurer = rememberTextMeasurer()
@@ -230,8 +233,13 @@ fun WordJump(
                 PadButton("◀", ExplorerBlue, onPress = { holdLeft = true }, onRelease = { holdLeft = false })
                 PadButton("▶", ExplorerBlue, onPress = { holdRight = true }, onRelease = { holdRight = false })
                 Spacer(Modifier.weight(1f))
-                PadButton("⤒", SolarAmber, onPress = { jump() })
-                PadButton("✓", if (riding != null && !solved) SuccessGreen else SuccessGreen.copy(alpha = 0.4f), onPress = { choose() })
+                // Labelled so it's clear which button jumps and which one picks the word.
+                LabelButton("⤒", language.pick("قفز", "Jump"), SolarAmber, onPress = { jump() })
+                LabelButton(
+                    "✓", language.pick("اختيار", "Choose"),
+                    if (riding != null && !solved) SuccessGreen else SuccessGreen.copy(alpha = 0.4f),
+                    onPress = { choose() }
+                )
             }
         }
     }
@@ -256,5 +264,23 @@ internal fun PadButton(symbol: String, color: Color, size: Dp = 58.dp, onPress: 
             }
     ) {
         Box(contentAlignment = Alignment.Center) { Text(symbol, color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.ExtraBold) }
+    }
+}
+
+/** Round button with its symbol and a short name under it (Jump, Choose), so it's clear what it does. */
+@Composable
+private fun LabelButton(symbol: String, label: String, color: Color, onPress: () -> Unit) {
+    val press by rememberUpdatedState(onPress)
+    Surface(
+        shape = CircleShape,
+        color = color,
+        modifier = Modifier
+            .size(68.dp)
+            .pointerInput(Unit) { detectTapGestures(onPress = { press() }) }
+    ) {
+        Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+            Text(symbol, color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, lineHeight = 22.sp)
+            Text(label, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold, lineHeight = 13.sp)
+        }
     }
 }

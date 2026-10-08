@@ -13,8 +13,8 @@ android {
         applicationId = "com.bluediamond.spanishblaster.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 25
-        versionName = "1.15.0"
+        versionCode = 26
+        versionName = "1.16.0"
     }
 
     signingConfigs {
@@ -51,8 +51,8 @@ android {
         create("italian") {
             dimension = "language"
             applicationId = "com.bluediamond.italianblaster.app"
-            versionCode = 6
-            versionName = "1.5.0"
+            versionCode = 7
+            versionName = "1.6.0"
         }
     }
 
@@ -101,6 +101,7 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
+    implementation(libs.play.services.ads)
     debugImplementation(libs.androidx.ui.tooling)
     testImplementation(libs.junit)
 }

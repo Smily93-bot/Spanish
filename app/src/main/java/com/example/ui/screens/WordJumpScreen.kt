@@ -137,6 +137,7 @@ private fun JumpRun(data: SpanishContent, viewModel: BlasterViewModel, language:
             key(round) {
                 WordJump(
                     options = word.options,
+                    language = language,
                     solved = solved,
                     wrong = wrong,
                     check = { normalizeAnswer(it) == normalizeAnswer(word.answer) },
