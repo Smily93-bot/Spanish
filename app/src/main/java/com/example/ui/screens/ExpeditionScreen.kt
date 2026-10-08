@@ -195,7 +195,6 @@ private val SIDES = listOf(IntOffset(1, 0), IntOffset(-1, 0), IntOffset(0, 1), I
 private enum class Challenge(val icon: String) {
     KEY("💳"),      // find the room's access card first
     BOXES("🔋"),    // push the batteries onto the chargers (Sokoban)
-    REVERSE("🔄"),  // broken gravity magnets: the arrows push Lía the opposite way
     ROBOT("🤖"),    // a patrolling security robot: touching it costs a diamond
     FETCH("🎁")     // a crew member asks (in the target language) for a thing kept in an earlier room
 }
@@ -300,10 +299,10 @@ private class ShipMap(level: Int, private val things: List<CourseWord>) {
         val kinds = when (level) {
             1 -> listOf(Challenge.FETCH, Challenge.KEY)
             2 -> listOf(Challenge.FETCH, Challenge.BOXES, Challenge.KEY)
-            3 -> listOf(Challenge.FETCH, Challenge.BOXES, Challenge.REVERSE, Challenge.FETCH)
+            3 -> listOf(Challenge.FETCH, Challenge.BOXES, Challenge.KEY, Challenge.FETCH)
             else -> listOf(
                 Challenge.FETCH, Challenge.FETCH, Challenge.BOXES, Challenge.BOXES,
-                Challenge.KEY, Challenge.REVERSE, Challenge.ROBOT
+                Challenge.KEY, Challenge.ROBOT
             ).shuffled(random).take(minOf(7, 3 + level / 2))
         }
         val rooms = (0..6).shuffled(random).toMutableList()
@@ -350,8 +349,6 @@ private class ShipMap(level: Int, private val things: List<CourseWord>) {
                 if (placed == 0) return false
                 return true
             }
-            // The whole room is affected; nothing to place.
-            Challenge.REVERSE -> return true
             Challenge.FETCH -> {
                 // Only things you can carry: nouns (taught with their article), not "hello" or "sad".
                 val articles = setOf("el", "la", "los", "las", "il", "lo", "i", "gli", "le")
@@ -503,7 +500,6 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
 
     /** Lía has just stepped onto [p]: pick things up, open the room's game, take the key, leave. */
     fun arrive(p: IntOffset) {
-        if (ship.challenges[ship.room(p) ?: -1] == Challenge.REVERSE) hint(NiloLines.reversed)
         things[p]?.let { thing ->
             // Pick it up; whatever she was carrying is left here instead.
             things.remove(p)
@@ -536,7 +532,7 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
                             viewModel.soundEngine.powerUp()
                             say(NiloLines.thanks)
                         }
-                        inHand != null -> say(NiloLine("${tl("No, eso es")} ${inHand.word}. ${tl("Necesito")} ${fetch.wanted.word}.", "", ""))
+                        inHand != null -> say(NiloLine("${tl("No, eso no es")} ${fetch.wanted.word}.", "", ""))
                         else -> say(NiloLine("${tl("Necesito")} ${fetch.wanted.word}.", "", ""))
                     }
                 }
@@ -600,9 +596,7 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
                     continue
                 }
             }
-            // In a room with broken gravity magnets every arrow works the other way round.
-            val reversed = ship.challenges[ship.room(liaTo) ?: -1] == Challenge.REVERSE
-            val dir = held?.let { if (reversed) IntOffset(-it.x, -it.y) else it }
+            val dir = held
             if (dir == null) {
                 continue
             }
@@ -1021,14 +1015,6 @@ private fun DrawScope.drawShip(
         val room = ship.room(p)
         if (room != null) {
             drawRect(roomColor(room).copy(alpha = 0.30f), tl, tile)
-            if (ship.challenges[room] == Challenge.REVERSE) {
-                // Broken gravity magnets: striped floor with a turning arrow here and there.
-                drawRect(SolarAmber.copy(alpha = 0.25f), tl, tile)
-                drawLine(SolarAmber.copy(alpha = 0.6f), tl + Offset(0f, ts), tl + Offset(ts, 0f), strokeWidth = ts * 0.06f)
-                if ((p.x + p.y) % 3 == 0 && c == '.') {
-                    rotate(clock * 90f, pivot = center(p)) { text("🔄", center(p), 0.32f) }
-                }
-            }
             if (room > reached || (room == EXIT_ROOM && next != null)) drawRect(Color.Black.copy(alpha = 0.45f), tl, tile)
         }
         when (c) {
@@ -1198,17 +1184,24 @@ private fun DrawScope.drawShip(
     }
     niloSays?.let {
         val head = topLeft(nilo.x + 0.5f, nilo.y + 0.9f) - Offset(0f, spriteH + 4f)
-        drawBubble(textMeasurer, it, head.x.coerceIn(size.width * 0.2f, size.width * 0.8f), head.y.coerceAtLeast(40f))
+        drawBubble(textMeasurer, it, head.x, head.y.coerceAtLeast(40f))
     }
 }
 
 /** Speech bubble whose bottom edge sits at [bottomY], centred on [centerX]. */
 private fun DrawScope.drawBubble(textMeasurer: TextMeasurer, text: String, centerX: Float, bottomY: Float) {
-    val layout = textMeasurer.measure(text, TextStyle(color = TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.Bold))
+    // Long lines wrap, and the bubble is kept fully inside the map.
+    val margin = 8.dp.toPx()
+    val layout = textMeasurer.measure(
+        text,
+        TextStyle(color = TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center),
+        constraints = Constraints(maxWidth = (size.width * 0.8f).toInt())
+    )
     val w = layout.size.width + 16.dp.toPx()
     val h = layout.size.height + 10.dp.toPx()
-    val left = centerX - w / 2
-    val top = bottomY - h
+    val left = (centerX - w / 2).coerceIn(margin, (size.width - w - margin).coerceAtLeast(margin))
+    val top = (bottomY - h).coerceAtLeast(margin)
+    @Suppress("NAME_SHADOWING") val centerX = left + w / 2
     drawRoundRect(AdventureSurface, topLeft = Offset(left, top), size = Size(w, h), cornerRadius = CornerRadius(9.dp.toPx()))
     drawRoundRect(SolarAmber, topLeft = Offset(left, top), size = Size(w, h), cornerRadius = CornerRadius(9.dp.toPx()), style = Stroke(2.dp.toPx()))
     drawText(layout, topLeft = Offset(centerX - layout.size.width / 2f, top + h / 2 - layout.size.height / 2f))

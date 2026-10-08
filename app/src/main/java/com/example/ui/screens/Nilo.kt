@@ -48,7 +48,6 @@ object NiloLines {
     val pushBoxes = NiloLine(tl("¡Empuja las baterías a los cargadores!"), "ادفعي البطاريات إلى أماكن الشحن!", "Push the batteries onto the chargers!")
     val boxesDone = NiloLine(tl("¡Bien! Las baterías están cargando."), "رائع! البطاريات تُشحن.", "Great! The batteries are charging.")
     val thanks = NiloLine(tl("¡Gracias! ¡Es justo lo que necesitaba!"), "شكرًا! هذا ما كنت أحتاجه!", "Thanks! That's just what I needed!")
-    val reversed = NiloLine(tl("¡Los controles están al revés!"), "أزرار التحكم معكوسة!", "The controls are reversed!")
     val robot = NiloLine(tl("¡Cuidado con el robot de seguridad!"), "انتبهي من روبوت الحراسة!", "Watch out for the security robot!")
     val home = NiloLine(tl("¡Lo logramos! ¡Una página más!"), "نجحنا! صفحة أخرى!", "We did it! One more page!")
     val praise = listOf(
