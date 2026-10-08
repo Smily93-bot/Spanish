@@ -43,6 +43,12 @@ object NiloLines {
     val doorOpen = NiloLine(tl("¡La puerta se abrió!"), "انفتح الباب!", "The door is open!")
     val findKey = NiloLine(tl("¡Mira, la llave!"), "انظري، المفتاح!", "Look, the key!")
     val gotKey = NiloLine(tl("¡Tenemos la llave! ¡A la salida!"), "معنا المفتاح! إلى المخرج!", "We have the key! To the exit!")
+    val roomKey = NiloLine(tl("¡Una llave!"), "مفتاح!", "A key!")
+    val findRoomKey = NiloLine(tl("¡Busca la llave de esta sala!"), "ابحثي عن مفتاح هذه الغرفة!", "Find this room's key!")
+    val pushBoxes = NiloLine(tl("¡Empuja las cajas a los círculos!"), "ادفعي الصناديق إلى الدوائر!", "Push the boxes onto the circles!")
+    val boxesDone = NiloLine(tl("¡Bien! Las cajas están en su sitio."), "رائع! الصناديق في مكانها.", "Great! The boxes are in place.")
+    val ice = NiloLine(tl("¡Hielo! ¡Cuidado, resbala!"), "جليد! انتبهي، إنه زلق!", "Ice! Careful, it's slippery!")
+    val robot = NiloLine(tl("¡Cuidado con el robot!"), "انتبهي من الروبوت!", "Watch out for the robot!")
     val home = NiloLine(tl("¡Lo logramos! ¡Una página más!"), "نجحنا! صفحة أخرى!", "We did it! One more page!")
     val praise = listOf(
         NiloLine(tl("¡Muy bien!"), "أحسنتِ!", "Well done!"),

@@ -167,13 +167,39 @@ private const val ZOOM = 1.3f         // how much closer than "whole ship on scr
 private val DOORS = "abcdefgX"
 private val SIDES = listOf(IntOffset(1, 0), IntOffset(-1, 0), IntOffset(0, 1), IntOffset(0, -1))
 
+/** Extra puzzles some rooms get before their game opens, after the old PC games Chip's Challenge and Sokoban. */
+private enum class Challenge(val icon: String) {
+    KEY("🗝️"),      // find the room's key first
+    BOXES("📦"),    // push the boxes onto the circles (Sokoban)
+    ICE("🧊"),      // ice floor: Lía slides until something stops her
+    ROBOT("🤖")     // a patrolling robot: touching it costs a diamond
+}
+
+/** A robot walking back and forth over [length] tiles from [from] in direction [dir]. */
+private class Robot(val room: Int, val from: IntOffset, val dir: IntOffset, val length: Int) {
+    /** Position in tiles at time [clock] (two tiles a second). */
+    fun at(clock: Float): Offset {
+        val span = (length - 1).coerceAtLeast(1)
+        val s = (clock * 2f) % (2f * span)
+        val k = if (s <= span) s else 2f * span - s
+        return Offset(from.x + dir.x * k, from.y + dir.y * k)
+    }
+}
+
 /**
- * The ship for one level: the floor plans take turns (and are mirrored on the next round), and
- * each level scatters its own diamonds through the rooms.
+ * The ship for one level: the floor plans take turns (and are mirrored on the next round), each
+ * level scatters its own diamonds, and from level to level more rooms get a puzzle.
  */
 private class ShipMap(level: Int) {
     private val grid: Array<CharArray>
     private val roomOf = HashMap<IntOffset, Int>()
+    val challenges = HashMap<Int, Challenge>()
+    /** Boxes (room, start tile) and the circles they must be pushed onto. */
+    val crateStarts = mutableListOf<Pair<Int, IntOffset>>()
+    val targets = HashMap<Int, MutableList<IntOffset>>()
+    val robots = mutableListOf<Robot>()
+    /** Tiles taken by a puzzle, kept free of diamonds (declared before init, which fills it). */
+    private val used = hashSetOf<IntOffset>()
 
     fun at(p: IntOffset): Char = grid.getOrNull(p.y)?.getOrNull(p.x) ?: '#'
     private fun inside(p: IntOffset) = p.x in 0 until MAP_W && p.y in 0 until MAP_H
@@ -198,11 +224,124 @@ private class ShipMap(level: Int) {
                 SIDES.forEach { stack.addLast(p + it) }
             }
         }
+        placeChallenges(level, random)
         // Diamonds in different places every level: two in each room, one in the start room.
         (listOf(START_ROOM) + (0..6)).forEach { id ->
-            roomOf.filter { (p, r) -> r == id && at(p) == '.' }.keys.shuffled(random)
+            roomOf.filter { (p, r) -> r == id && at(p) == '.' && p !in used }.keys.shuffled(random)
                 .take(if (id == START_ROOM) 1 else 2)
                 .forEach { grid[it.y][it.x] = '*' }
+        }
+    }
+
+    // ------------------------------------------------------------------ Puzzles
+
+    private fun doorInto(room: Int) = find(DOORS[room])
+    fun doorTo(room: Int) = doorInto(room)
+
+    /** A plain floor tile of [room] that isn't next to a door, a pad or the start/key/exit. */
+    private fun free(p: IntOffset, room: Int) =
+        roomOf[p] == room && at(p) == '.' && p !in used && SIDES.none { at(p + it) in DOORS || at(p + it) in "0123456PKE" }
+
+    private fun freeTiles(room: Int) = roomOf.keys.filter { free(it, room) }
+
+    /** Tiles reachable from the start with every door open; ice makes Lía slide. */
+    private fun reachable(blocked: Set<IntOffset> = emptySet()): Set<IntOffset> {
+        fun open(p: IntOffset) = inside(p) && at(p) != '#' && p !in blocked
+        val start = find('P')
+        val seen = hashSetOf(start)
+        val queue = ArrayDeque(listOf(start))
+        while (queue.isNotEmpty()) {
+            val p = queue.removeFirst()
+            for (d in SIDES) {
+                var q = p + d
+                if (!open(q)) continue
+                while (at(q) == 'I' && open(q + d)) q += d
+                if (seen.add(q)) queue.addLast(q)
+            }
+        }
+        return seen
+    }
+
+    /** Every pad, the key spot and the exit can be reached. */
+    private fun solvable(blocked: Set<IntOffset> = emptySet()): Boolean {
+        val seen = reachable(blocked)
+        return (0..6).all { find('0' + it) in seen } && find('K') in seen && find('E') in seen
+    }
+
+    private fun placeChallenges(level: Int, random: kotlin.random.Random) {
+        val kinds = when (level) {
+            1 -> listOf(Challenge.KEY)
+            2 -> listOf(Challenge.KEY, Challenge.BOXES)
+            3 -> listOf(Challenge.ICE, Challenge.BOXES)
+            else -> Challenge.entries.shuffled(random).take(minOf(4, 2 + level / 3))
+        }
+        val rooms = (0..6).shuffled(random).toMutableList()
+        for (kind in kinds) {
+            val room = rooms.firstOrNull { place(kind, it, level, random) } ?: continue
+            rooms.remove(room)
+            challenges[room] = kind
+        }
+    }
+
+    private fun place(kind: Challenge, room: Int, level: Int, random: kotlin.random.Random): Boolean {
+        val tiles = freeTiles(room)
+        when (kind) {
+            Challenge.KEY -> {
+                // The key hides in the corner furthest from the door.
+                val door = doorInto(room)
+                val p = tiles.maxByOrNull { abs(it.x - door.x) + abs(it.y - door.y) } ?: return false
+                grid[p.y][p.x] = 'k'
+                used += p
+                return true
+            }
+            Challenge.BOXES -> {
+                // Each box sits in a straight line: where Lía stands, the box, (free tiles,) the circle.
+                val pushes = if (level >= 4) 2 else 1
+                var placed = 0
+                for (start in tiles.shuffled(random)) {
+                    if (placed == 2) break
+                    for (d in SIDES.shuffled(random)) {
+                        val line = (0..pushes + 1).map { IntOffset(start.x + d.x * it, start.y + d.y * it) }
+                        if (!line.all { free(it, room) }) continue
+                        val crate = line[1]
+                        val target = line.last()
+                        val boxesNow = crateStarts.filter { it.first == room }.map { it.second }.toSet() + crate
+                        val boxesDone = targets[room].orEmpty().toSet() + target
+                        if (!solvable(boxesNow) || !solvable(boxesDone) || line[0] !in reachable(boxesNow)) continue
+                        crateStarts += room to crate
+                        targets.getOrPut(room) { mutableListOf() } += target
+                        grid[target.y][target.x] = 'T'
+                        used += line
+                        placed++
+                        break
+                    }
+                }
+                if (placed == 0) return false
+                return true
+            }
+            Challenge.ICE -> {
+                if (tiles.size < 5) return false
+                tiles.forEach { grid[it.y][it.x] = 'I' }
+                if (!solvable()) {
+                    tiles.forEach { grid[it.y][it.x] = '.' }
+                    return false
+                }
+                used += tiles
+                return true
+            }
+            Challenge.ROBOT -> {
+                for (start in tiles.shuffled(random)) {
+                    for (d in listOf(IntOffset(1, 0), IntOffset(0, 1))) {
+                        var length = 1
+                        while (length < 5 && free(IntOffset(start.x + d.x * length, start.y + d.y * length), room)) length++
+                        if (length >= 3) {
+                            robots += Robot(room, start, d, length)
+                            return true
+                        }
+                    }
+                }
+                return false
+            }
         }
     }
 
@@ -242,6 +381,13 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
     var progress by remember { mutableFloatStateOf(1f) }
     var facing by remember { mutableFloatStateOf(1f) }
     var held by remember { mutableStateOf<IntOffset?>(null) }
+    // Puzzles: where the boxes are now, room keys picked up, sliding on ice, robot bumps.
+    val crates = remember(tablet.id) { ship.crateStarts.map { it.second }.toMutableStateList() }
+    val roomKeys = remember { mutableStateListOf<Int>() }
+    var slideDir by remember { mutableStateOf<IntOffset?>(null) }
+    var moveDir by remember { mutableStateOf(IntOffset(1, 0)) }
+    var lastHintAt by remember { mutableFloatStateOf(-10f) }
+    var lastRobotHit by remember { mutableFloatStateOf(-10f) }
     var clock by remember { mutableFloatStateOf(0f) }
 
     // Mission state.
@@ -293,9 +439,33 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
         else -> true
     }
 
+    /** A room's puzzle is done (or it has none), so its game can open. */
+    fun puzzleDone(room: Int): Boolean = when (ship.challenges[room]) {
+        Challenge.KEY -> room in roomKeys
+        Challenge.BOXES -> ship.targets[room].orEmpty().all { it in crates }
+        else -> true
+    }
+
+    fun hint(line: NiloLine) {
+        if (clock - lastHintAt > 3f) {
+            lastHintAt = clock
+            say(line)
+        }
+    }
+
     /** Lía has just stepped onto [p]: pick things up, open the room's game, take the key, leave. */
     fun arrive(p: IntOffset) {
+        // On ice she keeps sliding the same way until something stops her.
+        slideDir = if (ship.at(p) == 'I') moveDir else null
+        if (ship.at(p) == 'I' && ship.challenges[ship.room(p) ?: -1] == Challenge.ICE) hint(NiloLines.ice)
         when (val c = ship.at(p)) {
+            'k' -> ship.room(p)?.let { room ->
+                if (room !in roomKeys) {
+                    roomKeys += room
+                    viewModel.soundEngine.powerUp()
+                    say(NiloLines.roomKey)
+                }
+            }
             '*' -> if (p !in collected) {
                 collected += p
                 viewModel.soundEngine.click()
@@ -303,7 +473,10 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
             }
             in '0'..'6' -> {
                 val i = c - '0'
-                if (i == Station.entries.indices.firstOrNull { it !in solved }) {
+                if (i == Station.entries.indices.firstOrNull { it !in solved } && !puzzleDone(i)) {
+                    viewModel.soundEngine.error()
+                    hint(if (ship.challenges[i] == Challenge.KEY) NiloLines.findRoomKey else NiloLines.pushBoxes)
+                } else if (i == Station.entries.indices.firstOrNull { it !in solved }) {
                     openStation = i
                     held = null
                     viewModel.soundEngine.powerUp()
@@ -340,7 +513,25 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
                 continue
             }
             if (openStation != null || finished) continue
-            val dir = held
+            // Robots: bumping into one costs a diamond and sends Lía back a step.
+            if (clock - lastRobotHit > 1.5f && ship.robots.any { (it.at(clock) - Offset(liaTo.x.toFloat(), liaTo.y.toFloat())).getDistance() < 0.6f }) {
+                lastRobotHit = clock
+                if (collected.size + adDiamonds - lostDiamonds > 0) {
+                    lostDiamonds++
+                    lostAt = clock
+                }
+                viewModel.soundEngine.error()
+                say(NiloLines.robot)
+                slideDir = null
+                if (liaFrom != liaTo) {
+                    val back = liaFrom
+                    liaFrom = liaTo
+                    liaTo = back
+                    progress = 0f
+                    continue
+                }
+            }
+            val dir = slideDir ?: held
             if (dir == null) {
                 if (clock - lastMoveAt > 9f && niloLine == null) {
                     say(NiloLines.idle, speak = false)
@@ -351,14 +542,42 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
             if (dir.x != 0) facing = dir.x.toFloat()
             val next = liaTo + dir
             val c = ship.at(next)
+            val sliding = slideDir != null
+            val crate = crates.indexOf(next)
             when {
-                c == '#' -> Unit
-                !doorOpen(c) -> if (clock - lastBumpAt > 3f) {
-                    lastBumpAt = clock
-                    viewModel.soundEngine.error()
-                    say(if (c == 'X') NiloLines.needKey else NiloLines.locked)
+                c == '#' -> slideDir = null
+                !doorOpen(c) -> {
+                    slideDir = null
+                    if (clock - lastBumpAt > 3f) {
+                        lastBumpAt = clock
+                        viewModel.soundEngine.error()
+                        say(if (c == 'X') NiloLines.needKey else NiloLines.locked)
+                    }
+                }
+                crate >= 0 -> {
+                    // Sokoban: a box moves one tile if the tile behind it is empty floor in the same room.
+                    val beyond = next + dir
+                    if (!sliding && ship.at(beyond) in ".T" && beyond !in crates && ship.room(beyond) == ship.room(next)) {
+                        crates[crate] = beyond
+                        viewModel.soundEngine.click()
+                        moveDir = dir
+                        niloFrom = niloTo
+                        niloTo = liaTo
+                        liaFrom = liaTo
+                        liaTo = next
+                        progress = 0f
+                        lastMoveAt = clock
+                        val room = ship.room(beyond)
+                        if (room != null && ship.challenges[room] == Challenge.BOXES && puzzleDone(room)) {
+                            viewModel.soundEngine.powerUp()
+                            say(NiloLines.boxesDone)
+                        }
+                    } else {
+                        slideDir = null
+                    }
                 }
                 else -> {
+                    moveDir = dir
                     niloFrom = niloTo
                     niloTo = liaTo
                     liaFrom = liaTo
@@ -434,8 +653,37 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
                         next = nextStation,
                         collected = collected,
                         hasKey = hasKey,
-                        isOpen = ::doorOpen
+                        isOpen = ::doorOpen,
+                        crates = crates,
+                        roomKeys = roomKeys,
+                        puzzleDone = ::puzzleDone
                     )
+                }
+                // Sokoban rooms: put the boxes back if one gets stuck.
+                val hereRoom = ship.room(liaTo)
+                if (hereRoom != null && ship.challenges[hereRoom] == Challenge.BOXES && !puzzleDone(hereRoom) && hereRoom == nextStation) {
+                    Surface(
+                        onClick = {
+                            ship.crateStarts.forEachIndexed { k, (room, start) -> if (room == hereRoom) crates[k] = start }
+                            // Back to the door so Lía isn't standing inside a box.
+                            val door = ship.doorTo(hereRoom)
+                            liaFrom = door
+                            liaTo = door
+                            niloFrom = door
+                            niloTo = door
+                            progress = 1f
+                            slideDir = null
+                        },
+                        shape = RoundedCornerShape(50),
+                        color = SolarAmber,
+                        modifier = Modifier.align(Alignment.TopEnd).padding(8.dp)
+                    ) {
+                        Text(
+                            language.pick("↺ أعيدي الصناديق", "↺ Reset boxes"),
+                            color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 14.sp,
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                        )
+                    }
                 }
                 // A short title card when a level starts.
                 if (clock < 2.6f) {
@@ -579,7 +827,10 @@ private fun DrawScope.drawShip(
     next: Int?,
     collected: List<IntOffset>,
     hasKey: Boolean,
-    isOpen: (Char) -> Boolean
+    isOpen: (Char) -> Boolean,
+    crates: List<IntOffset>,
+    roomKeys: List<Int>,
+    puzzleDone: (Int) -> Boolean
 ) {
     // Space all around the ship.
     drawRect(Brush.verticalGradient(listOf(SpaceDeep, SpaceNavy)))
@@ -730,6 +981,13 @@ private fun DrawScope.drawShip(
                 drawCircle(st.color.copy(alpha = if (done || active) 1f else 0.4f), radius = ts * 0.42f, center = center(p))
                 drawCircle(Color.White, radius = ts * 0.42f, center = center(p), style = Stroke(ts * 0.06f))
                 text(if (done) "✓" else st.emoji, center(p), 0.38f)
+                // The room's puzzle comes first: show what it needs on the pad.
+                ship.challenges[i]?.let { ch ->
+                    if (!done && !puzzleDone(i) && (ch == Challenge.KEY || ch == Challenge.BOXES)) {
+                        drawCircle(HULL, radius = ts * 0.2f, center = center(p) + Offset(ts * 0.36f, -ts * 0.36f))
+                        text(ch.icon, center(p) + Offset(ts * 0.36f, -ts * 0.36f), 0.22f)
+                    }
+                }
             }
             '*' -> if (p !in collected) {
                 val bob = sin(clock * 3f + p.x + p.y) * ts * 0.05f
@@ -737,6 +995,22 @@ private fun DrawScope.drawShip(
                 drawCircle(SolarGold.copy(alpha = 0.3f), radius = ts * 0.3f, center = cc)
                 rotate(45f, pivot = cc) { drawRect(SolarGold, cc - Offset(ts * 0.15f, ts * 0.15f), Size(ts * 0.3f, ts * 0.3f)) }
                 rotate(45f, pivot = cc) { drawRect(Color.White.copy(alpha = 0.7f), cc - Offset(ts * 0.15f, ts * 0.15f), Size(ts * 0.3f, ts * 0.3f), style = Stroke(ts * 0.04f)) }
+            }
+            'I' -> {
+                // Ice: pale blue with a few shiny streaks.
+                drawRect(Color(0xFFBFE9FF).copy(alpha = 0.75f), tl, tile)
+                drawLine(Color.White.copy(alpha = 0.8f), tl + Offset(ts * 0.2f, ts * 0.65f), tl + Offset(ts * 0.5f, ts * 0.35f), strokeWidth = ts * 0.05f)
+                drawLine(Color.White.copy(alpha = 0.6f), tl + Offset(ts * 0.5f, ts * 0.8f), tl + Offset(ts * 0.8f, ts * 0.5f), strokeWidth = ts * 0.04f)
+            }
+            'T' -> {
+                // Where a box must go.
+                drawCircle(SolarGold, radius = ts * 0.32f, center = center(p), style = Stroke(ts * 0.07f, pathEffect = PathEffect.dashPathEffect(floatArrayOf(ts * 0.12f, ts * 0.08f))))
+            }
+            'k' -> if (ship.room(p)?.let { it in roomKeys } != true) {
+                val bob = sin(clock * 3f + p.x) * ts * 0.05f
+                val room = ship.room(p) ?: 0
+                drawCircle(Station.entries[room.coerceIn(0, 6)].color.copy(alpha = 0.5f), radius = ts * 0.34f, center = center(p) + Offset(0f, bob))
+                text("🗝️", center(p) + Offset(0f, bob), 0.45f)
             }
             'K' -> if (next == null && !hasKey) {
                 val pulse = 0.5f + 0.5f * sin(clock * 5f)
@@ -755,6 +1029,24 @@ private fun DrawScope.drawShip(
         if (i > reached) return@forEachIndexed
         val p = ship.pads[i]
         text(st.es, center(p) + Offset(0f, ts * 0.78f), 0.24f, StarWhite, maxWidth = ts * 3f)
+    }
+
+    // Boxes (green when on a circle).
+    crates.forEach { p ->
+        val tl = topLeft(p.x, p.y) + Offset(ts * 0.1f, ts * 0.1f)
+        val onTarget = ship.at(p) == 'T'
+        val wood = if (onTarget) SuccessGreen else Color(0xFFB07A3E)
+        drawRoundRect(wood, tl, Size(ts * 0.8f, ts * 0.8f), CornerRadius(ts * 0.1f))
+        drawRoundRect(Color(0xFF6B4423), tl, Size(ts * 0.8f, ts * 0.8f), CornerRadius(ts * 0.1f), style = Stroke(ts * 0.06f))
+        drawLine(Color(0xFF6B4423), tl, tl + Offset(ts * 0.8f, ts * 0.8f), strokeWidth = ts * 0.05f)
+        drawLine(Color(0xFF6B4423), tl + Offset(ts * 0.8f, 0f), tl + Offset(0f, ts * 0.8f), strokeWidth = ts * 0.05f)
+    }
+    // Patrolling robots.
+    ship.robots.forEach { r ->
+        val pos = r.at(clock)
+        val c = topLeft(pos.x + 0.5f, pos.y + 0.5f)
+        drawCircle(MeteorRed.copy(alpha = 0.3f + 0.2f * sin(clock * 8f)), radius = ts * 0.48f, center = c)
+        text("🤖", c, 0.55f)
     }
 
     // Characters: whoever is lower on the screen is drawn last, in front.

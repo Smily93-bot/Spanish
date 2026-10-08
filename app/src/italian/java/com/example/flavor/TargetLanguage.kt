@@ -347,6 +347,12 @@ private val ITALIAN = mapOf(
     "¡Esta puerta está cerrada!" to "Questa porta è chiusa!",
     "¡Necesitamos la llave!" to "Ci serve la chiave!",
     "¡La puerta se abrió!" to "La porta si è aperta!",
+    "¡Una llave!" to "Una chiave!",
+    "¡Busca la llave de esta sala!" to "Cerca la chiave di questa stanza!",
+    "¡Empuja las cajas a los círculos!" to "Spingi le casse sui cerchi!",
+    "¡Bien! Las cajas están en su sitio." to "Brava! Le casse sono al loro posto.",
+    "¡Hielo! ¡Cuidado, resbala!" to "Ghiaccio! Attenta, si scivola!",
+    "¡Cuidado con el robot!" to "Attenta al robot!",
     "¡Mira, la llave!" to "Guarda, la chiave!",
     "¡Tenemos la llave! ¡A la salida!" to "Abbiamo la chiave! All'uscita!",
 )
