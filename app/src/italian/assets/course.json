@@ -22,13 +22,13 @@
       ],
       "tip": {
         "en": "Greetings change with the time of day: \"buongiorno\" in the morning, \"buonasera\" in the evening, \"buonanotte\" at bedtime. \"Ciao\" is for friends; with grown-ups say \"salve\" or \"buongiorno\".",
-        "ar": "تتغيّر التحيّة حسب الوقت: \"buongiorno\" في الصباح، و\"buonasera\" في المساء، و\"buonanotte\" قبل النوم. قولي \"ciao\" لأصدقائك، ومع الكبار قولي \"salve\" أو \"buongiorno\"."
+        "ar": "تتغيّر التحيّة حسب الوقت: \"buongiorno\" في الصباح، و\"buonasera\" في المساء، و\"buonanotte\" قبل النوم. قل \"ciao\" لأصدقائك، ومع الكبار قل \"salve\" أو \"buongiorno\"."
       }
     },
     {
       "id": "u2",
       "emoji": "🧒",
-      "title": {"t": "Io e te", "en": "Me and You", "ar": "أنا وأنتِ"},
+      "title": {"t": "Io e te", "en": "Me and You", "ar": "أنا وأنتَ"},
       "words": [
         {"t": "il nome", "b": "nome", "en": "name", "ar": "الاسم", "e": "📛"},
         {"t": "il bambino", "b": "bambino", "en": "boy", "ar": "ولد", "e": "👦"},
@@ -47,7 +47,7 @@
       ],
       "tip": {
         "en": "\"Sono\" means \"I am\" and \"sei\" means \"you are\": \"Sono Sara\". To say your name, use \"Mi chiamo...\" (my name is...). To ask, say \"Come ti chiami?\".",
-        "ar": "\"Sono\" تعني \"أنا\" و\"sei\" تعني \"أنتِ\": \"Sono Sara\". لتقولي اسمك استعملي \"Mi chiamo...\" أي \"اسمي...\". وللسؤال قولي \"Come ti chiami?\"."
+        "ar": "\"Sono\" تعني \"أنا\" و\"sei\" تعني \"أنتَ\": \"Sono Sara\". لتقول اسمك استعمل \"Mi chiamo...\" أي \"اسمي...\". وللسؤال قل \"Come ti chiami?\"."
       }
     },
     {
@@ -72,7 +72,7 @@
       ],
       "tip": {
         "en": "Nine is \"nove\" and ten is \"dieci\". To ask \"how many?\" say \"quanti?\" for masculine words and \"quante?\" for feminine words: \"Quante bambine?\".",
-        "ar": "تسعة هي \"nove\" وعشرة هي \"dieci\". لتسألي \"كم؟\" قولي \"quanti?\" مع الكلمات المذكّرة، و\"quante?\" مع الكلمات المؤنّثة: \"Quante bambine?\"."
+        "ar": "تسعة هي \"nove\" وعشرة هي \"dieci\". لتسأل \"كم؟\" قل \"quanti?\" مع الكلمات المذكّرة، و\"quante?\" مع الكلمات المؤنّثة: \"Quante bambine?\"."
       }
     },
     {
@@ -122,7 +122,7 @@
       ],
       "tip": {
         "en": "Every Italian noun is masculine or feminine. Masculine words use \"il\" (il nonno), feminine words use \"la\" (la nonna). Use \"lo\" before z or s + consonant (lo zio) and \"l'\" before a vowel (l'amore).",
-        "ar": "كل اسم في الإيطالية مذكّر أو مؤنّث. المذكّر يأخذ \"il\" مثل il nonno، والمؤنّث يأخذ \"la\" مثل la nonna. استعملي \"lo\" قبل z أو s مع حرف ساكن مثل lo zio، و\"l'\" قبل حرف علّة مثل l'amore."
+        "ar": "كل اسم في الإيطالية مذكّر أو مؤنّث. المذكّر يأخذ \"il\" مثل il nonno، والمؤنّث يأخذ \"la\" مثل la nonna. استعمل \"lo\" قبل z أو s مع حرف ساكن مثل lo zio، و\"l'\" قبل حرف علّة مثل l'amore."
       }
     },
     {
@@ -167,12 +167,12 @@
       "phrases": [
         {"t": "Mi piace la mela.", "en": "I like the apple.", "ar": "أحبّ التفاحة."},
         {"t": "Non mi piace il latte.", "en": "I don't like milk.", "ar": "لا أحبّ الحليب."},
-        {"t": "Ti piace il formaggio? Sì!", "en": "Do you like cheese? Yes!", "ar": "هل تحبّين الجبن؟ نعم!"},
+        {"t": "Ti piace il formaggio? Sì!", "en": "Do you like cheese? Yes!", "ar": "هل تحبّ الجبن؟ نعم!"},
         {"t": "Mi piace il pane con il formaggio.", "en": "I like bread with cheese.", "ar": "أحبّ الخبز مع الجبن."}
       ],
       "tip": {
         "en": "\"Mi piace\" means \"I like\" and \"non mi piace\" means \"I don't like\". To ask a friend, say \"Ti piace...?\" (do you like...?).",
-        "ar": "\"Mi piace\" تعني \"أحبّ\"، و\"non mi piace\" تعني \"لا أحبّ\". لتسألي صديقتك قولي \"Ti piace...?\" أي \"هل تحبّين...؟\"."
+        "ar": "\"Mi piace\" تعني \"أحبّ\"، و\"non mi piace\" تعني \"لا أحبّ\". لتسأل صديقك قل \"Ti piace...?\" أي \"هل تحبّ...؟\"."
       }
     },
     {
@@ -197,7 +197,7 @@
       ],
       "tip": {
         "en": "\"Un\" and \"una\" mean \"a\" or \"an\": un cane, una mucca. Use \"uno\" before z or s + consonant (uno zaino) and \"un'\" before a vowel in feminine words (un'amica).",
-        "ar": "\"Un\" و\"una\" تشبهان التنوين في العربية: un cane تعني \"كلبٌ\"، وuna mucca تعني \"بقرةٌ\". استعملي \"uno\" قبل z أو s مع حرف ساكن مثل uno zaino، و\"un'\" قبل حرف علّة في المؤنّث مثل un'amica."
+        "ar": "\"Un\" و\"una\" تشبهان التنوين في العربية: un cane تعني \"كلبٌ\"، وuna mucca تعني \"بقرةٌ\". استعمل \"uno\" قبل z أو s مع حرف ساكن مثل uno zaino، و\"un'\" قبل حرف علّة في المؤنّث مثل un'amica."
       }
     },
     {
@@ -222,7 +222,7 @@
       ],
       "tip": {
         "en": "\"Ho\" means \"I have\" (the h is silent): \"Ho due mani\". \"Hai...?\" means \"do you have...?\". Italian also uses it for age: \"Ho sette anni\" (I am seven).",
-        "ar": "\"Ho\" تعني \"لديّ\"، والحرف h لا يُنطق: \"Ho due mani\". و\"Hai...?\" تعني \"هل لديكِ...؟\". وتُستعمل للعمر أيضًا: \"Ho sette anni\" أي \"عمري سبع سنوات\"."
+        "ar": "\"Ho\" تعني \"لديّ\"، والحرف h لا يُنطق: \"Ho due mani\". و\"Hai...?\" تعني \"هل لديكَ...؟\". وتُستعمل للعمر أيضًا: \"Ho sette anni\" أي \"عمري سبع سنوات\"."
       }
     },
     {
@@ -243,11 +243,11 @@
         {"t": "Porto una maglietta rossa.", "en": "I'm wearing a red T-shirt.", "ar": "أرتدي قميصًا أحمر."},
         {"t": "Porto un vestito blu.", "en": "I'm wearing a blue dress.", "ar": "أرتدي فستانًا أزرق."},
         {"t": "Il mio papà porta un cappello nero.", "en": "My dad is wearing a black hat.", "ar": "أبي يرتدي قبّعة سوداء."},
-        {"t": "Porti le scarpe bianche?", "en": "Are you wearing white shoes?", "ar": "هل ترتدين حذاءً أبيض؟"}
+        {"t": "Porti le scarpe bianche?", "en": "Are you wearing white shoes?", "ar": "هل ترتدي حذاءً أبيض؟"}
       ],
       "tip": {
         "en": "\"Porto\" means \"I'm wearing\" and \"porti\" means \"you're wearing\". Remember: the colour comes after and matches: un vestito rosso, una maglietta rossa, le scarpe rosse.",
-        "ar": "\"Porto\" تعني \"أرتدي\"، و\"porti\" تعني \"ترتدين\". تذكّري: اللون يأتي بعد الاسم ويوافقه: un vestito rosso، una maglietta rossa، le scarpe rosse."
+        "ar": "\"Porto\" تعني \"أرتدي\"، و\"porti\" تعني \"ترتدي\". تذكّر: اللون يأتي بعد الاسم ويوافقه: un vestito rosso، una maglietta rossa، le scarpe rosse."
       }
     },
     {
@@ -272,7 +272,7 @@
       ],
       "tip": {
         "en": "\"C'è\" means \"there is\" (one thing) and \"ci sono\" means \"there are\" (many things): c'è un letto, ci sono due letti. To ask, just say it as a question: \"C'è una doccia?\".",
-        "ar": "\"C'è\" تعني \"يوجد\" لشيء واحد، و\"ci sono\" تعني \"توجد\" لعدّة أشياء: c'è un letto، ci sono due letti. وللسؤال قوليها بنبرة سؤال: \"C'è una doccia?\"."
+        "ar": "\"C'è\" تعني \"يوجد\" لشيء واحد، و\"ci sono\" تعني \"توجد\" لعدّة أشياء: c'è un letto، ci sono due letti. وللسؤال قلها بنبرة سؤال: \"C'è una doccia?\"."
       }
     },
     {
@@ -297,7 +297,2207 @@
       ],
       "tip": {
         "en": "Use \"è\" to say where something is: \"La chiave è sul tavolo\" (the key is on the table). Ask with \"Dov'è...?\" (where is...?).",
-        "ar": "استعملي \"è\" لتقولي أين يوجد الشيء: \"La chiave è sul tavolo\" أي \"المفتاح على الطاولة\". واسألي بـ \"Dov'è...?\" أي \"أين...؟\"."
+        "ar": "استعمل \"è\" لتقول أين يوجد الشيء: \"La chiave è sul tavolo\" أي \"المفتاح على الطاولة\". واسأل بـ \"Dov'è...?\" أي \"أين...؟\"."
+      }
+    },
+    {
+      "id": "u13",
+      "emoji": "🙏",
+      "title": {"t": "Cortesia", "en": "Courtesy", "ar": "كلمات اللطف"},
+      "words": [
+        {"t": "per favore", "b": "per favore", "en": "please", "ar": "من فضلك", "e": "🙏"},
+        {"t": "scusa", "b": "scusa", "en": "excuse me, sorry", "ar": "عذرًا", "e": "🙇"},
+        {"t": "prego", "b": "prego", "en": "you're welcome", "ar": "عفوًا", "e": "😊"},
+        {"t": "mi dispiace", "b": "mi dispiace", "en": "I'm sorry", "ar": "أنا آسف", "e": "😔"},
+        {"t": "benvenuto", "b": "benvenuto", "en": "welcome", "ar": "أهلًا وسهلًا", "e": "🤗"},
+        {"t": "auguri", "b": "auguri", "en": "congratulations", "ar": "تهانينا", "e": "🎊"},
+        {"t": "buon appetito", "b": "buon appetito", "en": "enjoy your meal", "ar": "بالهناء والشفاء", "e": "🍽️"},
+        {"t": "salute", "b": "salute", "en": "bless you!", "ar": "يرحمك الله", "e": "🤧"}
+      ],
+      "phrases": [
+        {"t": "Scusa, dov'è il bagno?", "en": "Excuse me, where is the bathroom?", "ar": "عذرًا، أين الحمّام؟"},
+        {"t": "Grazie. —Prego.", "en": "Thank you. —You're welcome.", "ar": "شكرًا. —عفوًا."},
+        {"t": "Mi dispiace molto.", "en": "I'm very sorry.", "ar": "أنا آسف جدًّا."},
+        {"t": "Benvenuto a casa mia!", "en": "Welcome to my home!", "ar": "أهلًا وسهلًا بك في بيتي!"}
+      ],
+      "tip": {
+        "en": "Add \"per favore\" to any request to make it polite: \"Acqua, per favore\". \"Prego\" is the answer to \"grazie\", and it also means \"go ahead\".",
+        "ar": "أضف \"per favore\" إلى أيّ طلب ليصبح مهذّبًا: \"Acqua, per favore\". وكلمة \"prego\" هي الردّ على \"grazie\"، وتعني أيضًا \"تفضّل\"."
+      }
+    },
+    {
+      "id": "u14",
+      "emoji": "🔟",
+      "title": {"t": "Altri numeri", "en": "More Numbers", "ar": "أرقام أخرى"},
+      "words": [
+        {"t": "zero", "b": "zero", "en": "zero", "ar": "صفر", "e": "0️⃣"},
+        {"t": "nove", "b": "nove", "en": "nine", "ar": "تسعة", "e": "9️⃣"},
+        {"t": "dieci", "b": "dieci", "en": "ten", "ar": "عشرة", "e": "🔟"},
+        {"t": "undici", "b": "undici", "en": "eleven", "ar": "أحد عشر", "e": "🕚"},
+        {"t": "dodici", "b": "dodici", "en": "twelve", "ar": "اثنا عشر", "e": "🕛"},
+        {"t": "cento", "b": "cento", "en": "one hundred", "ar": "مئة", "e": "💯"},
+        {"t": "più", "b": "più", "en": "plus, more", "ar": "زائد", "e": "➕"},
+        {"t": "meno", "b": "meno", "en": "minus, less", "ar": "ناقص", "e": "➖"}
+      ],
+      "phrases": [
+        {"t": "Due più due fa quattro.", "en": "Two plus two is four.", "ar": "اثنان زائد اثنين يساوي أربعة."},
+        {"t": "Dieci meno uno fa nove.", "en": "Ten minus one is nine.", "ar": "عشرة ناقص واحد يساوي تسعة."},
+        {"t": "Ho dodici anni.", "en": "I am twelve years old.", "ar": "عمري اثنا عشر عامًا."},
+        {"t": "Al cento per cento!", "en": "One hundred percent!", "ar": "مئة بالمئة!"}
+      ],
+      "tip": {
+        "en": "In sums say \"più\" (plus), \"meno\" (minus) and \"fa\" (equals): \"Due più tre fa cinque\".",
+        "ar": "في الحساب قل \"più\" (زائد)، و\"meno\" (ناقص)، و\"fa\" (يساوي): \"Due più tre fa cinque\"."
+      }
+    },
+    {
+      "id": "u15",
+      "emoji": "🙋",
+      "title": {"t": "Io, tu, lui", "en": "Pronouns", "ar": "الضمائر"},
+      "words": [
+        {"t": "io", "b": "io", "en": "I", "ar": "أنا", "e": "🙋"},
+        {"t": "tu", "b": "tu", "en": "you", "ar": "أنتَ", "e": "👉"},
+        {"t": "lui", "b": "lui", "en": "he", "ar": "هو", "e": "👦"},
+        {"t": "lei", "b": "lei", "en": "she", "ar": "هي", "e": "👧"},
+        {"t": "noi", "b": "noi", "en": "we", "ar": "نحن", "e": "👪"},
+        {"t": "voi", "b": "voi", "en": "you (plural)", "ar": "أنتم", "e": "👥"},
+        {"t": "loro", "b": "loro", "en": "they", "ar": "هم", "e": "👫"},
+        {"t": "tutti", "b": "tutti", "en": "everyone", "ar": "الجميع", "e": "🙌"}
+      ],
+      "phrases": [
+        {"t": "Io sono Sara e tu sei Leo.", "en": "I am Sara and you are Leo.", "ar": "أنا سارة وأنتَ ليو."},
+        {"t": "Lui è mio fratello.", "en": "He is my brother.", "ar": "هو أخي."},
+        {"t": "Lei è la mia amica.", "en": "She is my friend.", "ar": "هي صديقتي."},
+        {"t": "Noi siamo una famiglia.", "en": "We are a family.", "ar": "نحن عائلة."}
+      ],
+      "tip": {
+        "en": "Italian often drops the pronoun because the verb already shows who: \"Sono Sara\" = \"Io sono Sara\". Use \"Lei\" (with a capital L) to speak politely to an adult.",
+        "ar": "كثيرًا ما يُحذف الضمير في الإيطالية لأنّ الفعل يدلّ على الفاعل: \"Sono Sara\" مثل \"Io sono Sara\". واستعمل \"Lei\" (بحرف L كبير) لتخاطب الكبار بأدب."
+      }
+    },
+    {
+      "id": "u16",
+      "emoji": "📅",
+      "title": {"t": "I giorni della settimana", "en": "Days of the Week", "ar": "أيّام الأسبوع"},
+      "words": [
+        {"t": "lunedì", "b": "lunedì", "en": "Monday", "ar": "الاثنين", "e": "1️⃣"},
+        {"t": "martedì", "b": "martedì", "en": "Tuesday", "ar": "الثلاثاء", "e": "2️⃣"},
+        {"t": "mercoledì", "b": "mercoledì", "en": "Wednesday", "ar": "الأربعاء", "e": "3️⃣"},
+        {"t": "giovedì", "b": "giovedì", "en": "Thursday", "ar": "الخميس", "e": "4️⃣"},
+        {"t": "venerdì", "b": "venerdì", "en": "Friday", "ar": "الجمعة", "e": "5️⃣"},
+        {"t": "sabato", "b": "sabato", "en": "Saturday", "ar": "السبت", "e": "6️⃣"},
+        {"t": "domenica", "b": "domenica", "en": "Sunday", "ar": "الأحد", "e": "7️⃣"},
+        {"t": "la settimana", "b": "settimana", "en": "week", "ar": "أسبوع", "e": "📅"}
+      ],
+      "phrases": [
+        {"t": "Oggi è lunedì.", "en": "Today is Monday.", "ar": "اليوم هو الاثنين."},
+        {"t": "Sabato gioco con il mio amico.", "en": "On Saturday I play with my friend.", "ar": "يوم السبت ألعب مع صديقي."},
+        {"t": "La domenica mangio con la mia famiglia.", "en": "On Sundays I eat with my family.", "ar": "في أيّام الأحد آكل مع عائلتي."},
+        {"t": "Una settimana ha sette giorni.", "en": "A week has seven days.", "ar": "في الأسبوع سبعة أيّام."}
+      ],
+      "tip": {
+        "en": "Days are written with a small letter. \"Lunedì\" means \"on Monday\" and \"il lunedì\" means \"every Monday\". Only \"domenica\" is feminine.",
+        "ar": "تُكتب أيّام الأسبوع بحرف صغير. \"lunedì\" تعني \"يوم الاثنين\"، و\"il lunedì\" تعني \"كلّ يوم اثنين\". وكلمة \"domenica\" وحدها مؤنّثة."
+      }
+    },
+    {
+      "id": "u17",
+      "emoji": "🗓️",
+      "title": {"t": "I mesi", "en": "Months", "ar": "الأشهر"},
+      "words": [
+        {"t": "gennaio", "b": "gennaio", "en": "January", "ar": "يناير", "e": "⛄"},
+        {"t": "febbraio", "b": "febbraio", "en": "February", "ar": "فبراير", "e": "💘"},
+        {"t": "marzo", "b": "marzo", "en": "March", "ar": "مارس", "e": "🌱"},
+        {"t": "aprile", "b": "aprile", "en": "April", "ar": "أبريل", "e": "🌷"},
+        {"t": "maggio", "b": "maggio", "en": "May", "ar": "مايو", "e": "🌸"},
+        {"t": "giugno", "b": "giugno", "en": "June", "ar": "يونيو", "e": "🍓"},
+        {"t": "luglio", "b": "luglio", "en": "July", "ar": "يوليو", "e": "🍉"},
+        {"t": "agosto", "b": "agosto", "en": "August", "ar": "أغسطس", "e": "🌞"}
+      ],
+      "phrases": [
+        {"t": "Il mio compleanno è a maggio.", "en": "My birthday is in May.", "ar": "عيد ميلادي في مايو."},
+        {"t": "Gennaio è il primo mese.", "en": "January is the first month.", "ar": "يناير هو الشهر الأوّل."},
+        {"t": "Oggi è il tre aprile.", "en": "Today is the third of April.", "ar": "اليوم هو الثالث من أبريل."},
+        {"t": "Ad agosto vado al mare.", "en": "In August I go to the seaside.", "ar": "في أغسطس أذهب إلى البحر."}
+      ],
+      "tip": {
+        "en": "Months are written with a small letter. Use \"a\" with months: \"a marzo\" (\"ad\" before a vowel: \"ad aprile\"). For dates say \"il tre aprile\".",
+        "ar": "تُكتب الأشهر بحرف صغير. استعمل \"a\" مع الأشهر: \"a marzo\" (و\"ad\" قبل حرف علّة: \"ad aprile\"). وللتاريخ قل \"il tre aprile\"."
+      }
+    },
+    {
+      "id": "u18",
+      "emoji": "🍂",
+      "title": {"t": "Le stagioni", "en": "Seasons", "ar": "الفصول"},
+      "words": [
+        {"t": "settembre", "b": "settembre", "en": "September", "ar": "سبتمبر", "e": "🍎"},
+        {"t": "ottobre", "b": "ottobre", "en": "October", "ar": "أكتوبر", "e": "🎃"},
+        {"t": "novembre", "b": "novembre", "en": "November", "ar": "نوفمبر", "e": "🍂"},
+        {"t": "dicembre", "b": "dicembre", "en": "December", "ar": "ديسمبر", "e": "🎄"},
+        {"t": "la primavera", "b": "primavera", "en": "spring", "ar": "الربيع", "e": "🌼"},
+        {"t": "l'estate", "b": "estate", "en": "summer", "ar": "الصيف", "e": "🌴"},
+        {"t": "l'autunno", "b": "autunno", "en": "autumn", "ar": "الخريف", "e": "🍁"},
+        {"t": "l'inverno", "b": "inverno", "en": "winter", "ar": "الشتاء", "e": "☃️"}
+      ],
+      "phrases": [
+        {"t": "In estate fa caldo.", "en": "In summer it is hot.", "ar": "في الصيف يكون الجوّ حارًّا."},
+        {"t": "Mi piace la primavera.", "en": "I like spring.", "ar": "أحبّ الربيع."},
+        {"t": "In autunno cadono le foglie.", "en": "In autumn the leaves fall.", "ar": "في الخريف تتساقط الأوراق."},
+        {"t": "Natale è a dicembre.", "en": "Christmas is in December.", "ar": "عيد الميلاد في ديسمبر."}
+      ],
+      "tip": {
+        "en": "Use \"in\" with seasons: \"in estate\", \"in inverno\". \"Fa caldo\" means \"it is hot\" and \"fa freddo\" means \"it is cold\".",
+        "ar": "استعمل \"in\" مع الفصول: \"in estate\"، \"in inverno\". و\"fa caldo\" تعني \"الجوّ حارّ\"، و\"fa freddo\" تعني \"الجوّ بارد\"."
+      }
+    },
+    {
+      "id": "u19",
+      "emoji": "🕐",
+      "title": {"t": "L'ora", "en": "Telling the Time", "ar": "معرفة الوقت"},
+      "words": [
+        {"t": "l'ora", "b": "ora", "en": "hour, time", "ar": "ساعة", "e": "🕐"},
+        {"t": "il minuto", "b": "minuto", "en": "minute", "ar": "دقيقة", "e": "⏱️"},
+        {"t": "il mezzogiorno", "b": "mezzogiorno", "en": "midday", "ar": "الظهر", "e": "🕛"},
+        {"t": "la mezzanotte", "b": "mezzanotte", "en": "midnight", "ar": "منتصف الليل", "e": "🌌"},
+        {"t": "il pomeriggio", "b": "pomeriggio", "en": "afternoon", "ar": "بعد الظهر", "e": "🌇"},
+        {"t": "presto", "b": "presto", "en": "early", "ar": "باكرًا", "e": "🐓"},
+        {"t": "tardi", "b": "tardi", "en": "late", "ar": "متأخّرًا", "e": "🐌"},
+        {"t": "la sveglia", "b": "sveglia", "en": "alarm clock", "ar": "منبّه", "e": "⏰"}
+      ],
+      "phrases": [
+        {"t": "Che ore sono?", "en": "What time is it?", "ar": "كم الساعة؟"},
+        {"t": "Sono le tre e mezza.", "en": "It is half past three.", "ar": "الساعة الثالثة والنصف."},
+        {"t": "È l'una.", "en": "It is one o'clock.", "ar": "الساعة الواحدة."},
+        {"t": "Mi alzo presto.", "en": "I get up early.", "ar": "أنهض باكرًا."}
+      ],
+      "tip": {
+        "en": "Say \"È l'una\" for one o'clock, but \"Sono le due, sono le tre…\" for the other hours. \"E mezza\" means \"half past\".",
+        "ar": "قل \"È l'una\" للساعة الواحدة، و\"Sono le due، sono le tre…\" لباقي الساعات. و\"e mezza\" تعني \"والنصف\"."
+      }
+    },
+    {
+      "id": "u20",
+      "emoji": "📆",
+      "title": {"t": "Oggi e domani", "en": "Today & Tomorrow", "ar": "اليوم والغد"},
+      "words": [
+        {"t": "oggi", "b": "oggi", "en": "today", "ar": "اليوم", "e": "📆"},
+        {"t": "ieri", "b": "ieri", "en": "yesterday", "ar": "أمس", "e": "⬅️"},
+        {"t": "domani", "b": "domani", "en": "tomorrow", "ar": "غدًا", "e": "➡️"},
+        {"t": "adesso", "b": "adesso", "en": "now", "ar": "الآن", "e": "⌚"},
+        {"t": "il giorno", "b": "giorno", "en": "day", "ar": "يوم", "e": "🌞"},
+        {"t": "il mese", "b": "mese", "en": "month", "ar": "شهر", "e": "🗓️"},
+        {"t": "l'anno", "b": "anno", "en": "year", "ar": "سنة", "e": "🎆"},
+        {"t": "la data", "b": "data", "en": "date", "ar": "تاريخ", "e": "📅"}
+      ],
+      "phrases": [
+        {"t": "Oggi è martedì.", "en": "Today is Tuesday.", "ar": "اليوم هو الثلاثاء."},
+        {"t": "Ieri era domenica.", "en": "Yesterday was Sunday.", "ar": "أمس كان الأحد."},
+        {"t": "A domani!", "en": "See you tomorrow!", "ar": "إلى الغد!"},
+        {"t": "Che giorno è oggi?", "en": "What's the date today?", "ar": "ما تاريخ اليوم؟"}
+      ],
+      "tip": {
+        "en": "\"Domani\" means \"tomorrow\" and \"ieri\" means \"yesterday\". \"Domani mattina\" is \"tomorrow morning\".",
+        "ar": "\"domani\" تعني \"غدًا\" و\"ieri\" تعني \"أمس\". و\"domani mattina\" تعني \"غدًا صباحًا\"."
+      }
+    },
+    {
+      "id": "u21",
+      "emoji": "🌦️",
+      "title": {"t": "Il tempo", "en": "Weather", "ar": "الطقس"},
+      "words": [
+        {"t": "la pioggia", "b": "pioggia", "en": "rain", "ar": "مطر", "e": "🌧️"},
+        {"t": "la neve", "b": "neve", "en": "snow", "ar": "ثلج", "e": "🌨️"},
+        {"t": "il vento", "b": "vento", "en": "wind", "ar": "ريح", "e": "🌬️"},
+        {"t": "la nuvola", "b": "nuvola", "en": "cloud", "ar": "غيمة", "e": "☁️"},
+        {"t": "il caldo", "b": "caldo", "en": "heat", "ar": "حرّ", "e": "🥵"},
+        {"t": "il freddo", "b": "freddo", "en": "cold", "ar": "برد", "e": "🥶"},
+        {"t": "il temporale", "b": "temporale", "en": "storm", "ar": "عاصفة", "e": "⛈️"},
+        {"t": "l'arcobaleno", "b": "arcobaleno", "en": "rainbow", "ar": "قوس قزح", "e": "🌈"}
+      ],
+      "phrases": [
+        {"t": "Che tempo fa?", "en": "What's the weather like?", "ar": "كيف الطقس؟"},
+        {"t": "Oggi piove.", "en": "It's raining today.", "ar": "السماء تمطر اليوم."},
+        {"t": "C'è vento e fa freddo.", "en": "It's windy and cold.", "ar": "الجوّ عاصف وبارد."},
+        {"t": "Guarda, un arcobaleno!", "en": "Look, a rainbow!", "ar": "انظر، قوس قزح!"}
+      ],
+      "tip": {
+        "en": "\"Piove\" means \"it rains\" and \"nevica\" means \"it snows\". Say \"c'è il sole\" (it's sunny) and \"c'è vento\" (it's windy).",
+        "ar": "\"piove\" تعني \"تمطر\" و\"nevica\" تعني \"تثلج\". وقل \"c'è il sole\" (الجوّ مشمس) و\"c'è vento\" (الجوّ عاصف)."
+      }
+    },
+    {
+      "id": "u22",
+      "emoji": "🍦",
+      "title": {"t": "Merende", "en": "Snacks & Treats", "ar": "الوجبات الخفيفة والحلوى"},
+      "words": [
+        {"t": "il caffè", "b": "caffè", "en": "coffee", "ar": "قهوة", "e": "☕"},
+        {"t": "il tè", "b": "tè", "en": "tea", "ar": "شاي", "e": "🍵"},
+        {"t": "il succo", "b": "succo", "en": "juice", "ar": "عصير", "e": "🥤"},
+        {"t": "il cioccolato", "b": "cioccolato", "en": "chocolate", "ar": "شوكولاتة", "e": "🍫"},
+        {"t": "il gelato", "b": "gelato", "en": "ice cream", "ar": "مثلّجات", "e": "🍦"},
+        {"t": "il biscotto", "b": "biscotto", "en": "biscuit", "ar": "بسكويت", "e": "🍪"},
+        {"t": "la torta", "b": "torta", "en": "cake", "ar": "كعكة", "e": "🍰"},
+        {"t": "la caramella", "b": "caramella", "en": "sweet, candy", "ar": "حلوى", "e": "🍬"}
+      ],
+      "phrases": [
+        {"t": "Vuoi un caffè?", "en": "Do you want a coffee?", "ar": "هل تريد قهوة؟"},
+        {"t": "Sì, un tè, per favore.", "en": "Yes, a tea, please.", "ar": "نعم، شايًا من فضلك."},
+        {"t": "Voglio un gelato al cioccolato.", "en": "I want a chocolate ice cream.", "ar": "أريد مثلّجات بالشوكولاتة."},
+        {"t": "Mi piace il succo d'arancia.", "en": "I like orange juice.", "ar": "أحبّ عصير البرتقال."}
+      ],
+      "tip": {
+        "en": "\"Voglio\" means \"I want\" and \"vuoi…?\" means \"do you want…?\". For flavours use \"al\" or \"alla\": \"gelato al cioccolato\".",
+        "ar": "\"voglio\" تعني \"أريد\"، و\"vuoi…?\" تعني \"هل تريد…؟\". وللنكهات استعمل \"al\" أو \"alla\": \"gelato al cioccolato\"."
+      }
+    },
+    {
+      "id": "u23",
+      "emoji": "🍲",
+      "title": {"t": "I pasti", "en": "Meals", "ar": "الوجبات"},
+      "words": [
+        {"t": "la colazione", "b": "colazione", "en": "breakfast", "ar": "فطور", "e": "🥞"},
+        {"t": "il pranzo", "b": "pranzo", "en": "lunch", "ar": "غداء", "e": "🍱"},
+        {"t": "la cena", "b": "cena", "en": "dinner", "ar": "عشاء", "e": "🍝"},
+        {"t": "il riso", "b": "riso", "en": "rice", "ar": "أرزّ", "e": "🍚"},
+        {"t": "il pollo", "b": "pollo", "en": "chicken", "ar": "دجاج", "e": "🍗"},
+        {"t": "la zuppa", "b": "zuppa", "en": "soup", "ar": "حساء", "e": "🍲"},
+        {"t": "la fame", "b": "fame", "en": "hunger", "ar": "جوع", "e": "😋"},
+        {"t": "la sete", "b": "sete", "en": "thirst", "ar": "عطش", "e": "🥤"}
+      ],
+      "phrases": [
+        {"t": "Ho fame.", "en": "I am hungry.", "ar": "أنا جائع."},
+        {"t": "Hai sete?", "en": "Are you thirsty?", "ar": "هل أنتَ عطشان؟"},
+        {"t": "Mangio il riso con il pollo.", "en": "I eat rice with chicken.", "ar": "آكل الأرزّ مع الدجاج."},
+        {"t": "La cena è pronta.", "en": "Dinner is ready.", "ar": "العشاء جاهز."}
+      ],
+      "tip": {
+        "en": "In Italian you \"have\" hunger: \"ho fame\" (I am hungry), \"ho sete\" (I am thirsty). Remember: the h in \"ho\" is silent.",
+        "ar": "في الإيطالية تقول \"لديّ جوع\": \"ho fame\" أي \"أنا جائع\"، و\"ho sete\" أي \"أنا عطشان\". وتذكّر: الحرف h في \"ho\" لا يُنطق."
+      }
+    },
+    {
+      "id": "u24",
+      "emoji": "🍊",
+      "title": {"t": "La frutta", "en": "Fruit", "ar": "الفواكه"},
+      "words": [
+        {"t": "l'arancia", "b": "arancia", "en": "orange", "ar": "برتقالة", "e": "🍊"},
+        {"t": "il limone", "b": "limone", "en": "lemon", "ar": "ليمونة", "e": "🍋"},
+        {"t": "l'uva", "b": "uva", "en": "grapes", "ar": "عنب", "e": "🍇"},
+        {"t": "la pera", "b": "pera", "en": "pear", "ar": "إجاصة", "e": "🍐"},
+        {"t": "l'anguria", "b": "anguria", "en": "watermelon", "ar": "بطّيخ", "e": "🍉"},
+        {"t": "l'ananas", "b": "ananas", "en": "pineapple", "ar": "أناناس", "e": "🍍"},
+        {"t": "la ciliegia", "b": "ciliegia", "en": "cherry", "ar": "كرزة", "e": "🍒"},
+        {"t": "la pesca", "b": "pesca", "en": "peach", "ar": "خوخة", "e": "🍑"}
+      ],
+      "phrases": [
+        {"t": "L'arancia è dolce.", "en": "The orange is sweet.", "ar": "البرتقالة حلوة."},
+        {"t": "Il limone è giallo.", "en": "The lemon is yellow.", "ar": "الليمونة صفراء."},
+        {"t": "Mi piacciono le ciliegie.", "en": "I like cherries.", "ar": "أحبّ الكرز."},
+        {"t": "Ti piacciono le pere?", "en": "Do you like pears?", "ar": "هل تحبّ الإجاص؟"}
+      ],
+      "tip": {
+        "en": "For one thing say \"mi piace\"; for several say \"mi piacciono\": \"Mi piacciono le pere\".",
+        "ar": "مع الشيء الواحد قل \"mi piace\"، ومع عدّة أشياء قل \"mi piacciono\": \"Mi piacciono le pere\"."
+      }
+    },
+    {
+      "id": "u25",
+      "emoji": "🥕",
+      "title": {"t": "La verdura", "en": "Vegetables", "ar": "الخضروات"},
+      "words": [
+        {"t": "la carota", "b": "carota", "en": "carrot", "ar": "جزرة", "e": "🥕"},
+        {"t": "il pomodoro", "b": "pomodoro", "en": "tomato", "ar": "طماطم", "e": "🍅"},
+        {"t": "la patata", "b": "patata", "en": "potato", "ar": "بطاطا", "e": "🥔"},
+        {"t": "la lattuga", "b": "lattuga", "en": "lettuce", "ar": "خسّ", "e": "🥬"},
+        {"t": "il mais", "b": "mais", "en": "corn", "ar": "ذرة", "e": "🌽"},
+        {"t": "il cetriolo", "b": "cetriolo", "en": "cucumber", "ar": "خيار", "e": "🥒"},
+        {"t": "il peperone", "b": "peperone", "en": "pepper", "ar": "فلفل", "e": "🌶️"},
+        {"t": "la melanzana", "b": "melanzana", "en": "aubergine", "ar": "باذنجان", "e": "🍆"}
+      ],
+      "phrases": [
+        {"t": "Il pomodoro è rosso.", "en": "The tomato is red.", "ar": "الطماطم حمراء."},
+        {"t": "La lattuga e il cetriolo sono verdi.", "en": "Lettuce and cucumber are green.", "ar": "الخسّ والخيار أخضران."},
+        {"t": "Non mi piace la melanzana.", "en": "I don't like aubergine.", "ar": "لا أحبّ الباذنجان."},
+        {"t": "Le patate sono buone.", "en": "Potatoes are good.", "ar": "البطاطا لذيذة."}
+      ],
+      "tip": {
+        "en": "Adjectives agree with the noun: \"il pomodoro rosso\", \"le patate buone\". Adjectives in -e have only two forms: \"verde, verdi\".",
+        "ar": "تتوافق الصفة مع الاسم: \"il pomodoro rosso\"، \"le patate buone\". والصفات المنتهية بـ -e لها شكلان فقط: \"verde، verdi\"."
+      }
+    },
+    {
+      "id": "u26",
+      "emoji": "🍴",
+      "title": {"t": "In cucina", "en": "In the Kitchen", "ar": "في المطبخ"},
+      "words": [
+        {"t": "il piatto", "b": "piatto", "en": "plate", "ar": "صحن", "e": "🍽️"},
+        {"t": "la forchetta", "b": "forchetta", "en": "fork", "ar": "شوكة", "e": "🍴"},
+        {"t": "il coltello", "b": "coltello", "en": "knife", "ar": "سكّين", "e": "🔪"},
+        {"t": "il cucchiaio", "b": "cucchiaio", "en": "spoon", "ar": "ملعقة", "e": "🥄"},
+        {"t": "il bicchiere", "b": "bicchiere", "en": "glass", "ar": "كأس", "e": "🥛"},
+        {"t": "la tazza", "b": "tazza", "en": "cup", "ar": "فنجان", "e": "☕"},
+        {"t": "la padella", "b": "padella", "en": "frying pan", "ar": "مقلاة", "e": "🍳"},
+        {"t": "la ciotola", "b": "ciotola", "en": "bowl", "ar": "وعاء", "e": "🥣"}
+      ],
+      "phrases": [
+        {"t": "Mi serve una forchetta.", "en": "I need a fork.", "ar": "أحتاج إلى شوكة."},
+        {"t": "Il bicchiere è sul tavolo.", "en": "The glass is on the table.", "ar": "الكأس على الطاولة."},
+        {"t": "La padella è calda.", "en": "The frying pan is hot.", "ar": "المقلاة ساخنة."},
+        {"t": "Un bicchiere d'acqua, per favore.", "en": "A glass of water, please.", "ar": "كأس ماء، من فضلك."}
+      ],
+      "tip": {
+        "en": "Use \"di\" to say what is inside: \"un bicchiere d'acqua\" (a glass of water), \"una tazza di tè\" (a cup of tea).",
+        "ar": "استعمل \"di\" لتقول ما في الداخل: \"un bicchiere d'acqua\" أي \"كأس ماء\"، و\"una tazza di tè\" أي \"فنجان شاي\"."
+      }
+    },
+    {
+      "id": "u27",
+      "emoji": "🔺",
+      "title": {"t": "Colori e forme", "en": "Colours & Shapes", "ar": "الألوان والأشكال"},
+      "words": [
+        {"t": "rosa", "b": "rosa", "en": "pink", "ar": "ورديّ", "e": "🌸"},
+        {"t": "marrone", "b": "marrone", "en": "brown", "ar": "بنّيّ", "e": "🌰"},
+        {"t": "grigio", "b": "grigio", "en": "grey", "ar": "رماديّ", "e": "🌫️"},
+        {"t": "dorato", "b": "dorato", "en": "golden", "ar": "ذهبيّ", "e": "🥇"},
+        {"t": "il cerchio", "b": "cerchio", "en": "circle", "ar": "دائرة", "e": "⭕"},
+        {"t": "il quadrato", "b": "quadrato", "en": "square", "ar": "مربّع", "e": "⬛"},
+        {"t": "il triangolo", "b": "triangolo", "en": "triangle", "ar": "مثلّث", "e": "🔺"},
+        {"t": "il rombo", "b": "rombo", "en": "diamond (shape)", "ar": "معيّن", "e": "🔶"}
+      ],
+      "phrases": [
+        {"t": "Il sole è un cerchio.", "en": "The sun is a circle.", "ar": "الشمس دائرة."},
+        {"t": "Disegno un triangolo rosa.", "en": "I draw a pink triangle.", "ar": "أرسم مثلّثًا ورديًّا."},
+        {"t": "L'orso è marrone.", "en": "The bear is brown.", "ar": "الدبّ بنّيّ."},
+        {"t": "Di che colore è?", "en": "What colour is it?", "ar": "ما لونه؟"}
+      ],
+      "tip": {
+        "en": "Some colours never change: \"rosa\", \"viola\" and \"blu\" are the same for every noun: \"una gonna rosa\", \"due cappelli rosa\".",
+        "ar": "بعض الألوان لا تتغيّر أبدًا: \"rosa\" و\"viola\" و\"blu\" تبقى كما هي مع كلّ اسم: \"una gonna rosa\"، \"due cappelli rosa\"."
+      }
+    },
+    {
+      "id": "u28",
+      "emoji": "🧸",
+      "title": {"t": "I giocattoli", "en": "Toys", "ar": "الألعاب"},
+      "words": [
+        {"t": "il giocattolo", "b": "giocattolo", "en": "toy", "ar": "لعبة", "e": "🧸"},
+        {"t": "la palla", "b": "palla", "en": "ball", "ar": "كرة", "e": "⚾"},
+        {"t": "la bambola", "b": "bambola", "en": "doll", "ar": "دمية", "e": "🎎"},
+        {"t": "il puzzle", "b": "puzzle", "en": "puzzle", "ar": "أحجية", "e": "🧩"},
+        {"t": "i dadi", "b": "dadi", "en": "dice", "ar": "نرد", "e": "🎲"},
+        {"t": "il robot", "b": "robot", "en": "robot", "ar": "روبوت", "e": "🤖"},
+        {"t": "lo skateboard", "b": "skateboard", "en": "skateboard", "ar": "لوح تزلّج", "e": "🛹"},
+        {"t": "il monopattino", "b": "monopattino", "en": "scooter", "ar": "سكوتر", "e": "🛴"}
+      ],
+      "phrases": [
+        {"t": "Questo è il mio giocattolo.", "en": "This is my toy.", "ar": "هذه لعبتي."},
+        {"t": "Questa bambola è bella.", "en": "This doll is pretty.", "ar": "هذه الدمية جميلة."},
+        {"t": "Giochiamo con la palla?", "en": "Shall we play with the ball?", "ar": "هل نلعب بالكرة؟"},
+        {"t": "Questo robot è nuovo.", "en": "This robot is new.", "ar": "هذا الروبوت جديد."}
+      ],
+      "tip": {
+        "en": "\"Questo\" means \"this\": \"questo robot\". Use \"questa\" with feminine nouns: \"questa palla\".",
+        "ar": "\"questo\" تعني \"هذا\": \"questo robot\". واستعمل \"questa\" مع الأسماء المؤنّثة: \"questa palla\"."
+      }
+    },
+    {
+      "id": "u29",
+      "emoji": "🐄",
+      "title": {"t": "Animali della fattoria", "en": "Farm Animals", "ar": "حيوانات المزرعة"},
+      "words": [
+        {"t": "il maiale", "b": "maiale", "en": "pig", "ar": "خنزير", "e": "🐖"},
+        {"t": "la pecora", "b": "pecora", "en": "sheep", "ar": "خروف", "e": "🐑"},
+        {"t": "la gallina", "b": "gallina", "en": "hen", "ar": "دجاجة", "e": "🐔"},
+        {"t": "l'anatra", "b": "anatra", "en": "duck", "ar": "بطّة", "e": "🦆"},
+        {"t": "la capra", "b": "capra", "en": "goat", "ar": "عنزة", "e": "🐐"},
+        {"t": "il gallo", "b": "gallo", "en": "rooster", "ar": "ديك", "e": "🐓"},
+        {"t": "il topo", "b": "topo", "en": "mouse", "ar": "فأر", "e": "🐭"},
+        {"t": "l'ape", "b": "ape", "en": "bee", "ar": "نحلة", "e": "🐝"}
+      ],
+      "phrases": [
+        {"t": "Il gallo canta la mattina.", "en": "The rooster sings in the morning.", "ar": "يصيح الديك في الصباح."},
+        {"t": "La mucca dà il latte.", "en": "The cow gives milk.", "ar": "البقرة تعطي الحليب."},
+        {"t": "Ci sono tre pecore nella fattoria.", "en": "There are three sheep on the farm.", "ar": "توجد ثلاثة خراف في المزرعة."},
+        {"t": "La gallina fa le uova.", "en": "The hen lays eggs.", "ar": "الدجاجة تبيض."}
+      ],
+      "tip": {
+        "en": "Verbs for \"he/she/it\" end in -a or -e: \"canta\", \"mangia\", \"vede\". \"La capra mangia l'erba\".",
+        "ar": "الأفعال مع \"هو/هي\" تنتهي بـ -a أو -e: \"canta\"، \"mangia\"، \"vede\". مثل: \"La capra mangia l'erba\"."
+      }
+    },
+    {
+      "id": "u30",
+      "emoji": "🦁",
+      "title": {"t": "Animali selvatici", "en": "Wild Animals", "ar": "الحيوانات البرّيّة"},
+      "words": [
+        {"t": "l'elefante", "b": "elefante", "en": "elephant", "ar": "فيل", "e": "🐘"},
+        {"t": "la giraffa", "b": "giraffa", "en": "giraffe", "ar": "زرافة", "e": "🦒"},
+        {"t": "la scimmia", "b": "scimmia", "en": "monkey", "ar": "قرد", "e": "🐒"},
+        {"t": "la tigre", "b": "tigre", "en": "tiger", "ar": "نمر", "e": "🐅"},
+        {"t": "l'orso", "b": "orso", "en": "bear", "ar": "دبّ", "e": "🐻"},
+        {"t": "il serpente", "b": "serpente", "en": "snake", "ar": "أفعى", "e": "🐍"},
+        {"t": "il coccodrillo", "b": "coccodrillo", "en": "crocodile", "ar": "تمساح", "e": "🐊"},
+        {"t": "il lupo", "b": "lupo", "en": "wolf", "ar": "ذئب", "e": "🐺"}
+      ],
+      "phrases": [
+        {"t": "L'elefante è grande.", "en": "The elephant is big.", "ar": "الفيل كبير."},
+        {"t": "La giraffa è molto alta.", "en": "The giraffe is very tall.", "ar": "الزرافة طويلة جدًّا."},
+        {"t": "La scimmia mangia le banane.", "en": "The monkey eats bananas.", "ar": "القرد يأكل الموز."},
+        {"t": "Attenzione, un serpente!", "en": "Careful, a snake!", "ar": "انتبه، أفعى!"}
+      ],
+      "tip": {
+        "en": "\"Molto\" means \"very\" before an adjective: \"molto grande\", \"molto alta\". Note: \"la tigre\" is feminine in Italian.",
+        "ar": "\"molto\" تعني \"جدًّا\" قبل الصفة: \"molto grande\"، \"molto alta\". ولاحظ أنّ \"la tigre\" مؤنّثة في الإيطالية."
+      }
+    },
+    {
+      "id": "u31",
+      "emoji": "🦋",
+      "title": {"t": "Piccoli animali", "en": "Small Creatures", "ar": "كائنات صغيرة"},
+      "words": [
+        {"t": "la farfalla", "b": "farfalla", "en": "butterfly", "ar": "فراشة", "e": "🦋"},
+        {"t": "la formica", "b": "formica", "en": "ant", "ar": "نملة", "e": "🐜"},
+        {"t": "il ragno", "b": "ragno", "en": "spider", "ar": "عنكبوت", "e": "🕷️"},
+        {"t": "la lumaca", "b": "lumaca", "en": "snail", "ar": "حلزون", "e": "🐌"},
+        {"t": "la rana", "b": "rana", "en": "frog", "ar": "ضفدع", "e": "🐸"},
+        {"t": "la tartaruga", "b": "tartaruga", "en": "tortoise, turtle", "ar": "سلحفاة", "e": "🐢"},
+        {"t": "la zanzara", "b": "zanzara", "en": "mosquito", "ar": "بعوضة", "e": "🦟"},
+        {"t": "la coccinella", "b": "coccinella", "en": "ladybird", "ar": "دعسوقة", "e": "🐞"}
+      ],
+      "phrases": [
+        {"t": "La farfalla vola.", "en": "The butterfly flies.", "ar": "الفراشة تطير."},
+        {"t": "La lumaca è lenta.", "en": "The snail is slow.", "ar": "الحلزون بطيء."},
+        {"t": "Dov'è la rana?", "en": "Where is the frog?", "ar": "أين الضفدع؟"},
+        {"t": "La coccinella è rossa e nera.", "en": "The ladybird is red and black.", "ar": "الدعسوقة حمراء وسوداء."}
+      ],
+      "tip": {
+        "en": "Add -ino or -etto to make a word small and cute: \"gatto → gattino\", \"casa → casetta\".",
+        "ar": "أضف -ino أو -etto لتجعل الكلمة صغيرة ولطيفة: \"gatto ← gattino\"، \"casa ← casetta\"."
+      }
+    },
+    {
+      "id": "u32",
+      "emoji": "🦉",
+      "title": {"t": "Gli uccelli", "en": "Birds", "ar": "الطيور"},
+      "words": [
+        {"t": "l'aquila", "b": "aquila", "en": "eagle", "ar": "نسر", "e": "🦅"},
+        {"t": "la colomba", "b": "colomba", "en": "dove", "ar": "حمامة", "e": "🕊️"},
+        {"t": "il gufo", "b": "gufo", "en": "owl", "ar": "بومة", "e": "🦉"},
+        {"t": "il pinguino", "b": "pinguino", "en": "penguin", "ar": "بطريق", "e": "🐧"},
+        {"t": "il pappagallo", "b": "pappagallo", "en": "parrot", "ar": "ببغاء", "e": "🦜"},
+        {"t": "il pavone", "b": "pavone", "en": "peacock", "ar": "طاووس", "e": "🦚"},
+        {"t": "il cigno", "b": "cigno", "en": "swan", "ar": "بجعة", "e": "🦢"},
+        {"t": "il pulcino", "b": "pulcino", "en": "chick", "ar": "كتكوت", "e": "🐤"}
+      ],
+      "phrases": [
+        {"t": "Il gufo vola di notte.", "en": "The owl flies at night.", "ar": "تطير البومة في الليل."},
+        {"t": "Il pappagallo parla.", "en": "The parrot talks.", "ar": "الببغاء يتكلّم."},
+        {"t": "Il pinguino non vola.", "en": "The penguin doesn't fly.", "ar": "البطريق لا يطير."},
+        {"t": "Il cigno è bianco.", "en": "The swan is white.", "ar": "البجعة بيضاء."}
+      ],
+      "tip": {
+        "en": "To say \"not\", put \"non\" before the verb: \"Il pinguino non vola\".",
+        "ar": "لتنفي الجملة ضع \"non\" قبل الفعل: \"Il pinguino non vola\"."
+      }
+    },
+    {
+      "id": "u33",
+      "emoji": "🌳",
+      "title": {"t": "La natura", "en": "Nature", "ar": "الطبيعة"},
+      "words": [
+        {"t": "l'albero", "b": "albero", "en": "tree", "ar": "شجرة", "e": "🌳"},
+        {"t": "il fiore", "b": "fiore", "en": "flower", "ar": "زهرة", "e": "🌺"},
+        {"t": "la montagna", "b": "montagna", "en": "mountain", "ar": "جبل", "e": "⛰️"},
+        {"t": "il fiume", "b": "fiume", "en": "river", "ar": "نهر", "e": "🏞️"},
+        {"t": "il bosco", "b": "bosco", "en": "forest", "ar": "غابة", "e": "🌲"},
+        {"t": "la foglia", "b": "foglia", "en": "leaf", "ar": "ورقة شجر", "e": "🍃"},
+        {"t": "l'erba", "b": "erba", "en": "grass", "ar": "عشب", "e": "🌿"},
+        {"t": "l'isola", "b": "isola", "en": "island", "ar": "جزيرة", "e": "🏝️"}
+      ],
+      "phrases": [
+        {"t": "L'albero è alto e verde.", "en": "The tree is tall and green.", "ar": "الشجرة عالية وخضراء."},
+        {"t": "Ci sono tanti fiori nel bosco.", "en": "There are many flowers in the forest.", "ar": "توجد أزهار كثيرة في الغابة."},
+        {"t": "Il fiume va al mare.", "en": "The river goes to the sea.", "ar": "النهر يصبّ في البحر."},
+        {"t": "Abito vicino alla montagna.", "en": "I live near the mountain.", "ar": "أسكن قرب الجبل."}
+      ],
+      "tip": {
+        "en": "Prepositions join the article: \"in + il = nel\", \"a + il = al\", \"di + il = del\": \"nel bosco\", \"al mare\".",
+        "ar": "تندمج حروف الجرّ مع أداة التعريف: \"in + il = nel\"، \"a + il = al\"، \"di + il = del\": \"nel bosco\"، \"al mare\"."
+      }
+    },
+    {
+      "id": "u34",
+      "emoji": "🌊",
+      "title": {"t": "Il mare", "en": "The Sea", "ar": "البحر"},
+      "words": [
+        {"t": "il mare", "b": "mare", "en": "sea", "ar": "بحر", "e": "🌊"},
+        {"t": "la spiaggia", "b": "spiaggia", "en": "beach", "ar": "شاطئ", "e": "🏖️"},
+        {"t": "la nave", "b": "nave", "en": "ship", "ar": "سفينة", "e": "🚢"},
+        {"t": "la conchiglia", "b": "conchiglia", "en": "seashell", "ar": "صدفة", "e": "🐚"},
+        {"t": "il polpo", "b": "polpo", "en": "octopus", "ar": "أخطبوط", "e": "🐙"},
+        {"t": "la balena", "b": "balena", "en": "whale", "ar": "حوت", "e": "🐋"},
+        {"t": "il granchio", "b": "granchio", "en": "crab", "ar": "سلطعون", "e": "🦀"},
+        {"t": "il delfino", "b": "delfino", "en": "dolphin", "ar": "دلفين", "e": "🐬"}
+      ],
+      "phrases": [
+        {"t": "Mi piace nuotare nel mare.", "en": "I like swimming in the sea.", "ar": "أحبّ السباحة في البحر."},
+        {"t": "Cerco conchiglie sulla spiaggia.", "en": "I look for shells on the beach.", "ar": "أبحث عن الأصداف على الشاطئ."},
+        {"t": "Il polpo ha otto braccia.", "en": "The octopus has eight arms.", "ar": "للأخطبوط ثماني أذرع."},
+        {"t": "La balena è enorme.", "en": "The whale is huge.", "ar": "الحوت ضخم."}
+      ],
+      "tip": {
+        "en": "\"Mi piace\" + a verb means \"I like doing\": \"mi piace nuotare\", \"mi piace leggere\".",
+        "ar": "\"mi piace\" مع فعل تعني \"أحبّ أن أفعل\": \"mi piace nuotare\"، \"mi piace leggere\"."
+      }
+    },
+    {
+      "id": "u35",
+      "emoji": "🌻",
+      "title": {"t": "Le piante", "en": "Plants", "ar": "النباتات"},
+      "words": [
+        {"t": "il seme", "b": "seme", "en": "seed", "ar": "بذرة", "e": "🌱"},
+        {"t": "la rosa", "b": "rosa", "en": "rose", "ar": "وردة", "e": "🌹"},
+        {"t": "il girasole", "b": "girasole", "en": "sunflower", "ar": "عبّاد الشمس", "e": "🌻"},
+        {"t": "il tulipano", "b": "tulipano", "en": "tulip", "ar": "توليب", "e": "🌷"},
+        {"t": "il cactus", "b": "cactus", "en": "cactus", "ar": "صبّار", "e": "🌵"},
+        {"t": "il fungo", "b": "fungo", "en": "mushroom", "ar": "فطر", "e": "🍄"},
+        {"t": "la palma", "b": "palma", "en": "palm tree", "ar": "نخلة", "e": "🌴"},
+        {"t": "il grano", "b": "grano", "en": "wheat", "ar": "قمح", "e": "🌾"}
+      ],
+      "phrases": [
+        {"t": "La rosa profuma.", "en": "The rose smells nice.", "ar": "رائحة الوردة طيّبة."},
+        {"t": "Il girasole guarda il sole.", "en": "The sunflower looks at the sun.", "ar": "عبّاد الشمس ينظر إلى الشمس."},
+        {"t": "Il cactus ha bisogno di poca acqua.", "en": "The cactus needs little water.", "ar": "الصبّار يحتاج إلى قليل من الماء."},
+        {"t": "Pianto un seme.", "en": "I plant a seed.", "ar": "أزرع بذرة."}
+      ],
+      "tip": {
+        "en": "Verbs ending in -are, like \"piantare\", end in -o for \"I\": \"pianto\" (I plant), \"guardo\" (I look).",
+        "ar": "الأفعال المنتهية بـ -are مثل \"piantare\" تنتهي بـ -o مع \"أنا\": \"pianto\" أي \"أزرع\"، و\"guardo\" أي \"أنظر\"."
+      }
+    },
+    {
+      "id": "u36",
+      "emoji": "👪",
+      "title": {"t": "Altri parenti", "en": "More Family", "ar": "المزيد من العائلة"},
+      "words": [
+        {"t": "il figlio", "b": "figlio", "en": "son", "ar": "ابن", "e": "👦"},
+        {"t": "la figlia", "b": "figlia", "en": "daughter", "ar": "ابنة", "e": "👧"},
+        {"t": "lo zio", "b": "zio", "en": "uncle", "ar": "عمّ", "e": "🧔"},
+        {"t": "la zia", "b": "zia", "en": "aunt", "ar": "عمّة", "e": "👩"},
+        {"t": "il cugino", "b": "cugino", "en": "cousin", "ar": "ابن العمّ", "e": "🧒"},
+        {"t": "il marito", "b": "marito", "en": "husband", "ar": "زوج", "e": "🤵"},
+        {"t": "la moglie", "b": "moglie", "en": "wife", "ar": "زوجة", "e": "👰"},
+        {"t": "i genitori", "b": "genitori", "en": "parents", "ar": "والدان", "e": "👪"}
+      ],
+      "phrases": [
+        {"t": "Mio zio ha due figli.", "en": "My uncle has two children.", "ar": "عند عمّي ولدان."},
+        {"t": "I miei genitori sono a casa.", "en": "My parents are at home.", "ar": "والداي في البيت."},
+        {"t": "Lei è mia zia.", "en": "She is my aunt.", "ar": "هي عمّتي."},
+        {"t": "Mio cugino è divertente.", "en": "My cousin is fun.", "ar": "ابن عمّي مرح."}
+      ],
+      "tip": {
+        "en": "With one family member, drop the article: \"mio zio\", \"mia zia\". In the plural keep it: \"i miei genitori\".",
+        "ar": "مع فرد واحد من العائلة تُحذف أداة التعريف: \"mio zio\"، \"mia zia\". أمّا في الجمع فتبقى: \"i miei genitori\"."
+      }
+    },
+    {
+      "id": "u37",
+      "emoji": "🦵",
+      "title": {"t": "Altre parti del corpo", "en": "The Body 2", "ar": "أجزاء أخرى من الجسم"},
+      "words": [
+        {"t": "la testa", "b": "testa", "en": "head", "ar": "رأس", "e": "👤"},
+        {"t": "i capelli", "b": "capelli", "en": "hair", "ar": "شعر", "e": "💇"},
+        {"t": "la gamba", "b": "gamba", "en": "leg", "ar": "ساق", "e": "🦵"},
+        {"t": "il dito", "b": "dito", "en": "finger", "ar": "إصبع", "e": "☝️"},
+        {"t": "la faccia", "b": "faccia", "en": "face", "ar": "وجه", "e": "🙂"},
+        {"t": "il cuore", "b": "cuore", "en": "heart", "ar": "قلب", "e": "❤️"},
+        {"t": "la lingua", "b": "lingua", "en": "tongue", "ar": "لسان", "e": "👅"},
+        {"t": "l'osso", "b": "osso", "en": "bone", "ar": "عظم", "e": "🦴"}
+      ],
+      "phrases": [
+        {"t": "Mi lavo la faccia.", "en": "I wash my face.", "ar": "أغسل وجهي."},
+        {"t": "Ho i capelli lunghi.", "en": "I have long hair.", "ar": "شعري طويل."},
+        {"t": "Ho dieci dita.", "en": "I have ten fingers.", "ar": "لديّ عشرة أصابع."},
+        {"t": "Il cane ha un osso.", "en": "The dog has a bone.", "ar": "عند الكلب عظمة."}
+      ],
+      "tip": {
+        "en": "With body parts Italian uses the article, not \"my\": \"Mi lavo la faccia\". Some plurals are irregular: \"il dito → le dita\", \"l'osso → le ossa\".",
+        "ar": "مع أجزاء الجسم تستعمل الإيطالية أداة التعريف وليس \"my\": \"Mi lavo la faccia\". وبعض الجموع شاذّة: \"il dito ← le dita\"، \"l'osso ← le ossa\"."
+      }
+    },
+    {
+      "id": "u38",
+      "emoji": "👓",
+      "title": {"t": "Gli accessori", "en": "Accessories", "ar": "الإكسسوارات"},
+      "words": [
+        {"t": "gli occhiali", "b": "occhiali", "en": "glasses", "ar": "نظّارة", "e": "👓"},
+        {"t": "il berretto", "b": "berretto", "en": "cap", "ar": "قبّعة رياضيّة", "e": "🧢"},
+        {"t": "i guanti", "b": "guanti", "en": "gloves", "ar": "قفّازان", "e": "🧤"},
+        {"t": "la borsa", "b": "borsa", "en": "handbag", "ar": "حقيبة يد", "e": "👜"},
+        {"t": "l'anello", "b": "anello", "en": "ring", "ar": "خاتم", "e": "💍"},
+        {"t": "la cravatta", "b": "cravatta", "en": "tie", "ar": "ربطة عنق", "e": "👔"},
+        {"t": "lo stivale", "b": "stivale", "en": "boot", "ar": "جزمة", "e": "👢"},
+        {"t": "l'ombrello", "b": "ombrello", "en": "umbrella", "ar": "مظلّة", "e": "☂️"}
+      ],
+      "phrases": [
+        {"t": "Porto gli occhiali.", "en": "I wear glasses.", "ar": "أرتدي نظّارة."},
+        {"t": "Dov'è il mio ombrello?", "en": "Where is my umbrella?", "ar": "أين مظلّتي؟"},
+        {"t": "Questo anello è d'oro.", "en": "This ring is made of gold.", "ar": "هذا الخاتم من ذهب."},
+        {"t": "Fa freddo: mi metto i guanti.", "en": "It's cold: I put on my gloves.", "ar": "الجوّ بارد: ألبس القفّازين."}
+      ],
+      "tip": {
+        "en": "\"Portare\" means \"to wear\" and \"mettersi\" means \"to put on\": \"mi metto il berretto\". Use \"di\" for materials: \"d'oro\" (made of gold).",
+        "ar": "\"portare\" تعني \"يرتدي\"، و\"mettersi\" تعني \"يلبس الآن\": \"mi metto il berretto\". واستعمل \"di\" للمادّة: \"d'oro\" أي \"من ذهب\"."
+      }
+    },
+    {
+      "id": "u39",
+      "emoji": "😠",
+      "title": {"t": "I sentimenti", "en": "Feelings", "ar": "المشاعر"},
+      "words": [
+        {"t": "arrabbiato", "b": "arrabbiato", "en": "angry", "ar": "غاضب", "e": "😠"},
+        {"t": "stanco", "b": "stanco", "en": "tired", "ar": "متعب", "e": "😩"},
+        {"t": "spaventato", "b": "spaventato", "en": "scared", "ar": "خائف", "e": "😱"},
+        {"t": "sorpreso", "b": "sorpreso", "en": "surprised", "ar": "مندهش", "e": "😮"},
+        {"t": "nervoso", "b": "nervoso", "en": "nervous", "ar": "متوتّر", "e": "😬"},
+        {"t": "tranquillo", "b": "tranquillo", "en": "calm", "ar": "هادئ", "e": "😌"},
+        {"t": "annoiato", "b": "annoiato", "en": "bored", "ar": "ضَجِر", "e": "😑"},
+        {"t": "innamorato", "b": "innamorato", "en": "in love", "ar": "عاشق", "e": "😍"}
+      ],
+      "phrases": [
+        {"t": "Sono stanco.", "en": "I am tired.", "ar": "أنا متعب."},
+        {"t": "Sei arrabbiato?", "en": "Are you angry?", "ar": "هل أنتَ غاضب؟"},
+        {"t": "Mia sorella è nervosa.", "en": "My sister is nervous.", "ar": "أختي متوتّرة."},
+        {"t": "Siamo tranquilli.", "en": "We are calm.", "ar": "نحن هادئون."}
+      ],
+      "tip": {
+        "en": "Use \"essere\" for feelings: \"Sono stanco\". A girl says \"stanca\": the adjective agrees with the person.",
+        "ar": "استعمل \"essere\" مع المشاعر: \"Sono stanco\". والبنت تقول \"stanca\"، فالصفة توافق الشخص."
+      }
+    },
+    {
+      "id": "u40",
+      "emoji": "🤒",
+      "title": {"t": "La salute", "en": "Health", "ar": "الصحّة"},
+      "words": [
+        {"t": "malato", "b": "malato", "en": "ill", "ar": "مريض", "e": "🤒"},
+        {"t": "la febbre", "b": "febbre", "en": "fever", "ar": "حمّى", "e": "🌡️"},
+        {"t": "il dolore", "b": "dolore", "en": "pain", "ar": "ألم", "e": "🤕"},
+        {"t": "la tosse", "b": "tosse", "en": "cough", "ar": "سعال", "e": "😷"},
+        {"t": "il raffreddore", "b": "raffreddore", "en": "cold (illness)", "ar": "زكام", "e": "🤧"},
+        {"t": "la medicina", "b": "medicina", "en": "medicine", "ar": "دواء", "e": "💊"},
+        {"t": "sano", "b": "sano", "en": "healthy", "ar": "سليم", "e": "🍏"},
+        {"t": "l'ambulanza", "b": "ambulanza", "en": "ambulance", "ar": "سيّارة إسعاف", "e": "🚑"}
+      ],
+      "phrases": [
+        {"t": "Mi fa male la testa.", "en": "My head hurts.", "ar": "رأسي يؤلمني."},
+        {"t": "Ho la febbre e la tosse.", "en": "I have a fever and a cough.", "ar": "عندي حمّى وسعال."},
+        {"t": "Sono malato.", "en": "I am ill.", "ar": "أنا مريض."},
+        {"t": "Prendi la medicina.", "en": "Take the medicine.", "ar": "خذ الدواء."}
+      ],
+      "tip": {
+        "en": "To say what hurts use \"mi fa male\" + body part: \"Mi fa male la testa\". For several parts: \"mi fanno male i piedi\".",
+        "ar": "لتقول ما يؤلمك استعمل \"mi fa male\" مع جزء الجسم: \"Mi fa male la testa\". ومع الجمع: \"mi fanno male i piedi\"."
+      }
+    },
+    {
+      "id": "u41",
+      "emoji": "🏃",
+      "title": {"t": "Verbi di ogni giorno", "en": "Everyday Verbs", "ar": "أفعال يوميّة"},
+      "words": [
+        {"t": "mangiare", "b": "mangiare", "en": "to eat", "ar": "يأكل", "e": "🍽️"},
+        {"t": "bere", "b": "bere", "en": "to drink", "ar": "يشرب", "e": "🥤"},
+        {"t": "dormire", "b": "dormire", "en": "to sleep", "ar": "ينام", "e": "😴"},
+        {"t": "parlare", "b": "parlare", "en": "to speak", "ar": "يتكلّم", "e": "🗣️"},
+        {"t": "leggere", "b": "leggere", "en": "to read", "ar": "يقرأ", "e": "📖"},
+        {"t": "scrivere", "b": "scrivere", "en": "to write", "ar": "يكتب", "e": "✍️"},
+        {"t": "correre", "b": "correre", "en": "to run", "ar": "يركض", "e": "🏃"},
+        {"t": "giocare", "b": "giocare", "en": "to play", "ar": "يلعب", "e": "🤹"}
+      ],
+      "phrases": [
+        {"t": "Mangio pane e bevo latte.", "en": "I eat bread and drink milk.", "ar": "آكل الخبز وأشرب الحليب."},
+        {"t": "Il mio gatto dorme tanto.", "en": "My cat sleeps a lot.", "ar": "قطّي ينام كثيرًا."},
+        {"t": "Leggo un libro.", "en": "I read a book.", "ar": "أقرأ كتابًا."},
+        {"t": "I bambini corrono e giocano.", "en": "The children run and play.", "ar": "الأطفال يركضون ويلعبون."}
+      ],
+      "tip": {
+        "en": "Italian verbs end in -are, -ere or -ire. For \"I\" change the ending to -o: \"parlare → parlo\", \"leggere → leggo\", \"dormire → dormo\".",
+        "ar": "تنتهي الأفعال الإيطالية بـ -are أو -ere أو -ire. ومع \"أنا\" غيّر النهاية إلى -o: \"parlare ← parlo\"، \"leggere ← leggo\"، \"dormire ← dormo\"."
+      }
+    },
+    {
+      "id": "u42",
+      "emoji": "⏰",
+      "title": {"t": "La mia giornata", "en": "Daily Routine", "ar": "يومي"},
+      "words": [
+        {"t": "svegliarsi", "b": "svegliarsi", "en": "to wake up", "ar": "يستيقظ", "e": "⏰"},
+        {"t": "alzarsi", "b": "alzarsi", "en": "to get up", "ar": "ينهض", "e": "🛏️"},
+        {"t": "fare la doccia", "b": "fare la doccia", "en": "to have a shower", "ar": "يستحمّ", "e": "🚿"},
+        {"t": "lavarsi", "b": "lavarsi", "en": "to wash (yourself)", "ar": "يغتسل", "e": "🧼"},
+        {"t": "vestirsi", "b": "vestirsi", "en": "to get dressed", "ar": "يرتدي ملابسه", "e": "👕"},
+        {"t": "pettinarsi", "b": "pettinarsi", "en": "to comb your hair", "ar": "يمشّط شعره", "e": "💇"},
+        {"t": "fare colazione", "b": "fare colazione", "en": "to have breakfast", "ar": "يتناول الفطور", "e": "🥐"},
+        {"t": "andare a letto", "b": "andare a letto", "en": "to go to bed", "ar": "يذهب إلى الفراش", "e": "🛌"}
+      ],
+      "phrases": [
+        {"t": "Mi sveglio alle sette.", "en": "I wake up at seven.", "ar": "أستيقظ في الساعة السابعة."},
+        {"t": "Faccio la doccia e mi vesto.", "en": "I have a shower and get dressed.", "ar": "أستحمّ وأرتدي ملابسي."},
+        {"t": "Faccio colazione con la mia famiglia.", "en": "I have breakfast with my family.", "ar": "أتناول الفطور مع عائلتي."},
+        {"t": "Vado a letto alle nove.", "en": "I go to bed at nine.", "ar": "أذهب إلى الفراش في الساعة التاسعة."}
+      ],
+      "tip": {
+        "en": "Verbs ending in -si are reflexive: you do them to yourself. Put \"mi\" before the verb: \"mi lavo\" (I wash myself), \"mi vesto\".",
+        "ar": "الأفعال المنتهية بـ -si أفعال انعكاسيّة: تقوم بها لنفسك. ضع \"mi\" قبل الفعل: \"mi lavo\" أي \"أغتسل\"، و\"mi vesto\" أي \"أرتدي ملابسي\"."
+      }
+    },
+    {
+      "id": "u43",
+      "emoji": "❓",
+      "title": {"t": "Le domande", "en": "Question Words", "ar": "كلمات السؤال"},
+      "words": [
+        {"t": "che cosa", "b": "che cosa", "en": "what", "ar": "ماذا", "e": "❓"},
+        {"t": "chi", "b": "chi", "en": "who", "ar": "مَن", "e": "👤"},
+        {"t": "dove", "b": "dove", "en": "where", "ar": "أين", "e": "📍"},
+        {"t": "quando", "b": "quando", "en": "when", "ar": "متى", "e": "📅"},
+        {"t": "come", "b": "come", "en": "how", "ar": "كيف", "e": "🤔"},
+        {"t": "perché", "b": "perché", "en": "why", "ar": "لماذا", "e": "❔"},
+        {"t": "quanto", "b": "quanto", "en": "how much", "ar": "كم", "e": "🔢"},
+        {"t": "quale", "b": "quale", "en": "which", "ar": "أيّ", "e": "☝️"}
+      ],
+      "phrases": [
+        {"t": "Che cos'è questo?", "en": "What is this?", "ar": "ما هذا؟"},
+        {"t": "Chi è lei?", "en": "Who is she?", "ar": "مَن هي؟"},
+        {"t": "Quando è il tuo compleanno?", "en": "When is your birthday?", "ar": "متى عيد ميلادك؟"},
+        {"t": "Perché sei triste?", "en": "Why are you sad?", "ar": "لماذا أنتَ حزين؟"}
+      ],
+      "tip": {
+        "en": "\"Perché\" means both \"why?\" and \"because\": \"Perché sei triste? Perché piove\". \"Dove\" + \"è\" becomes \"dov'è\".",
+        "ar": "\"perché\" تعني \"لماذا؟\" و\"لأنّ\" معًا: \"Perché sei triste? Perché piove\". و\"dove\" مع \"è\" تصبح \"dov'è\"."
+      }
+    },
+    {
+      "id": "u44",
+      "emoji": "📦",
+      "title": {"t": "Dov'è?", "en": "Where Things Are", "ar": "أماكن الأشياء"},
+      "words": [
+        {"t": "sopra", "b": "sopra", "en": "on, above", "ar": "فوق", "e": "🔝"},
+        {"t": "sotto", "b": "sotto", "en": "under", "ar": "تحت", "e": "🔽"},
+        {"t": "dentro", "b": "dentro", "en": "inside", "ar": "داخل", "e": "📥"},
+        {"t": "fuori", "b": "fuori", "en": "outside", "ar": "خارج", "e": "📤"},
+        {"t": "davanti", "b": "davanti", "en": "in front", "ar": "أمام", "e": "⏩"},
+        {"t": "dietro", "b": "dietro", "en": "behind", "ar": "خلف", "e": "⏪"},
+        {"t": "tra", "b": "tra", "en": "between", "ar": "بين", "e": "↔️"},
+        {"t": "accanto", "b": "accanto", "en": "next to", "ar": "بجانب", "e": "👫"}
+      ],
+      "phrases": [
+        {"t": "Il gatto è sotto il tavolo.", "en": "The cat is under the table.", "ar": "القطّ تحت الطاولة."},
+        {"t": "Il libro è sopra il letto.", "en": "The book is on the bed.", "ar": "الكتاب فوق السرير."},
+        {"t": "Sono dietro la porta.", "en": "I am behind the door.", "ar": "أنا خلف الباب."},
+        {"t": "La mia casa è accanto al parco.", "en": "My house is next to the park.", "ar": "بيتي بجانب الحديقة."}
+      ],
+      "tip": {
+        "en": "\"Accanto\" and \"davanti\" need \"a\": \"accanto al parco\", \"davanti alla casa\". \"Sopra\", \"sotto\" and \"dietro\" go straight before the noun.",
+        "ar": "\"accanto\" و\"davanti\" تحتاجان إلى \"a\": \"accanto al parco\"، \"davanti alla casa\". أمّا \"sopra\" و\"sotto\" و\"dietro\" فتأتي قبل الاسم مباشرة."
+      }
+    },
+    {
+      "id": "u45",
+      "emoji": "🧭",
+      "title": {"t": "Le indicazioni", "en": "Directions", "ar": "الاتّجاهات"},
+      "words": [
+        {"t": "la sinistra", "b": "sinistra", "en": "left", "ar": "اليسار", "e": "⬅️"},
+        {"t": "la destra", "b": "destra", "en": "right", "ar": "اليمين", "e": "➡️"},
+        {"t": "dritto", "b": "dritto", "en": "straight on", "ar": "إلى الأمام", "e": "⬆️"},
+        {"t": "vicino", "b": "vicino", "en": "near", "ar": "قريب", "e": "📍"},
+        {"t": "lontano", "b": "lontano", "en": "far", "ar": "بعيد", "e": "🔭"},
+        {"t": "qui", "b": "qui", "en": "here", "ar": "هنا", "e": "👇"},
+        {"t": "lì", "b": "lì", "en": "there", "ar": "هناك", "e": "👉"},
+        {"t": "la mappa", "b": "mappa", "en": "map", "ar": "خريطة", "e": "🗺️"}
+      ],
+      "phrases": [
+        {"t": "Gira a sinistra.", "en": "Turn left.", "ar": "انعطف يسارًا."},
+        {"t": "Vai sempre dritto.", "en": "Go straight on.", "ar": "تابع إلى الأمام مباشرة."},
+        {"t": "È lontano? No, è vicino.", "en": "Is it far? No, it's near.", "ar": "هل هو بعيد؟ لا، إنّه قريب."},
+        {"t": "La banca è qui, a destra.", "en": "The bank is here, on the right.", "ar": "المصرف هنا، على اليمين."}
+      ],
+      "tip": {
+        "en": "To give directions use the \"tu\" command: \"gira\" (turn), \"vai\" (go), \"attraversa\" (cross). Say \"a destra\" and \"a sinistra\" with no article.",
+        "ar": "لإعطاء الاتّجاهات استعمل صيغة الأمر مع \"tu\": \"gira\" أي \"انعطف\"، و\"vai\" أي \"اذهب\"، و\"attraversa\" أي \"اعبر\". وقل \"a destra\" و\"a sinistra\" بلا أداة تعريف."
+      }
+    },
+    {
+      "id": "u46",
+      "emoji": "🏙️",
+      "title": {"t": "La città", "en": "The City", "ar": "المدينة"},
+      "words": [
+        {"t": "la città", "b": "città", "en": "city", "ar": "مدينة", "e": "🏙️"},
+        {"t": "la strada", "b": "strada", "en": "street", "ar": "شارع", "e": "🛣️"},
+        {"t": "il parco", "b": "parco", "en": "park", "ar": "حديقة عامّة", "e": "⛲"},
+        {"t": "l'ospedale", "b": "ospedale", "en": "hospital", "ar": "مستشفى", "e": "🏥"},
+        {"t": "la banca", "b": "banca", "en": "bank", "ar": "مصرف", "e": "🏦"},
+        {"t": "la chiesa", "b": "chiesa", "en": "church", "ar": "كنيسة", "e": "⛪"},
+        {"t": "il museo", "b": "museo", "en": "museum", "ar": "متحف", "e": "🏛️"},
+        {"t": "il ponte", "b": "ponte", "en": "bridge", "ar": "جسر", "e": "🌉"}
+      ],
+      "phrases": [
+        {"t": "La mia città è molto bella.", "en": "My city is very beautiful.", "ar": "مدينتي جميلة جدًّا."},
+        {"t": "C'è un ospedale qui vicino?", "en": "Is there a hospital nearby?", "ar": "هل يوجد مستشفى قريب؟"},
+        {"t": "Il parco è in questa strada.", "en": "The park is on this street.", "ar": "الحديقة في هذا الشارع."},
+        {"t": "Attraversiamo il ponte.", "en": "We cross the bridge.", "ar": "نعبر الجسر."}
+      ],
+      "tip": {
+        "en": "\"C'è\" says that something exists: \"C'è un museo\". \"È\" says where a known thing is: \"Il museo è in centro\".",
+        "ar": "\"c'è\" تدلّ على وجود شيء: \"C'è un museo\". و\"è\" تدلّ على مكان شيء معروف: \"Il museo è in centro\"."
+      }
+    },
+    {
+      "id": "u47",
+      "emoji": "🚌",
+      "title": {"t": "I trasporti", "en": "Transport", "ar": "المواصلات"},
+      "words": [
+        {"t": "la macchina", "b": "macchina", "en": "car", "ar": "سيّارة", "e": "🚗"},
+        {"t": "l'autobus", "b": "autobus", "en": "bus", "ar": "حافلة", "e": "🚌"},
+        {"t": "il treno", "b": "treno", "en": "train", "ar": "قطار", "e": "🚆"},
+        {"t": "l'aereo", "b": "aereo", "en": "plane", "ar": "طائرة", "e": "✈️"},
+        {"t": "la bicicletta", "b": "bicicletta", "en": "bicycle", "ar": "درّاجة", "e": "🚲"},
+        {"t": "il taxi", "b": "taxi", "en": "taxi", "ar": "سيّارة أجرة", "e": "🚕"},
+        {"t": "la metropolitana", "b": "metropolitana", "en": "underground", "ar": "مترو الأنفاق", "e": "🚇"},
+        {"t": "la moto", "b": "moto", "en": "motorbike", "ar": "درّاجة ناريّة", "e": "🏍️"}
+      ],
+      "phrases": [
+        {"t": "Vado a scuola in autobus.", "en": "I go to school by bus.", "ar": "أذهب إلى المدرسة بالحافلة."},
+        {"t": "Mio padre va in macchina.", "en": "My father goes by car.", "ar": "أبي يذهب بالسيّارة."},
+        {"t": "Mi piace andare in bicicletta.", "en": "I like riding my bike.", "ar": "أحبّ ركوب الدرّاجة."},
+        {"t": "Il treno è veloce.", "en": "The train is fast.", "ar": "القطار سريع."}
+      ],
+      "tip": {
+        "en": "Use \"in\" for transport, with no article: \"in treno\", \"in macchina\". But \"on foot\" is \"a piedi\".",
+        "ar": "استعمل \"in\" مع وسائل النقل بلا أداة تعريف: \"in treno\"، \"in macchina\". أمّا \"سيرًا على الأقدام\" فهي \"a piedi\"."
+      }
+    },
+    {
+      "id": "u48",
+      "emoji": "🚦",
+      "title": {"t": "Sulla strada", "en": "On the Road", "ar": "على الطريق"},
+      "words": [
+        {"t": "il semaforo", "b": "semaforo", "en": "traffic light", "ar": "إشارة المرور", "e": "🚦"},
+        {"t": "il distributore", "b": "distributore", "en": "petrol station", "ar": "محطّة وقود", "e": "⛽"},
+        {"t": "la fermata", "b": "fermata", "en": "bus stop", "ar": "موقف الحافلة", "e": "🚏"},
+        {"t": "il porto", "b": "porto", "en": "port", "ar": "ميناء", "e": "⚓"},
+        {"t": "il camion", "b": "camion", "en": "lorry", "ar": "شاحنة", "e": "🚚"},
+        {"t": "l'elicottero", "b": "elicottero", "en": "helicopter", "ar": "مروحيّة", "e": "🚁"},
+        {"t": "il trattore", "b": "trattore", "en": "tractor", "ar": "جرّار", "e": "🚜"},
+        {"t": "la barca a vela", "b": "barca a vela", "en": "sailing boat", "ar": "مركب شراعيّ", "e": "⛵"}
+      ],
+      "phrases": [
+        {"t": "Il semaforo è rosso.", "en": "The traffic light is red.", "ar": "إشارة المرور حمراء."},
+        {"t": "Aspetto l'autobus alla fermata.", "en": "I wait for the bus at the stop.", "ar": "أنتظر الحافلة في الموقف."},
+        {"t": "La nave parte dal porto.", "en": "The ship leaves the port.", "ar": "تغادر السفينة الميناء."},
+        {"t": "Il camion è molto grande.", "en": "The lorry is very big.", "ar": "الشاحنة كبيرة جدًّا."}
+      ],
+      "tip": {
+        "en": "Some nouns don't change in the plural: \"il camion → i camion\", \"il taxi → i taxi\", \"la moto → le moto\".",
+        "ar": "بعض الأسماء لا تتغيّر في الجمع: \"il camion ← i camion\"، \"il taxi ← i taxi\"، \"la moto ← le moto\"."
+      }
+    },
+    {
+      "id": "u49",
+      "emoji": "🏪",
+      "title": {"t": "I negozi", "en": "Shops", "ar": "المتاجر"},
+      "words": [
+        {"t": "il negozio", "b": "negozio", "en": "shop", "ar": "متجر", "e": "🏪"},
+        {"t": "il supermercato", "b": "supermercato", "en": "supermarket", "ar": "سوبرماركت", "e": "🛒"},
+        {"t": "il panificio", "b": "panificio", "en": "bakery", "ar": "مخبز", "e": "🥖"},
+        {"t": "la farmacia", "b": "farmacia", "en": "pharmacy", "ar": "صيدليّة", "e": "💊"},
+        {"t": "la pasticceria", "b": "pasticceria", "en": "cake shop", "ar": "محلّ حلويات", "e": "🍰"},
+        {"t": "la libreria", "b": "libreria", "en": "bookshop", "ar": "مكتبة لبيع الكتب", "e": "📖"},
+        {"t": "la macelleria", "b": "macelleria", "en": "butcher's", "ar": "ملحمة", "e": "🥩"},
+        {"t": "la gioielleria", "b": "gioielleria", "en": "jeweller's", "ar": "محلّ مجوهرات", "e": "💍"}
+      ],
+      "phrases": [
+        {"t": "Vado al panificio.", "en": "I'm going to the bakery.", "ar": "أذهب إلى المخبز."},
+        {"t": "La farmacia è chiusa.", "en": "The pharmacy is closed.", "ar": "الصيدليّة مغلقة."},
+        {"t": "Compro pane e latte.", "en": "I buy bread and milk.", "ar": "أشتري خبزًا وحليبًا."},
+        {"t": "A che ora apre il negozio?", "en": "What time does the shop open?", "ar": "متى يفتح المتجر؟"}
+      ],
+      "tip": {
+        "en": "Many shop names end in -eria: \"pasticceria\", \"macelleria\", \"gioielleria\". Careful: \"libreria\" is a bookshop, not a library!",
+        "ar": "كثير من أسماء المتاجر ينتهي بـ -eria: \"pasticceria\"، \"macelleria\"، \"gioielleria\". وانتبه: \"libreria\" محلّ لبيع الكتب وليست مكتبة عامّة!"
+      }
+    },
+    {
+      "id": "u50",
+      "emoji": "💰",
+      "title": {"t": "I soldi", "en": "Money", "ar": "المال"},
+      "words": [
+        {"t": "i soldi", "b": "soldi", "en": "money", "ar": "مال", "e": "💰"},
+        {"t": "l'euro", "b": "euro", "en": "euro", "ar": "يورو", "e": "💶"},
+        {"t": "la carta di credito", "b": "carta di credito", "en": "bank card", "ar": "بطاقة مصرفيّة", "e": "💳"},
+        {"t": "il prezzo", "b": "prezzo", "en": "price", "ar": "سعر", "e": "🏷️"},
+        {"t": "caro", "b": "caro", "en": "expensive", "ar": "غالٍ", "e": "💎"},
+        {"t": "economico", "b": "economico", "en": "cheap", "ar": "رخيص", "e": "👛"},
+        {"t": "il sacchetto", "b": "sacchetto", "en": "bag", "ar": "كيس", "e": "🛍️"},
+        {"t": "il bancomat", "b": "bancomat", "en": "cash machine", "ar": "صرّاف آليّ", "e": "🏧"}
+      ],
+      "phrases": [
+        {"t": "Quanto costa?", "en": "How much is it?", "ar": "كم ثمنه؟"},
+        {"t": "Costa cinque euro.", "en": "It costs five euros.", "ar": "ثمنه خمسة يورو."},
+        {"t": "È molto caro.", "en": "It's very expensive.", "ar": "إنّه غالٍ جدًّا."},
+        {"t": "Posso pagare con la carta?", "en": "Can I pay by card?", "ar": "هل يمكنني الدفع بالبطاقة؟"}
+      ],
+      "tip": {
+        "en": "Ask prices with \"Quanto costa?\" for one thing and \"Quanto costano?\" for several. \"Euro\" never changes: \"un euro, due euro\".",
+        "ar": "اسأل عن السعر بـ \"Quanto costa?\" لشيء واحد، وبـ \"Quanto costano?\" لعدّة أشياء. وكلمة \"euro\" لا تتغيّر: \"un euro، due euro\"."
+      }
+    },
+    {
+      "id": "u51",
+      "emoji": "👮",
+      "title": {"t": "I mestieri", "en": "Jobs", "ar": "المهن"},
+      "words": [
+        {"t": "il medico", "b": "medico", "en": "doctor", "ar": "طبيب", "e": "💉"},
+        {"t": "l'insegnante", "b": "insegnante", "en": "teacher", "ar": "معلّم", "e": "🏫"},
+        {"t": "il poliziotto", "b": "poliziotto", "en": "police officer", "ar": "شرطيّ", "e": "👮"},
+        {"t": "il pompiere", "b": "pompiere", "en": "firefighter", "ar": "رجل إطفاء", "e": "🚒"},
+        {"t": "il cuoco", "b": "cuoco", "en": "cook", "ar": "طبّاخ", "e": "🍳"},
+        {"t": "il contadino", "b": "contadino", "en": "farmer", "ar": "مزارع", "e": "🚜"},
+        {"t": "il postino", "b": "postino", "en": "postman", "ar": "ساعي البريد", "e": "📮"},
+        {"t": "il pilota", "b": "pilota", "en": "pilot", "ar": "طيّار", "e": "🛫"}
+      ],
+      "phrases": [
+        {"t": "Mia madre fa il medico.", "en": "My mother is a doctor.", "ar": "أمّي طبيبة."},
+        {"t": "Da grande voglio fare il pilota.", "en": "When I grow up I want to be a pilot.", "ar": "عندما أكبر أريد أن أصبح طيّارًا."},
+        {"t": "Che lavoro fai? Sono insegnante.", "en": "What do you do? I'm a teacher.", "ar": "ماذا تعمل؟ أنا معلّم."},
+        {"t": "Il pompiere è coraggioso.", "en": "The firefighter is brave.", "ar": "رجل الإطفاء شجاع."}
+      ],
+      "tip": {
+        "en": "Say your job with \"fare\" + article or with \"essere\" and no article: \"Faccio il cuoco\" = \"Sono cuoco\". Feminine forms: \"cuoca\", \"postina\".",
+        "ar": "قل مهنتك بـ \"fare\" مع أداة التعريف، أو بـ \"essere\" بلا أداة: \"Faccio il cuoco\" = \"Sono cuoco\". والصيغ المؤنّثة: \"cuoca\"، \"postina\"."
+      }
+    },
+    {
+      "id": "u52",
+      "emoji": "⚽",
+      "title": {"t": "Gli sport", "en": "Sports", "ar": "الرياضة"},
+      "words": [
+        {"t": "il calcio", "b": "calcio", "en": "football", "ar": "كرة القدم", "e": "⚽"},
+        {"t": "la pallacanestro", "b": "pallacanestro", "en": "basketball", "ar": "كرة السلّة", "e": "🏀"},
+        {"t": "il tennis", "b": "tennis", "en": "tennis", "ar": "التنس", "e": "🎾"},
+        {"t": "il nuoto", "b": "nuoto", "en": "swimming", "ar": "السباحة", "e": "🏊"},
+        {"t": "lo sci", "b": "sci", "en": "skiing", "ar": "التزلّج", "e": "⛷️"},
+        {"t": "il golf", "b": "golf", "en": "golf", "ar": "الغولف", "e": "⛳"},
+        {"t": "la pallavolo", "b": "pallavolo", "en": "volleyball", "ar": "الكرة الطائرة", "e": "🏐"},
+        {"t": "il ciclismo", "b": "ciclismo", "en": "cycling", "ar": "ركوب الدرّاجات", "e": "🚴"}
+      ],
+      "phrases": [
+        {"t": "Gioco a calcio con i miei amici.", "en": "I play football with my friends.", "ar": "ألعب كرة القدم مع أصدقائي."},
+        {"t": "Giochi a tennis?", "en": "Do you play tennis?", "ar": "هل تلعب التنس؟"},
+        {"t": "Mi piace la pallacanestro.", "en": "I like basketball.", "ar": "أحبّ كرة السلّة."},
+        {"t": "Faccio nuoto il lunedì.", "en": "I go swimming on Mondays.", "ar": "أمارس السباحة أيّام الاثنين."}
+      ],
+      "tip": {
+        "en": "Use \"giocare a\" for ball games (\"gioco a tennis\") and \"fare\" for other sports (\"faccio nuoto\").",
+        "ar": "استعمل \"giocare a\" مع ألعاب الكرة (\"gioco a tennis\")، و\"fare\" مع الرياضات الأخرى (\"faccio nuoto\")."
+      }
+    },
+    {
+      "id": "u53",
+      "emoji": "🏆",
+      "title": {"t": "La partita", "en": "Match Day", "ar": "يوم المباراة"},
+      "words": [
+        {"t": "la partita", "b": "partita", "en": "match", "ar": "مباراة", "e": "🏟️"},
+        {"t": "la squadra", "b": "squadra", "en": "team", "ar": "فريق", "e": "🎽"},
+        {"t": "il gol", "b": "gol", "en": "goal", "ar": "هدف", "e": "🥅"},
+        {"t": "il campione", "b": "campione", "en": "champion", "ar": "بطل", "e": "🏆"},
+        {"t": "la medaglia", "b": "medaglia", "en": "medal", "ar": "ميداليّة", "e": "🏅"},
+        {"t": "il giocatore", "b": "giocatore", "en": "player", "ar": "لاعب", "e": "⛹️"},
+        {"t": "l'allenamento", "b": "allenamento", "en": "training", "ar": "تدريب", "e": "🏋️"},
+        {"t": "la corsa", "b": "corsa", "en": "race", "ar": "سباق", "e": "🏁"}
+      ],
+      "phrases": [
+        {"t": "Gol! Vinciamo la partita.", "en": "Goal! We win the match.", "ar": "هدف! نفوز بالمباراة."},
+        {"t": "La mia squadra è la migliore.", "en": "My team is the best.", "ar": "فريقي هو الأفضل."},
+        {"t": "Ho allenamento martedì.", "en": "I have training on Tuesday.", "ar": "عندي تدريب يوم الثلاثاء."},
+        {"t": "Lei vince una medaglia d'oro.", "en": "She wins a gold medal.", "ar": "هي تفوز بميداليّة ذهبيّة."}
+      ],
+      "tip": {
+        "en": "For \"we\", all verbs end in -iamo: \"vinciamo\" (we win), \"giochiamo\" (we play), \"corriamo\" (we run).",
+        "ar": "مع \"نحن\" تنتهي كلّ الأفعال بـ -iamo: \"vinciamo\" أي \"نفوز\"، و\"giochiamo\" أي \"نلعب\"، و\"corriamo\" أي \"نركض\"."
+      }
+    },
+    {
+      "id": "u54",
+      "emoji": "🎵",
+      "title": {"t": "La musica", "en": "Music", "ar": "الموسيقى"},
+      "words": [
+        {"t": "la musica", "b": "musica", "en": "music", "ar": "موسيقى", "e": "🎵"},
+        {"t": "la chitarra", "b": "chitarra", "en": "guitar", "ar": "غيتار", "e": "🎸"},
+        {"t": "il pianoforte", "b": "pianoforte", "en": "piano", "ar": "بيانو", "e": "🎹"},
+        {"t": "il violino", "b": "violino", "en": "violin", "ar": "كمان", "e": "🎻"},
+        {"t": "il tamburo", "b": "tamburo", "en": "drum", "ar": "طبل", "e": "🥁"},
+        {"t": "la tromba", "b": "tromba", "en": "trumpet", "ar": "بوق", "e": "🎺"},
+        {"t": "la canzone", "b": "canzone", "en": "song", "ar": "أغنية", "e": "🎤"},
+        {"t": "ballare", "b": "ballare", "en": "to dance", "ar": "يرقص", "e": "💃"}
+      ],
+      "phrases": [
+        {"t": "Suono la chitarra.", "en": "I play the guitar.", "ar": "أعزف على الغيتار."},
+        {"t": "Mia sorella suona il pianoforte.", "en": "My sister plays the piano.", "ar": "أختي تعزف على البيانو."},
+        {"t": "Adoro questa canzone.", "en": "I love this song.", "ar": "أحبّ هذه الأغنية كثيرًا."},
+        {"t": "Balliamo?", "en": "Shall we dance?", "ar": "هل نرقص؟"}
+      ],
+      "tip": {
+        "en": "For instruments use \"suonare\", not \"giocare\": \"suono il pianoforte\". \"Adoro\" means \"I love\" for things.",
+        "ar": "مع الآلات الموسيقيّة استعمل \"suonare\" وليس \"giocare\": \"suono il pianoforte\". و\"adoro\" تعني \"أحبّ كثيرًا\" مع الأشياء."
+      }
+    },
+    {
+      "id": "u55",
+      "emoji": "🎨",
+      "title": {"t": "Gli hobby", "en": "Hobbies", "ar": "الهوايات"},
+      "words": [
+        {"t": "dipingere", "b": "dipingere", "en": "to paint", "ar": "يلوّن", "e": "🎨"},
+        {"t": "disegnare", "b": "disegnare", "en": "to draw", "ar": "يرسم", "e": "✏️"},
+        {"t": "il cinema", "b": "cinema", "en": "cinema", "ar": "سينما", "e": "🎬"},
+        {"t": "la foto", "b": "foto", "en": "photo", "ar": "صورة", "e": "📷"},
+        {"t": "il videogioco", "b": "videogioco", "en": "video game", "ar": "لعبة فيديو", "e": "🎮"},
+        {"t": "gli scacchi", "b": "scacchi", "en": "chess", "ar": "الشطرنج", "e": "♟️"},
+        {"t": "cucinare", "b": "cucinare", "en": "to cook", "ar": "يطبخ", "e": "🍳"},
+        {"t": "pescare", "b": "pescare", "en": "to fish", "ar": "يصطاد السمك", "e": "🎣"}
+      ],
+      "phrases": [
+        {"t": "Il mio hobby è disegnare.", "en": "My hobby is drawing.", "ar": "هوايتي الرسم."},
+        {"t": "Il sabato vado al cinema.", "en": "On Saturdays I go to the cinema.", "ar": "في أيّام السبت أذهب إلى السينما."},
+        {"t": "Giochi a scacchi?", "en": "Do you play chess?", "ar": "هل تلعب الشطرنج؟"},
+        {"t": "Mi piace fare foto.", "en": "I like taking photos.", "ar": "أحبّ التقاط الصور."}
+      ],
+      "tip": {
+        "en": "Foreign words like \"hobby\" and \"sport\" don't change in the plural: \"gli hobby\", \"gli sport\".",
+        "ar": "الكلمات الأجنبيّة مثل \"hobby\" و\"sport\" لا تتغيّر في الجمع: \"gli hobby\"، \"gli sport\"."
+      }
+    },
+    {
+      "id": "u56",
+      "emoji": "🎭",
+      "title": {"t": "Il tempo libero", "en": "Free Time", "ar": "وقت الفراغ"},
+      "words": [
+        {"t": "il fine settimana", "b": "fine settimana", "en": "weekend", "ar": "عطلة نهاية الأسبوع", "e": "📆"},
+        {"t": "passeggiare", "b": "passeggiare", "en": "to go for a walk", "ar": "يتنزّه", "e": "🚶"},
+        {"t": "il concerto", "b": "concerto", "en": "concert", "ar": "حفلة موسيقيّة", "e": "🎼"},
+        {"t": "il teatro", "b": "teatro", "en": "theatre", "ar": "مسرح", "e": "🎭"},
+        {"t": "il film", "b": "film", "en": "film", "ar": "فيلم", "e": "🎞️"},
+        {"t": "la gita", "b": "gita", "en": "outing, trip", "ar": "نزهة", "e": "🥾"},
+        {"t": "fare campeggio", "b": "fare campeggio", "en": "to go camping", "ar": "يخيّم", "e": "⛺"},
+        {"t": "il circo", "b": "circo", "en": "circus", "ar": "سيرك", "e": "🎪"}
+      ],
+      "phrases": [
+        {"t": "Questo fine settimana andiamo a teatro.", "en": "This weekend we're going to the theatre.", "ar": "في عطلة نهاية الأسبوع هذه نذهب إلى المسرح."},
+        {"t": "Andiamo a vedere un film.", "en": "Let's go and see a film.", "ar": "هيّا نشاهد فيلمًا."},
+        {"t": "Mi piace passeggiare nel parco.", "en": "I like walking in the park.", "ar": "أحبّ التنزّه في الحديقة."},
+        {"t": "Domenica facciamo una gita.", "en": "On Sunday we're going on an outing.", "ar": "يوم الأحد نقوم بنزهة."}
+      ],
+      "tip": {
+        "en": "\"Andiamo a\" + verb means \"let's go and…\": \"Andiamo a vedere un film\". Note: \"a teatro\" but \"al cinema\".",
+        "ar": "\"andiamo a\" مع فعل تعني \"هيّا نذهب لـ…\": \"Andiamo a vedere un film\". ولاحظ: \"a teatro\" لكن \"al cinema\"."
+      }
+    },
+    {
+      "id": "u57",
+      "emoji": "🐘",
+      "title": {"t": "Grande e piccolo", "en": "Size & Age", "ar": "الحجم والعمر"},
+      "words": [
+        {"t": "grande", "b": "grande", "en": "big", "ar": "كبير", "e": "🐘"},
+        {"t": "piccolo", "b": "piccolo", "en": "small", "ar": "صغير", "e": "🐭"},
+        {"t": "alto", "b": "alto", "en": "tall", "ar": "طويل القامة", "e": "🦒"},
+        {"t": "basso", "b": "basso", "en": "short (height)", "ar": "قصير القامة", "e": "🐜"},
+        {"t": "lungo", "b": "lungo", "en": "long", "ar": "طويل", "e": "🐍"},
+        {"t": "corto", "b": "corto", "en": "short (length)", "ar": "قصير", "e": "✂️"},
+        {"t": "nuovo", "b": "nuovo", "en": "new", "ar": "جديد", "e": "🆕"},
+        {"t": "vecchio", "b": "vecchio", "en": "old", "ar": "قديم", "e": "🏚️"}
+      ],
+      "phrases": [
+        {"t": "L'elefante è grande e il topo è piccolo.", "en": "The elephant is big and the mouse is small.", "ar": "الفيل كبير والفأر صغير."},
+        {"t": "Mio fratello è alto.", "en": "My brother is tall.", "ar": "أخي طويل القامة."},
+        {"t": "Il serpente è lungo.", "en": "The snake is long.", "ar": "الأفعى طويلة."},
+        {"t": "La mia bici è nuova, non è vecchia.", "en": "My bike is new, not old.", "ar": "درّاجتي جديدة، ليست قديمة."}
+      ],
+      "tip": {
+        "en": "\"Grande\" is the same for masculine and feminine; its plural is \"grandi\". Adjectives in -o have four forms: \"piccolo, piccola, piccoli, piccole\".",
+        "ar": "\"grande\" لا تتغيّر مع المذكّر والمؤنّث، وجمعها \"grandi\". أمّا الصفات المنتهية بـ -o فلها أربعة أشكال: \"piccolo، piccola، piccoli، piccole\"."
+      }
+    },
+    {
+      "id": "u58",
+      "emoji": "✨",
+      "title": {"t": "I contrari", "en": "Opposites", "ar": "الأضداد"},
+      "words": [
+        {"t": "veloce", "b": "veloce", "en": "fast", "ar": "سريع", "e": "🐇"},
+        {"t": "lento", "b": "lento", "en": "slow", "ar": "بطيء", "e": "🐢"},
+        {"t": "facile", "b": "facile", "en": "easy", "ar": "سهل", "e": "👌"},
+        {"t": "difficile", "b": "difficile", "en": "difficult", "ar": "صعب", "e": "🧗"},
+        {"t": "pulito", "b": "pulito", "en": "clean", "ar": "نظيف", "e": "✨"},
+        {"t": "sporco", "b": "sporco", "en": "dirty", "ar": "متّسخ", "e": "🦠"},
+        {"t": "bello", "b": "bello", "en": "pretty", "ar": "جميل", "e": "🌹"},
+        {"t": "brutto", "b": "brutto", "en": "ugly", "ar": "قبيح", "e": "👹"}
+      ],
+      "phrases": [
+        {"t": "Il coniglio è veloce e la tartaruga è lenta.", "en": "The rabbit is fast and the tortoise is slow.", "ar": "الأرنب سريع والسلحفاة بطيئة."},
+        {"t": "Questo esercizio è facile.", "en": "This exercise is easy.", "ar": "هذا التمرين سهل."},
+        {"t": "Le mie scarpe sono sporche.", "en": "My shoes are dirty.", "ar": "حذائي متّسخ."},
+        {"t": "Che bello!", "en": "How lovely!", "ar": "ما أجمله!"}
+      ],
+      "tip": {
+        "en": "\"Che\" + adjective makes an exclamation: \"Che bello!\" (how lovely!), \"Che brutto!\" (how ugly!).",
+        "ar": "\"che\" مع صفة تفيد التعجّب: \"Che bello!\" أي \"ما أجمله!\"، و\"Che brutto!\" أي \"ما أقبحه!\"."
+      }
+    },
+    {
+      "id": "u59",
+      "emoji": "🔥",
+      "title": {"t": "Caldo e freddo", "en": "Hot & Cold", "ar": "ساخن وبارد"},
+      "words": [
+        {"t": "caldo", "b": "caldo", "en": "hot", "ar": "ساخن", "e": "🔥"},
+        {"t": "freddo", "b": "freddo", "en": "cold", "ar": "بارد", "e": "❄️"},
+        {"t": "forte", "b": "forte", "en": "strong", "ar": "قويّ", "e": "💪"},
+        {"t": "debole", "b": "debole", "en": "weak", "ar": "ضعيف", "e": "🥀"},
+        {"t": "rumoroso", "b": "rumoroso", "en": "noisy", "ar": "صاخب", "e": "📢"},
+        {"t": "silenzioso", "b": "silenzioso", "en": "quiet", "ar": "هادئ", "e": "🤫"},
+        {"t": "bagnato", "b": "bagnato", "en": "wet", "ar": "مبلّل", "e": "💦"},
+        {"t": "asciutto", "b": "asciutto", "en": "dry", "ar": "جافّ", "e": "🏜️"}
+      ],
+      "phrases": [
+        {"t": "Attenzione, la zuppa è calda!", "en": "Careful, the soup is hot!", "ar": "انتبه، الحساء ساخن!"},
+        {"t": "L'acqua è fredda.", "en": "The water is cold.", "ar": "الماء بارد."},
+        {"t": "Il mio cane è bagnato.", "en": "My dog is wet.", "ar": "كلبي مبلّل."},
+        {"t": "La biblioteca è silenziosa.", "en": "The library is quiet.", "ar": "المكتبة هادئة."}
+      ],
+      "tip": {
+        "en": "For things say \"è caldo\" (\"il tè è caldo\"); for weather say \"fa caldo\"; for people say \"ho caldo\".",
+        "ar": "مع الأشياء قل \"è caldo\" (\"il tè è caldo\")، ومع الطقس قل \"fa caldo\"، ومع الأشخاص قل \"ho caldo\"."
+      }
+    },
+    {
+      "id": "u60",
+      "emoji": "😊",
+      "title": {"t": "Il carattere", "en": "Personality", "ar": "الشخصيّة"},
+      "words": [
+        {"t": "simpatico", "b": "simpatico", "en": "nice, friendly", "ar": "لطيف", "e": "😊"},
+        {"t": "gentile", "b": "gentile", "en": "kind", "ar": "طيّب", "e": "🤗"},
+        {"t": "intelligente", "b": "intelligente", "en": "clever", "ar": "ذكيّ", "e": "💡"},
+        {"t": "divertente", "b": "divertente", "en": "fun, funny", "ar": "مرح", "e": "😂"},
+        {"t": "serio", "b": "serio", "en": "serious", "ar": "جادّ", "e": "😐"},
+        {"t": "timido", "b": "timido", "en": "shy", "ar": "خجول", "e": "😳"},
+        {"t": "coraggioso", "b": "coraggioso", "en": "brave", "ar": "شجاع", "e": "🦸"},
+        {"t": "curioso", "b": "curioso", "en": "curious", "ar": "فضوليّ", "e": "🧐"}
+      ],
+      "phrases": [
+        {"t": "La mia amica è molto simpatica.", "en": "My friend is very nice.", "ar": "صديقتي لطيفة جدًّا."},
+        {"t": "Sei molto intelligente.", "en": "You are very clever.", "ar": "أنتَ ذكيّ جدًّا."},
+        {"t": "Mio fratello è timido.", "en": "My brother is shy.", "ar": "أخي خجول."},
+        {"t": "Il gatto è curioso.", "en": "The cat is curious.", "ar": "القطّ فضوليّ."}
+      ],
+      "tip": {
+        "en": "Use \"essere\" for personality: \"Sono timido\". Adjectives in -e are the same for boys and girls: \"gentile\", \"intelligente\".",
+        "ar": "استعمل \"essere\" مع الشخصيّة: \"Sono timido\". والصفات المنتهية بـ -e واحدة للولد والبنت: \"gentile\"، \"intelligente\"."
+      }
+    },
+    {
+      "id": "u61",
+      "emoji": "🦘",
+      "title": {"t": "Muoversi", "en": "Moving Around", "ar": "الحركة"},
+      "words": [
+        {"t": "camminare", "b": "camminare", "en": "to walk", "ar": "يمشي", "e": "🚶"},
+        {"t": "saltare", "b": "saltare", "en": "to jump", "ar": "يقفز", "e": "🦘"},
+        {"t": "nuotare", "b": "nuotare", "en": "to swim", "ar": "يسبح", "e": "🏊"},
+        {"t": "volare", "b": "volare", "en": "to fly", "ar": "يطير", "e": "🕊️"},
+        {"t": "salire", "b": "salire", "en": "to go up", "ar": "يصعد", "e": "⬆️"},
+        {"t": "scendere", "b": "scendere", "en": "to go down", "ar": "ينزل", "e": "⬇️"},
+        {"t": "entrare", "b": "entrare", "en": "to go in", "ar": "يدخل", "e": "🚪"},
+        {"t": "arrivare", "b": "arrivare", "en": "to arrive", "ar": "يصل", "e": "🏁"}
+      ],
+      "phrases": [
+        {"t": "Il canguro salta tanto.", "en": "The kangaroo jumps a lot.", "ar": "الكنغر يقفز كثيرًا."},
+        {"t": "Salgo le scale.", "en": "I go up the stairs.", "ar": "أصعد الدرج."},
+        {"t": "Posso entrare?", "en": "May I come in?", "ar": "هل يمكنني الدخول؟"},
+        {"t": "Il treno arriva alle otto.", "en": "The train arrives at eight.", "ar": "يصل القطار في الساعة الثامنة."}
+      ],
+      "tip": {
+        "en": "Some verbs are irregular: \"salire → salgo\" (I go up), \"uscire → esco\" (I go out). Learn them one by one.",
+        "ar": "بعض الأفعال شاذّة: \"salire ← salgo\" أي \"أصعد\"، و\"uscire ← esco\" أي \"أخرج\". تعلّمها واحدًا واحدًا."
+      }
+    },
+    {
+      "id": "u62",
+      "emoji": "👀",
+      "title": {"t": "Altri verbi", "en": "More Verbs", "ar": "أفعال أخرى"},
+      "words": [
+        {"t": "andare", "b": "andare", "en": "to go", "ar": "يذهب", "e": "🏃"},
+        {"t": "venire", "b": "venire", "en": "to come", "ar": "يأتي", "e": "🔙"},
+        {"t": "vedere", "b": "vedere", "en": "to see", "ar": "يرى", "e": "👀"},
+        {"t": "sentire", "b": "sentire", "en": "to hear", "ar": "يسمع", "e": "👂"},
+        {"t": "aprire", "b": "aprire", "en": "to open", "ar": "يفتح", "e": "📂"},
+        {"t": "chiudere", "b": "chiudere", "en": "to close", "ar": "يغلق", "e": "🔒"},
+        {"t": "dare", "b": "dare", "en": "to give", "ar": "يعطي", "e": "🎁"},
+        {"t": "prendere", "b": "prendere", "en": "to take", "ar": "يأخذ", "e": "✋"}
+      ],
+      "phrases": [
+        {"t": "Vado al parco. Vieni?", "en": "I'm going to the park. Are you coming?", "ar": "أذهب إلى الحديقة. هل تأتي؟"},
+        {"t": "Vedo un uccello.", "en": "I see a bird.", "ar": "أرى عصفورًا."},
+        {"t": "Apri la porta, per favore.", "en": "Open the door, please.", "ar": "افتح الباب، من فضلك."},
+        {"t": "Ti do un regalo.", "en": "I'm giving you a present.", "ar": "أعطيك هديّة."}
+      ],
+      "tip": {
+        "en": "\"Andare\" is irregular: vado, vai, va, andiamo. \"Vado al mare\" (I go to the seaside).",
+        "ar": "الفعل \"andare\" شاذّ: vado، vai، va، andiamo. مثل: \"Vado al mare\" أي \"أذهب إلى البحر\"."
+      }
+    },
+    {
+      "id": "u63",
+      "emoji": "👃",
+      "title": {"t": "I sensi", "en": "The Senses", "ar": "الحواسّ"},
+      "words": [
+        {"t": "guardare", "b": "guardare", "en": "to look", "ar": "ينظر", "e": "👁️"},
+        {"t": "ascoltare", "b": "ascoltare", "en": "to listen", "ar": "يستمع", "e": "🎧"},
+        {"t": "annusare", "b": "annusare", "en": "to smell", "ar": "يشمّ", "e": "👃"},
+        {"t": "toccare", "b": "toccare", "en": "to touch", "ar": "يلمس", "e": "🤚"},
+        {"t": "assaggiare", "b": "assaggiare", "en": "to taste", "ar": "يتذوّق", "e": "👅"},
+        {"t": "il sapore", "b": "sapore", "en": "flavour", "ar": "طعم", "e": "😋"},
+        {"t": "dolce", "b": "dolce", "en": "sweet", "ar": "حلو", "e": "🍭"},
+        {"t": "salato", "b": "salato", "en": "salty", "ar": "مالح", "e": "🧂"}
+      ],
+      "phrases": [
+        {"t": "Guarda le stelle.", "en": "Look at the stars.", "ar": "انظر إلى النجوم."},
+        {"t": "Ascolto la musica.", "en": "I listen to music.", "ar": "أستمع إلى الموسيقى."},
+        {"t": "Vuoi assaggiare?", "en": "Do you want a taste?", "ar": "هل تريد أن تتذوّق؟"},
+        {"t": "La caramella è dolce e la zuppa è salata.", "en": "The candy is sweet and the soup is salty.", "ar": "الحلوى حلوة والحساء مالح."}
+      ],
+      "tip": {
+        "en": "\"Vedere\" is \"to see\" and \"guardare\" is \"to look at\"; \"sentire\" is \"to hear\" and \"ascoltare\" is \"to listen to\".",
+        "ar": "\"vedere\" تعني \"يرى\" و\"guardare\" تعني \"ينظر إلى\"، و\"sentire\" تعني \"يسمع\" و\"ascoltare\" تعني \"يستمع إلى\"."
+      }
+    },
+    {
+      "id": "u64",
+      "emoji": "💻",
+      "title": {"t": "La tecnologia", "en": "Technology", "ar": "التكنولوجيا"},
+      "words": [
+        {"t": "il telefono", "b": "telefono", "en": "phone", "ar": "هاتف", "e": "📱"},
+        {"t": "il computer", "b": "computer", "en": "computer", "ar": "حاسوب", "e": "💻"},
+        {"t": "lo schermo", "b": "schermo", "en": "screen", "ar": "شاشة", "e": "🖥️"},
+        {"t": "l'email", "b": "email", "en": "email", "ar": "بريد إلكترونيّ", "e": "📧"},
+        {"t": "internet", "b": "internet", "en": "internet", "ar": "الإنترنت", "e": "🌐"},
+        {"t": "la batteria", "b": "batteria", "en": "battery", "ar": "بطّاريّة", "e": "🔋"},
+        {"t": "la fotocamera", "b": "fotocamera", "en": "camera", "ar": "كاميرا", "e": "📸"},
+        {"t": "la televisione", "b": "televisione", "en": "television", "ar": "تلفاز", "e": "📺"}
+      ],
+      "phrases": [
+        {"t": "Il mio telefono non ha più batteria.", "en": "My phone's battery is dead.", "ar": "بطّاريّة هاتفي فارغة."},
+        {"t": "Mi dai la tua email?", "en": "Can you give me your email?", "ar": "هل تعطيني بريدك الإلكترونيّ؟"},
+        {"t": "Guardo la televisione la sera.", "en": "I watch TV in the evening.", "ar": "أشاهد التلفاز في المساء."},
+        {"t": "Uso il computer per studiare.", "en": "I use the computer to study.", "ar": "أستعمل الحاسوب للدراسة."}
+      ],
+      "tip": {
+        "en": "\"Per\" + verb tells the purpose: \"Uso il computer per studiare\" (to study). Many tech words come from English: \"il computer\", \"l'email\".",
+        "ar": "\"per\" مع فعل تدلّ على الغرض: \"Uso il computer per studiare\" أي \"للدراسة\". وكثير من كلمات التكنولوجيا مأخوذ من الإنجليزيّة: \"il computer\"، \"l'email\"."
+      }
+    },
+    {
+      "id": "u65",
+      "emoji": "✉️",
+      "title": {"t": "Messaggi", "en": "Communication", "ar": "التواصل"},
+      "words": [
+        {"t": "la lettera", "b": "lettera", "en": "letter", "ar": "رسالة", "e": "✉️"},
+        {"t": "il messaggio", "b": "messaggio", "en": "message", "ar": "رسالة نصّيّة", "e": "💬"},
+        {"t": "la telefonata", "b": "telefonata", "en": "phone call", "ar": "مكالمة", "e": "📞"},
+        {"t": "la parola", "b": "parola", "en": "word", "ar": "كلمة", "e": "🔤"},
+        {"t": "il giornale", "b": "giornale", "en": "newspaper", "ar": "جريدة", "e": "📰"},
+        {"t": "la penna", "b": "penna", "en": "pen", "ar": "قلم حبر", "e": "🖊️"},
+        {"t": "il foglio", "b": "foglio", "en": "sheet of paper", "ar": "ورقة", "e": "📄"},
+        {"t": "la notizia", "b": "notizia", "en": "piece of news", "ar": "خبر", "e": "📢"}
+      ],
+      "phrases": [
+        {"t": "Scrivo una lettera a mia nonna.", "en": "I write a letter to my grandmother.", "ar": "أكتب رسالة إلى جدّتي."},
+        {"t": "Ho un messaggio nuovo.", "en": "I have a new message.", "ar": "عندي رسالة جديدة."},
+        {"t": "Hai una penna?", "en": "Do you have a pen?", "ar": "هل عندك قلم؟"},
+        {"t": "Che bella notizia!", "en": "What good news!", "ar": "يا له من خبر سارّ!"}
+      ],
+      "tip": {
+        "en": "Words ending in -zione are feminine (\"la lezione\"), and words ending in -aggio are masculine (\"il messaggio\", \"il viaggio\").",
+        "ar": "الكلمات المنتهية بـ -zione مؤنّثة (\"la lezione\")، والكلمات المنتهية بـ -aggio مذكّرة (\"il messaggio\"، \"il viaggio\")."
+      }
+    },
+    {
+      "id": "u66",
+      "emoji": "🔬",
+      "title": {"t": "Le materie", "en": "School Subjects", "ar": "الموادّ الدراسيّة"},
+      "words": [
+        {"t": "la matematica", "b": "matematica", "en": "maths", "ar": "الرياضيّات", "e": "➗"},
+        {"t": "la storia", "b": "storia", "en": "history", "ar": "التاريخ", "e": "📜"},
+        {"t": "la geografia", "b": "geografia", "en": "geography", "ar": "الجغرافيا", "e": "🗺️"},
+        {"t": "le scienze", "b": "scienze", "en": "science", "ar": "العلوم", "e": "🔬"},
+        {"t": "l'arte", "b": "arte", "en": "art", "ar": "الفنّ", "e": "🖼️"},
+        {"t": "le lingue", "b": "lingue", "en": "languages", "ar": "اللغات", "e": "🗣️"},
+        {"t": "l'educazione fisica", "b": "educazione fisica", "en": "PE", "ar": "التربية البدنيّة", "e": "🤸"},
+        {"t": "l'informatica", "b": "informatica", "en": "computing", "ar": "المعلوماتيّة", "e": "💾"}
+      ],
+      "phrases": [
+        {"t": "La mia materia preferita è la storia.", "en": "My favourite subject is history.", "ar": "مادّتي المفضّلة هي التاريخ."},
+        {"t": "La matematica è difficile.", "en": "Maths is difficult.", "ar": "الرياضيّات صعبة."},
+        {"t": "Oggi abbiamo educazione fisica.", "en": "Today we have PE.", "ar": "اليوم عندنا تربية بدنيّة."},
+        {"t": "Mi piacciono le scienze.", "en": "I like science.", "ar": "أحبّ العلوم."}
+      ],
+      "tip": {
+        "en": "\"Preferito\" agrees with the noun: \"il mio libro preferito\", \"la mia materia preferita\".",
+        "ar": "تتوافق \"preferito\" مع الاسم: \"il mio libro preferito\"، \"la mia materia preferita\"."
+      }
+    },
+    {
+      "id": "u67",
+      "emoji": "🎓",
+      "title": {"t": "Imparare", "en": "Learning", "ar": "التعلّم"},
+      "words": [
+        {"t": "lo studente", "b": "studente", "en": "student", "ar": "تلميذ", "e": "🎓"},
+        {"t": "l'esame", "b": "esame", "en": "exam", "ar": "امتحان", "e": "📝"},
+        {"t": "la domanda", "b": "domanda", "en": "question", "ar": "سؤال", "e": "❓"},
+        {"t": "la risposta", "b": "risposta", "en": "answer", "ar": "جواب", "e": "💬"},
+        {"t": "la lezione", "b": "lezione", "en": "lesson", "ar": "درس", "e": "📘"},
+        {"t": "i compiti", "b": "compiti", "en": "homework", "ar": "الواجبات", "e": "📋"},
+        {"t": "imparare", "b": "imparare", "en": "to learn", "ar": "يتعلّم", "e": "🧠"},
+        {"t": "studiare", "b": "studiare", "en": "to study", "ar": "يدرس", "e": "📚"}
+      ],
+      "phrases": [
+        {"t": "Ho una domanda.", "en": "I have a question.", "ar": "عندي سؤال."},
+        {"t": "Domani ho un esame.", "en": "Tomorrow I have an exam.", "ar": "غدًا عندي امتحان."},
+        {"t": "Faccio i compiti dopo la scuola.", "en": "I do my homework after school.", "ar": "أقوم بواجباتي بعد المدرسة."},
+        {"t": "Imparo una lezione nuova ogni giorno.", "en": "I learn a new lesson every day.", "ar": "أتعلّم درسًا جديدًا كلّ يوم."}
+      ],
+      "tip": {
+        "en": "\"Fare\" is irregular: faccio, fai, fa, facciamo. \"Faccio i compiti\" = I do my homework.",
+        "ar": "الفعل \"fare\" شاذّ: faccio، fai، fa، facciamo. و\"Faccio i compiti\" تعني \"أقوم بواجباتي\"."
+      }
+    },
+    {
+      "id": "u68",
+      "emoji": "📎",
+      "title": {"t": "Sulla scrivania", "en": "At the Desk", "ar": "على المكتب"},
+      "words": [
+        {"t": "la cartella", "b": "cartella", "en": "folder", "ar": "ملفّ", "e": "📁"},
+        {"t": "la graffetta", "b": "graffetta", "en": "paper clip", "ar": "مشبك ورق", "e": "📎"},
+        {"t": "la calcolatrice", "b": "calcolatrice", "en": "calculator", "ar": "آلة حاسبة", "e": "🧮"},
+        {"t": "la puntina", "b": "puntina", "en": "drawing pin", "ar": "دبّوس", "e": "📌"},
+        {"t": "il calendario", "b": "calendario", "en": "calendar", "ar": "تقويم", "e": "🗓️"},
+        {"t": "l'agenda", "b": "agenda", "en": "planner", "ar": "مفكّرة", "e": "📔"},
+        {"t": "la lente d'ingrandimento", "b": "lente d'ingrandimento", "en": "magnifying glass", "ar": "عدسة مكبّرة", "e": "🔍"},
+        {"t": "il pastello", "b": "pastello", "en": "crayon", "ar": "قلم تلوين", "e": "🖍️"}
+      ],
+      "phrases": [
+        {"t": "Mi presti la calcolatrice?", "en": "Can you lend me the calculator?", "ar": "هل تعيرني الآلة الحاسبة؟"},
+        {"t": "La cartella è sulla scrivania.", "en": "The folder is on the desk.", "ar": "الملفّ على المكتب."},
+        {"t": "Scrivo la data sull'agenda.", "en": "I write the date in my planner.", "ar": "أكتب التاريخ في المفكّرة."},
+        {"t": "Ho pastelli di tanti colori.", "en": "I have crayons in many colours.", "ar": "عندي أقلام تلوين بألوان كثيرة."}
+      ],
+      "tip": {
+        "en": "\"Mi presti…?\" (will you lend me…?) is a friendly way to ask for something. Answer \"Sì, tieni\" (yes, here you are).",
+        "ar": "\"Mi presti…?\" أي \"هل تعيرني…؟\" طريقة لطيفة لطلب شيء. والجواب: \"Sì, tieni\" أي \"نعم، تفضّل\"."
+      }
+    },
+    {
+      "id": "u69",
+      "emoji": "🎉",
+      "title": {"t": "Le feste", "en": "Celebrations", "ar": "الاحتفالات"},
+      "words": [
+        {"t": "la festa", "b": "festa", "en": "party", "ar": "حفلة", "e": "🎉"},
+        {"t": "il compleanno", "b": "compleanno", "en": "birthday", "ar": "عيد ميلاد", "e": "🎂"},
+        {"t": "il regalo", "b": "regalo", "en": "present", "ar": "هديّة", "e": "🎁"},
+        {"t": "il Natale", "b": "Natale", "en": "Christmas", "ar": "عيد الميلاد المجيد", "e": "🎄"},
+        {"t": "il palloncino", "b": "palloncino", "en": "balloon", "ar": "بالون", "e": "🎈"},
+        {"t": "la candela", "b": "candela", "en": "candle", "ar": "شمعة", "e": "🕯️"},
+        {"t": "le vacanze", "b": "vacanze", "en": "holidays", "ar": "العطلة", "e": "🏝️"},
+        {"t": "il Capodanno", "b": "Capodanno", "en": "New Year", "ar": "رأس السنة", "e": "🎆"}
+      ],
+      "phrases": [
+        {"t": "Buon compleanno!", "en": "Happy birthday!", "ar": "عيد ميلاد سعيد!"},
+        {"t": "Ci sono dieci candeline sulla torta.", "en": "There are ten candles on the cake.", "ar": "توجد عشر شموع على الكعكة."},
+        {"t": "Questo regalo è per te.", "en": "This present is for you.", "ar": "هذه الهديّة لك."},
+        {"t": "Buon anno!", "en": "Happy New Year!", "ar": "سنة سعيدة!"}
+      ],
+      "tip": {
+        "en": "After \"per\" use \"te\" (you) and \"me\" (me): \"è per te\", \"è per me\".",
+        "ar": "بعد \"per\" استعمل \"te\" أي \"لك\"، و\"me\" أي \"لي\": \"è per te\"، \"è per me\"."
+      }
+    },
+    {
+      "id": "u70",
+      "emoji": "🏰",
+      "title": {"t": "Le fiabe", "en": "Fairy Tales", "ar": "الحكايات الخياليّة"},
+      "words": [
+        {"t": "il castello", "b": "castello", "en": "castle", "ar": "قلعة", "e": "🏰"},
+        {"t": "il re", "b": "re", "en": "king", "ar": "ملك", "e": "👑"},
+        {"t": "la regina", "b": "regina", "en": "queen", "ar": "ملكة", "e": "👸"},
+        {"t": "il principe", "b": "principe", "en": "prince", "ar": "أمير", "e": "🤴"},
+        {"t": "il drago", "b": "drago", "en": "dragon", "ar": "تنّين", "e": "🐉"},
+        {"t": "il fantasma", "b": "fantasma", "en": "ghost", "ar": "شبح", "e": "👻"},
+        {"t": "la strega", "b": "strega", "en": "witch", "ar": "ساحرة", "e": "🧙"},
+        {"t": "la fata", "b": "fata", "en": "fairy", "ar": "جنّيّة", "e": "🧚"}
+      ],
+      "phrases": [
+        {"t": "C'era una volta un re.", "en": "Once upon a time there was a king.", "ar": "كان يا ما كان، كان هناك ملك."},
+        {"t": "La regina vive in un castello.", "en": "The queen lives in a castle.", "ar": "تعيش الملكة في قلعة."},
+        {"t": "Il drago è verde e grande.", "en": "The dragon is green and big.", "ar": "التنّين أخضر وكبير."},
+        {"t": "La fata ha una bacchetta magica.", "en": "The fairy has a magic wand.", "ar": "لدى الجنّيّة عصا سحريّة."}
+      ],
+      "tip": {
+        "en": "Stories start with \"C'era una volta…\" (once upon a time…). \"Il re\" doesn't change in the plural: \"i re\".",
+        "ar": "تبدأ الحكايات بـ \"C'era una volta…\" أي \"كان يا ما كان…\". و\"il re\" لا تتغيّر في الجمع: \"i re\"."
+      }
+    },
+    {
+      "id": "u71",
+      "emoji": "🏡",
+      "title": {"t": "In casa", "en": "Around the House", "ar": "في أرجاء البيت"},
+      "words": [
+        {"t": "il giardino", "b": "giardino", "en": "garden", "ar": "حديقة البيت", "e": "🏡"},
+        {"t": "la vasca", "b": "vasca", "en": "bathtub", "ar": "حوض الاستحمام", "e": "🛁"},
+        {"t": "il water", "b": "water", "en": "toilet", "ar": "مرحاض", "e": "🚽"},
+        {"t": "la spazzatura", "b": "spazzatura", "en": "rubbish", "ar": "قمامة", "e": "🗑️"},
+        {"t": "la cassetta delle lettere", "b": "cassetta delle lettere", "en": "letterbox", "ar": "صندوق البريد", "e": "📫"},
+        {"t": "il campanello", "b": "campanello", "en": "doorbell", "ar": "جرس الباب", "e": "🔔"},
+        {"t": "la camera da letto", "b": "camera da letto", "en": "bedroom", "ar": "غرفة النوم", "e": "🛏️"},
+        {"t": "il soggiorno", "b": "soggiorno", "en": "living room", "ar": "غرفة الجلوس", "e": "🛋️"}
+      ],
+      "phrases": [
+        {"t": "Suona il campanello!", "en": "The doorbell is ringing!", "ar": "جرس الباب يرنّ!"},
+        {"t": "La mia camera da letto è piccola.", "en": "My bedroom is small.", "ar": "غرفة نومي صغيرة."},
+        {"t": "Giochiamo in giardino.", "en": "We play in the garden.", "ar": "نلعب في الحديقة."},
+        {"t": "Guardiamo la tv in soggiorno.", "en": "We watch TV in the living room.", "ar": "نشاهد التلفاز في غرفة الجلوس."}
+      ],
+      "tip": {
+        "en": "With rooms Italian often uses \"in\" with no article: \"in giardino\", \"in cucina\", \"in soggiorno\".",
+        "ar": "مع الغرف تستعمل الإيطالية غالبًا \"in\" بلا أداة تعريف: \"in giardino\"، \"in cucina\"، \"in soggiorno\"."
+      }
+    },
+    {
+      "id": "u72",
+      "emoji": "🧹",
+      "title": {"t": "Le faccende di casa", "en": "Chores", "ar": "الأعمال المنزليّة"},
+      "words": [
+        {"t": "pulire", "b": "pulire", "en": "to clean", "ar": "ينظّف", "e": "🧽"},
+        {"t": "spazzare", "b": "spazzare", "en": "to sweep", "ar": "يكنس", "e": "🧹"},
+        {"t": "lavare", "b": "lavare", "en": "to wash", "ar": "يغسل", "e": "💦"},
+        {"t": "mettere in ordine", "b": "mettere in ordine", "en": "to tidy up", "ar": "يرتّب", "e": "📦"},
+        {"t": "il bucato", "b": "bucato", "en": "laundry", "ar": "الغسيل", "e": "👚"},
+        {"t": "lavare i piatti", "b": "lavare i piatti", "en": "to do the dishes", "ar": "يغسل الصحون", "e": "🍽️"},
+        {"t": "rifare il letto", "b": "rifare il letto", "en": "to make the bed", "ar": "يرتّب السرير", "e": "🛏️"},
+        {"t": "il cesto", "b": "cesto", "en": "basket", "ar": "سلّة", "e": "🧺"}
+      ],
+      "phrases": [
+        {"t": "Aiuto a pulire la casa.", "en": "I help clean the house.", "ar": "أساعد في تنظيف البيت."},
+        {"t": "Rifaccio il letto ogni mattina.", "en": "I make my bed every morning.", "ar": "أرتّب سريري كلّ صباح."},
+        {"t": "Metti in ordine la tua camera!", "en": "Tidy your room!", "ar": "رتّب غرفتك!"},
+        {"t": "Mio padre lava i piatti.", "en": "My father does the dishes.", "ar": "أبي يغسل الصحون."}
+      ],
+      "tip": {
+        "en": "\"Aiutare a\" + verb means \"to help do\": \"Aiuto a spazzare\". \"Ogni\" means \"every\" and never changes: \"ogni giorno\".",
+        "ar": "\"aiutare a\" مع فعل تعني \"يساعد في\": \"Aiuto a spazzare\". و\"ogni\" تعني \"كلّ\" ولا تتغيّر أبدًا: \"ogni giorno\"."
+      }
+    },
+    {
+      "id": "u73",
+      "emoji": "🍕",
+      "title": {"t": "Il fast food", "en": "Fast Food", "ar": "الوجبات السريعة"},
+      "words": [
+        {"t": "la carne", "b": "carne", "en": "meat", "ar": "لحم", "e": "🥩"},
+        {"t": "il würstel", "b": "würstel", "en": "sausage", "ar": "نقانق", "e": "🌭"},
+        {"t": "la pasta", "b": "pasta", "en": "pasta", "ar": "معكرونة", "e": "🍝"},
+        {"t": "la pizza", "b": "pizza", "en": "pizza", "ar": "بيتزا", "e": "🍕"},
+        {"t": "l'hamburger", "b": "hamburger", "en": "burger", "ar": "برغر", "e": "🍔"},
+        {"t": "il panino", "b": "panino", "en": "sandwich", "ar": "شطيرة", "e": "🥪"},
+        {"t": "l'insalata", "b": "insalata", "en": "salad", "ar": "سلطة", "e": "🥗"},
+        {"t": "le patatine fritte", "b": "patatine fritte", "en": "chips", "ar": "بطاطا مقليّة", "e": "🍟"}
+      ],
+      "phrases": [
+        {"t": "Una pizza grande, per favore.", "en": "A large pizza, please.", "ar": "بيتزا كبيرة، من فضلك."},
+        {"t": "Vuoi le patatine fritte?", "en": "Do you want chips?", "ar": "هل تريد بطاطا مقليّة؟"},
+        {"t": "Preferisco l'insalata.", "en": "I prefer salad.", "ar": "أفضّل السلطة."},
+        {"t": "La pasta è buonissima.", "en": "The pasta is really good.", "ar": "المعكرونة لذيذة جدًّا."}
+      ],
+      "tip": {
+        "en": "Add -issimo to an adjective to mean \"very\": \"buono → buonissimo\", \"bello → bellissimo\".",
+        "ar": "أضف -issimo إلى الصفة لتعني \"جدًّا\": \"buono ← buonissimo\"، \"bello ← bellissimo\"."
+      }
+    },
+    {
+      "id": "u74",
+      "emoji": "🧾",
+      "title": {"t": "Al ristorante", "en": "At the Restaurant", "ar": "في المطعم"},
+      "words": [
+        {"t": "il ristorante", "b": "ristorante", "en": "restaurant", "ar": "مطعم", "e": "🍴"},
+        {"t": "il cameriere", "b": "cameriere", "en": "waiter", "ar": "نادل", "e": "🤵"},
+        {"t": "il menù", "b": "menù", "en": "menu", "ar": "قائمة الطعام", "e": "📜"},
+        {"t": "il conto", "b": "conto", "en": "bill", "ar": "الحساب", "e": "🧾"},
+        {"t": "la mancia", "b": "mancia", "en": "tip", "ar": "بقشيش", "e": "💵"},
+        {"t": "il dessert", "b": "dessert", "en": "dessert", "ar": "حلوى بعد الطعام", "e": "🍮"},
+        {"t": "il tavolo", "b": "tavolo", "en": "table", "ar": "طاولة", "e": "🍽️"},
+        {"t": "la bevanda", "b": "bevanda", "en": "drink", "ar": "مشروب", "e": "🥤"}
+      ],
+      "phrases": [
+        {"t": "Un tavolo per due, per favore.", "en": "A table for two, please.", "ar": "طاولة لشخصين، من فضلك."},
+        {"t": "Vorrei vedere il menù.", "en": "I would like to see the menu.", "ar": "أودّ أن أرى قائمة الطعام."},
+        {"t": "Cosa c'è per dessert?", "en": "What's for dessert?", "ar": "ماذا يوجد للتحلية؟"},
+        {"t": "Il conto, per favore.", "en": "The bill, please.", "ar": "الحساب، من فضلك."}
+      ],
+      "tip": {
+        "en": "\"Vorrei\" (I would like) is more polite than \"voglio\" (I want). Use it in restaurants and shops.",
+        "ar": "\"vorrei\" أي \"أودّ\" أكثر تهذيبًا من \"voglio\" أي \"أريد\". استعملها في المطاعم والمتاجر."
+      }
+    },
+    {
+      "id": "u75",
+      "emoji": "🍳",
+      "title": {"t": "Si cucina!", "en": "Let's Cook", "ar": "هيّا نطبخ"},
+      "words": [
+        {"t": "tagliare", "b": "tagliare", "en": "to cut", "ar": "يقطّع", "e": "🔪"},
+        {"t": "friggere", "b": "friggere", "en": "to fry", "ar": "يقلي", "e": "🍳"},
+        {"t": "bollire", "b": "bollire", "en": "to boil", "ar": "يغلي", "e": "♨️"},
+        {"t": "mescolare", "b": "mescolare", "en": "to mix", "ar": "يخلط", "e": "🥣"},
+        {"t": "arrostire", "b": "arrostire", "en": "to roast", "ar": "يشوي", "e": "🍖"},
+        {"t": "la ricetta", "b": "ricetta", "en": "recipe", "ar": "وصفة", "e": "📋"},
+        {"t": "il sale", "b": "sale", "en": "salt", "ar": "ملح", "e": "🧂"},
+        {"t": "lo zucchero", "b": "zucchero", "en": "sugar", "ar": "سكّر", "e": "🍬"}
+      ],
+      "phrases": [
+        {"t": "Taglia il pomodoro.", "en": "Cut the tomato.", "ar": "قطّع الطماطم."},
+        {"t": "Mescola la farina e lo zucchero.", "en": "Mix the flour and the sugar.", "ar": "اخلط الطحين والسكّر."},
+        {"t": "L'acqua bolle.", "en": "The water is boiling.", "ar": "الماء يغلي."},
+        {"t": "Un po' di sale, per favore.", "en": "A little salt, please.", "ar": "قليل من الملح، من فضلك."}
+      ],
+      "tip": {
+        "en": "Recipes use the \"tu\" command: -are verbs end in -a (\"taglia\", \"mescola\"), and -ere/-ire verbs end in -i (\"metti\", \"bolli\").",
+        "ar": "تستعمل الوصفات صيغة الأمر مع \"tu\": أفعال -are تنتهي بـ -a (\"taglia\"، \"mescola\")، وأفعال -ere و-ire تنتهي بـ -i (\"metti\"، \"bolli\")."
+      }
+    },
+    {
+      "id": "u76",
+      "emoji": "🧳",
+      "title": {"t": "I viaggi", "en": "Travel", "ar": "السفر"},
+      "words": [
+        {"t": "il viaggio", "b": "viaggio", "en": "journey", "ar": "سفر", "e": "🗺️"},
+        {"t": "la valigia", "b": "valigia", "en": "suitcase", "ar": "حقيبة سفر", "e": "🧳"},
+        {"t": "il passaporto", "b": "passaporto", "en": "passport", "ar": "جواز سفر", "e": "🛂"},
+        {"t": "l'aeroporto", "b": "aeroporto", "en": "airport", "ar": "مطار", "e": "🛫"},
+        {"t": "la stazione", "b": "stazione", "en": "station", "ar": "محطّة", "e": "🚉"},
+        {"t": "il biglietto", "b": "biglietto", "en": "ticket", "ar": "تذكرة", "e": "🎫"},
+        {"t": "il turista", "b": "turista", "en": "tourist", "ar": "سائح", "e": "📸"},
+        {"t": "la dogana", "b": "dogana", "en": "customs", "ar": "الجمارك", "e": "🛃"}
+      ],
+      "phrases": [
+        {"t": "Buon viaggio!", "en": "Have a good trip!", "ar": "رحلة سعيدة!"},
+        {"t": "La mia valigia è blu.", "en": "My suitcase is blue.", "ar": "حقيبة سفري زرقاء."},
+        {"t": "Un biglietto del treno, per favore.", "en": "A train ticket, please.", "ar": "تذكرة قطار، من فضلك."},
+        {"t": "Dov'è la stazione?", "en": "Where is the station?", "ar": "أين المحطّة؟"}
+      ],
+      "tip": {
+        "en": "Words in -ista change only in the plural: \"il turista → i turisti\", \"la turista → le turiste\".",
+        "ar": "الكلمات المنتهية بـ -ista تتغيّر في الجمع فقط: \"il turista ← i turisti\"، \"la turista ← le turiste\"."
+      }
+    },
+    {
+      "id": "u77",
+      "emoji": "🏨",
+      "title": {"t": "L'albergo", "en": "Hotel", "ar": "الفندق"},
+      "words": [
+        {"t": "l'hotel", "b": "hotel", "en": "hotel", "ar": "فندق", "e": "🏨"},
+        {"t": "la camera", "b": "camera", "en": "room", "ar": "غرفة", "e": "🛏️"},
+        {"t": "la reception", "b": "reception", "en": "reception", "ar": "الاستقبال", "e": "🛎️"},
+        {"t": "la prenotazione", "b": "prenotazione", "en": "booking", "ar": "حجز", "e": "📋"},
+        {"t": "il piano", "b": "piano", "en": "floor", "ar": "طابق", "e": "🏢"},
+        {"t": "la piscina", "b": "piscina", "en": "swimming pool", "ar": "مسبح", "e": "🏊"},
+        {"t": "la vista", "b": "vista", "en": "view", "ar": "منظر", "e": "🌇"},
+        {"t": "il wifi", "b": "wifi", "en": "wifi", "ar": "الواي فاي", "e": "📶"}
+      ],
+      "phrases": [
+        {"t": "Ho una prenotazione.", "en": "I have a booking.", "ar": "عندي حجز."},
+        {"t": "Vorrei una camera doppia.", "en": "I would like a double room.", "ar": "أودّ غرفة مزدوجة."},
+        {"t": "La camera è al terzo piano.", "en": "The room is on the third floor.", "ar": "الغرفة في الطابق الثالث."},
+        {"t": "Qual è la password del wifi?", "en": "What is the wifi password?", "ar": "ما كلمة سرّ الواي فاي؟"}
+      ],
+      "tip": {
+        "en": "\"Qual è\" (what is…?) has no apostrophe! Use it for a name, number or password: \"Qual è il tuo numero?\".",
+        "ar": "\"qual è\" أي \"ما…؟\" تُكتب بلا فاصلة علويّة! استعملها مع الاسم أو الرقم أو كلمة السرّ: \"Qual è il tuo numero?\"."
+      }
+    },
+    {
+      "id": "u78",
+      "emoji": "🌍",
+      "title": {"t": "Il mondo", "en": "The World", "ar": "العالم"},
+      "words": [
+        {"t": "il mondo", "b": "mondo", "en": "world", "ar": "عالم", "e": "🌍"},
+        {"t": "il paese", "b": "paese", "en": "country", "ar": "بلد", "e": "🗺️"},
+        {"t": "la capitale", "b": "capitale", "en": "capital city", "ar": "عاصمة", "e": "🏛️"},
+        {"t": "la bandiera", "b": "bandiera", "en": "flag", "ar": "علم", "e": "🚩"},
+        {"t": "il nord", "b": "nord", "en": "north", "ar": "الشمال", "e": "⬆️"},
+        {"t": "il sud", "b": "sud", "en": "south", "ar": "الجنوب", "e": "⬇️"},
+        {"t": "l'est", "b": "est", "en": "east", "ar": "الشرق", "e": "➡️"},
+        {"t": "l'ovest", "b": "ovest", "en": "west", "ar": "الغرب", "e": "⬅️"}
+      ],
+      "phrases": [
+        {"t": "Di dove sei?", "en": "Where are you from?", "ar": "من أين أنتَ؟"},
+        {"t": "Vengo dalla Giordania.", "en": "I'm from Jordan.", "ar": "أنا من الأردن."},
+        {"t": "Il sole sorge a est.", "en": "The sun rises in the east.", "ar": "تشرق الشمس من الشرق."},
+        {"t": "Il mio paese è molto bello.", "en": "My country is very beautiful.", "ar": "بلدي جميل جدًّا."}
+      ],
+      "tip": {
+        "en": "Use \"essere di\" with cities (\"Sono di Roma\") and \"venire da\" with countries (\"Vengo dall'Egitto\").",
+        "ar": "استعمل \"essere di\" مع المدن (\"Sono di Roma\")، و\"venire da\" مع البلدان (\"Vengo dall'Egitto\")."
+      }
+    },
+    {
+      "id": "u79",
+      "emoji": "🏞️",
+      "title": {"t": "La campagna", "en": "The Countryside", "ar": "الريف"},
+      "words": [
+        {"t": "la campagna", "b": "campagna", "en": "countryside", "ar": "ريف", "e": "🌾"},
+        {"t": "il villaggio", "b": "villaggio", "en": "village", "ar": "قرية", "e": "🏘️"},
+        {"t": "il deserto", "b": "deserto", "en": "desert", "ar": "صحراء", "e": "🐫"},
+        {"t": "il vulcano", "b": "vulcano", "en": "volcano", "ar": "بركان", "e": "🌋"},
+        {"t": "la giungla", "b": "giungla", "en": "jungle", "ar": "غابة استوائيّة", "e": "🐒"},
+        {"t": "il sentiero", "b": "sentiero", "en": "path", "ar": "درب", "e": "🛤️"},
+        {"t": "la fattoria", "b": "fattoria", "en": "farm", "ar": "مزرعة", "e": "🐄"},
+        {"t": "la valle", "b": "valle", "en": "valley", "ar": "وادٍ", "e": "🏞️"}
+      ],
+      "phrases": [
+        {"t": "I miei nonni vivono in un paesino.", "en": "My grandparents live in a village.", "ar": "يعيش جدّاي في قرية."},
+        {"t": "Nel deserto fa molto caldo.", "en": "It's very hot in the desert.", "ar": "الجوّ حارّ جدًّا في الصحراء."},
+        {"t": "Questo sentiero porta al fiume.", "en": "This path goes to the river.", "ar": "هذا الدرب يؤدّي إلى النهر."},
+        {"t": "Nella fattoria ci sono le mucche.", "en": "There are cows on the farm.", "ar": "توجد أبقار في المزرعة."}
+      ],
+      "tip": {
+        "en": "\"Vivere\" (to live) is a regular -ere verb: vivo, vivi, vive, viviamo, vivono. You can also say \"abitare\".",
+        "ar": "الفعل \"vivere\" أي \"يعيش\" فعل منتظم ينتهي بـ -ere: vivo، vivi، vive، viviamo، vivono. ويمكنك أيضًا أن تقول \"abitare\"."
+      }
+    },
+    {
+      "id": "u80",
+      "emoji": "⛈️",
+      "title": {"t": "Il cielo", "en": "Sky & Weather", "ar": "السماء والطقس"},
+      "words": [
+        {"t": "il cielo", "b": "cielo", "en": "sky", "ar": "سماء", "e": "🌤️"},
+        {"t": "la nebbia", "b": "nebbia", "en": "fog", "ar": "ضباب", "e": "🌫️"},
+        {"t": "il fulmine", "b": "fulmine", "en": "lightning", "ar": "برق", "e": "⚡"},
+        {"t": "il tuono", "b": "tuono", "en": "thunder", "ar": "رعد", "e": "🌩️"},
+        {"t": "il ghiaccio", "b": "ghiaccio", "en": "ice", "ar": "جليد", "e": "⛸️"},
+        {"t": "la temperatura", "b": "temperatura", "en": "temperature", "ar": "درجة الحرارة", "e": "🌡️"},
+        {"t": "il tornado", "b": "tornado", "en": "tornado", "ar": "إعصار", "e": "🌪️"},
+        {"t": "la goccia", "b": "goccia", "en": "drop", "ar": "قطرة", "e": "💧"}
+      ],
+      "phrases": [
+        {"t": "Il cielo è azzurro.", "en": "The sky is blue.", "ar": "السماء زرقاء."},
+        {"t": "C'è nebbia stamattina.", "en": "It's foggy this morning.", "ar": "يوجد ضباب هذا الصباح."},
+        {"t": "Ci sono dieci gradi.", "en": "It is ten degrees.", "ar": "درجة الحرارة عشر درجات."},
+        {"t": "Vedo un fulmine.", "en": "I see lightning.", "ar": "أرى برقًا."}
+      ],
+      "tip": {
+        "en": "\"C'è\" + noun also works for weather: \"c'è nebbia\" (it's foggy). \"Stamattina\" is short for \"questa mattina\" (this morning).",
+        "ar": "\"c'è\" مع اسم تُستعمل أيضًا للطقس: \"c'è nebbia\" أي \"يوجد ضباب\". و\"stamattina\" اختصار لـ \"questa mattina\" أي \"هذا الصباح\"."
+      }
+    },
+    {
+      "id": "u81",
+      "emoji": "♻️",
+      "title": {"t": "L'ambiente", "en": "The Environment", "ar": "البيئة"},
+      "words": [
+        {"t": "riciclare", "b": "riciclare", "en": "to recycle", "ar": "يعيد التدوير", "e": "♻️"},
+        {"t": "l'aria", "b": "aria", "en": "air", "ar": "هواء", "e": "💨"},
+        {"t": "la Terra", "b": "Terra", "en": "the Earth", "ar": "الأرض", "e": "🌎"},
+        {"t": "l'energia", "b": "energia", "en": "energy", "ar": "طاقة", "e": "⚡"},
+        {"t": "l'inquinamento", "b": "inquinamento", "en": "pollution", "ar": "تلوّث", "e": "🏭"},
+        {"t": "la plastica", "b": "plastica", "en": "plastic", "ar": "بلاستيك", "e": "🛍️"},
+        {"t": "proteggere", "b": "proteggere", "en": "to protect", "ar": "يحمي", "e": "🛡️"},
+        {"t": "il futuro", "b": "futuro", "en": "future", "ar": "مستقبل", "e": "🔮"}
+      ],
+      "phrases": [
+        {"t": "Ricicliamo la plastica.", "en": "We recycle plastic.", "ar": "نعيد تدوير البلاستيك."},
+        {"t": "Bisogna proteggere la Terra.", "en": "We must protect the Earth.", "ar": "يجب أن نحمي الأرض."},
+        {"t": "Qui l'aria è pulita.", "en": "The air is clean here.", "ar": "الهواء نظيف هنا."},
+        {"t": "Spegni la luce per risparmiare energia.", "en": "Turn off the light to save energy.", "ar": "أطفئ الضوء لتوفير الطاقة."}
+      ],
+      "tip": {
+        "en": "\"Bisogna\" + verb means \"we must\" or \"one must\": \"Bisogna riciclare\".",
+        "ar": "\"bisogna\" مع فعل تعني \"يجب\": \"Bisogna riciclare\"."
+      }
+    },
+    {
+      "id": "u82",
+      "emoji": "🚨",
+      "title": {"t": "Le emergenze", "en": "Emergencies", "ar": "حالات الطوارئ"},
+      "words": [
+        {"t": "aiuto", "b": "aiuto", "en": "help!", "ar": "النجدة", "e": "🆘"},
+        {"t": "il fuoco", "b": "fuoco", "en": "fire", "ar": "نار", "e": "🔥"},
+        {"t": "la polizia", "b": "polizia", "en": "police", "ar": "الشرطة", "e": "🚓"},
+        {"t": "il ladro", "b": "ladro", "en": "thief", "ar": "لصّ", "e": "🦹"},
+        {"t": "l'incidente", "b": "incidente", "en": "accident", "ar": "حادث", "e": "💥"},
+        {"t": "il pericolo", "b": "pericolo", "en": "danger", "ar": "خطر", "e": "⚠️"},
+        {"t": "l'allarme", "b": "allarme", "en": "alarm", "ar": "إنذار", "e": "🚨"},
+        {"t": "l'estintore", "b": "estintore", "en": "fire extinguisher", "ar": "طفّاية حريق", "e": "🧯"}
+      ],
+      "phrases": [
+        {"t": "Aiuto! Al fuoco!", "en": "Help! Fire!", "ar": "النجدة! حريق!"},
+        {"t": "Chiama la polizia.", "en": "Call the police.", "ar": "اتّصل بالشرطة."},
+        {"t": "C'è stato un incidente.", "en": "There has been an accident.", "ar": "وقع حادث."},
+        {"t": "Attenzione! Pericolo!", "en": "Careful! Danger!", "ar": "انتبه! خطر!"}
+      ],
+      "tip": {
+        "en": "In an emergency in Europe, call 112. To shout for help say \"Aiuto!\"; for a fire, shout \"Al fuoco!\".",
+        "ar": "في حالات الطوارئ في أوروبا اتّصل بالرقم 112. لطلب النجدة قل \"Aiuto!\"، وعند الحريق قل \"Al fuoco!\"."
+      }
+    },
+    {
+      "id": "u83",
+      "emoji": "💼",
+      "title": {"t": "Il lavoro", "en": "Work", "ar": "العمل"},
+      "words": [
+        {"t": "il lavoro", "b": "lavoro", "en": "work, job", "ar": "عمل", "e": "💼"},
+        {"t": "l'ufficio", "b": "ufficio", "en": "office", "ar": "مكتب", "e": "🏢"},
+        {"t": "il capo", "b": "capo", "en": "boss", "ar": "مدير", "e": "👔"},
+        {"t": "la riunione", "b": "riunione", "en": "meeting", "ar": "اجتماع", "e": "📊"},
+        {"t": "l'azienda", "b": "azienda", "en": "company", "ar": "شركة", "e": "🏭"},
+        {"t": "lo stipendio", "b": "stipendio", "en": "salary", "ar": "راتب", "e": "💸"},
+        {"t": "il collega", "b": "collega", "en": "colleague", "ar": "زميل", "e": "👥"},
+        {"t": "la stampante", "b": "stampante", "en": "printer", "ar": "طابعة", "e": "🖨️"}
+      ],
+      "phrases": [
+        {"t": "Lavoro in un ufficio.", "en": "I work in an office.", "ar": "أعمل في مكتب."},
+        {"t": "Ho una riunione alle dieci.", "en": "I have a meeting at ten.", "ar": "عندي اجتماع في الساعة العاشرة."},
+        {"t": "Il mio capo è simpatico.", "en": "My boss is nice.", "ar": "مديري لطيف."},
+        {"t": "La stampante non funziona.", "en": "The printer doesn't work.", "ar": "الطابعة لا تعمل."}
+      ],
+      "tip": {
+        "en": "Use \"alle\" + hour for the time of an event: \"alle dieci\" (at ten), \"all'una\" (at one).",
+        "ar": "استعمل \"alle\" مع الساعة لتقول موعد شيء: \"alle dieci\" أي \"في العاشرة\"، و\"all'una\" أي \"في الواحدة\"."
+      }
+    },
+    {
+      "id": "u84",
+      "emoji": "🛒",
+      "title": {"t": "Comprare e cercare", "en": "Buying & Finding", "ar": "الشراء والبحث"},
+      "words": [
+        {"t": "comprare", "b": "comprare", "en": "to buy", "ar": "يشتري", "e": "🛒"},
+        {"t": "vendere", "b": "vendere", "en": "to sell", "ar": "يبيع", "e": "🏷️"},
+        {"t": "pagare", "b": "pagare", "en": "to pay", "ar": "يدفع", "e": "💳"},
+        {"t": "cercare", "b": "cercare", "en": "to look for", "ar": "يبحث عن", "e": "🔍"},
+        {"t": "trovare", "b": "trovare", "en": "to find", "ar": "يجد", "e": "🎯"},
+        {"t": "perdere", "b": "perdere", "en": "to lose", "ar": "يضيّع", "e": "😟"},
+        {"t": "vincere", "b": "vincere", "en": "to win", "ar": "يفوز", "e": "🏆"},
+        {"t": "costare", "b": "costare", "en": "to cost", "ar": "يكلّف", "e": "💲"}
+      ],
+      "phrases": [
+        {"t": "Cerco le mie chiavi.", "en": "I'm looking for my keys.", "ar": "أبحث عن مفاتيحي."},
+        {"t": "Non trovo il mio telefono!", "en": "I can't find my phone!", "ar": "لا أجد هاتفي!"},
+        {"t": "Quanto costano le mele?", "en": "How much are the apples?", "ar": "كم سعر التفّاح؟"},
+        {"t": "Perdo sempre l'ombrello.", "en": "I always lose my umbrella.", "ar": "أضيّع مظلّتي دائمًا."}
+      ],
+      "tip": {
+        "en": "\"Cercare\" needs no word for \"for\": \"cerco le chiavi\". Note the h in \"cerchi\" (you look for): it keeps the hard sound.",
+        "ar": "\"cercare\" لا تحتاج إلى حرف جرّ: \"cerco le chiavi\". ولاحظ الحرف h في \"cerchi\" أي \"تبحث\": يحافظ على الصوت القاسي."
+      }
+    },
+    {
+      "id": "u85",
+      "emoji": "🗣️",
+      "title": {"t": "Parlare con gli altri", "en": "Talking", "ar": "أفعال الكلام"},
+      "words": [
+        {"t": "dire", "b": "dire", "en": "to say", "ar": "يقول", "e": "🗣️"},
+        {"t": "chiedere", "b": "chiedere", "en": "to ask", "ar": "يسأل", "e": "🙋"},
+        {"t": "rispondere", "b": "rispondere", "en": "to answer", "ar": "يجيب", "e": "💬"},
+        {"t": "chiamare", "b": "chiamare", "en": "to call", "ar": "يتّصل", "e": "📞"},
+        {"t": "mandare", "b": "mandare", "en": "to send", "ar": "يرسل", "e": "📤"},
+        {"t": "capire", "b": "capire", "en": "to understand", "ar": "يفهم", "e": "💡"},
+        {"t": "ripetere", "b": "ripetere", "en": "to repeat", "ar": "يكرّر", "e": "🔁"},
+        {"t": "dimenticare", "b": "dimenticare", "en": "to forget", "ar": "ينسى", "e": "🤷"}
+      ],
+      "phrases": [
+        {"t": "Non capisco.", "en": "I don't understand.", "ar": "لا أفهم."},
+        {"t": "Puoi ripetere, per favore?", "en": "Can you repeat, please?", "ar": "هل يمكنك أن تكرّر، من فضلك؟"},
+        {"t": "Ti chiamo domani.", "en": "I'll call you tomorrow.", "ar": "سأتّصل بك غدًا."},
+        {"t": "Come si dice «gatto» in inglese?", "en": "How do you say \"cat\" in English?", "ar": "كيف نقول «قطّ» بالإنجليزيّة؟"}
+      ],
+      "tip": {
+        "en": "\"Come si dice…?\" means \"how do you say…?\". \"Capire\" adds -isc-: \"capisco\" (I understand), \"capisci\" (you understand).",
+        "ar": "\"Come si dice…?\" تعني \"كيف نقول…؟\". والفعل \"capire\" يضيف -isc-: \"capisco\" أي \"أفهم\"، و\"capisci\" أي \"تفهم\"."
+      }
+    },
+    {
+      "id": "u86",
+      "emoji": "😂",
+      "title": {"t": "Ridere e piangere", "en": "Laugh & Cry", "ar": "الضحك والبكاء"},
+      "words": [
+        {"t": "ridere", "b": "ridere", "en": "to laugh", "ar": "يضحك", "e": "😂"},
+        {"t": "piangere", "b": "piangere", "en": "to cry", "ar": "يبكي", "e": "😭"},
+        {"t": "sorridere", "b": "sorridere", "en": "to smile", "ar": "يبتسم", "e": "😊"},
+        {"t": "gridare", "b": "gridare", "en": "to shout", "ar": "يصرخ", "e": "📣"},
+        {"t": "baciare", "b": "baciare", "en": "to kiss", "ar": "يقبّل", "e": "💋"},
+        {"t": "abbracciare", "b": "abbracciare", "en": "to hug", "ar": "يعانق", "e": "🤗"},
+        {"t": "sognare", "b": "sognare", "en": "to dream", "ar": "يحلم", "e": "💭"},
+        {"t": "pensare", "b": "pensare", "en": "to think", "ar": "يفكّر", "e": "🤔"}
+      ],
+      "phrases": [
+        {"t": "Il neonato piange.", "en": "The baby is crying.", "ar": "الرضيع يبكي."},
+        {"t": "Rido tanto con i miei amici.", "en": "I laugh a lot with my friends.", "ar": "أضحك كثيرًا مع أصدقائي."},
+        {"t": "Abbraccio mia madre.", "en": "I hug my mother.", "ar": "أعانق أمّي."},
+        {"t": "Penso a te.", "en": "I'm thinking of you.", "ar": "أفكّر فيك."}
+      ],
+      "tip": {
+        "en": "\"Pensare a\" means \"to think about\": \"Penso a te\" (I'm thinking of you), \"Penso alle vacanze\".",
+        "ar": "\"pensare a\" تعني \"يفكّر في\": \"Penso a te\" أي \"أفكّر فيك\"، و\"Penso alle vacanze\" أي \"أفكّر في العطلة\"."
+      }
+    },
+    {
+      "id": "u87",
+      "emoji": "🕊️",
+      "title": {"t": "Le emozioni", "en": "Emotions", "ar": "العواطف"},
+      "words": [
+        {"t": "la paura", "b": "paura", "en": "fear", "ar": "خوف", "e": "😨"},
+        {"t": "la gioia", "b": "gioia", "en": "joy", "ar": "فرح", "e": "🥳"},
+        {"t": "la sorpresa", "b": "sorpresa", "en": "surprise", "ar": "مفاجأة", "e": "😲"},
+        {"t": "la vergogna", "b": "vergogna", "en": "embarrassment", "ar": "خجل", "e": "😳"},
+        {"t": "la gelosia", "b": "gelosia", "en": "jealousy", "ar": "غيرة", "e": "😒"},
+        {"t": "la speranza", "b": "speranza", "en": "hope", "ar": "أمل", "e": "🤞"},
+        {"t": "la pace", "b": "pace", "en": "peace", "ar": "سلام", "e": "🕊️"},
+        {"t": "la rabbia", "b": "rabbia", "en": "rage", "ar": "غضب", "e": "😡"}
+      ],
+      "phrases": [
+        {"t": "Ho paura dei cani.", "en": "I'm scared of dogs.", "ar": "أخاف من الكلاب."},
+        {"t": "Che sorpresa!", "en": "What a surprise!", "ar": "يا لها من مفاجأة!"},
+        {"t": "Mi vergogno.", "en": "I'm embarrassed.", "ar": "أشعر بالخجل."},
+        {"t": "Vogliamo la pace.", "en": "We want peace.", "ar": "نريد السلام."}
+      ],
+      "tip": {
+        "en": "Many feelings use \"avere\": \"ho paura\" (I'm scared). \"Che…!\" + noun is an exclamation: \"Che gioia!\" (what joy!).",
+        "ar": "كثير من المشاعر يُعبَّر عنها بـ \"avere\": \"ho paura\" أي \"أنا خائف\". و\"Che…!\" مع اسم تفيد التعجّب: \"Che gioia!\" أي \"يا للفرح!\"."
+      }
+    },
+    {
+      "id": "u88",
+      "emoji": "💪",
+      "title": {"t": "Volere e potere", "en": "Want, Can, Must", "ar": "الإرادة والقدرة"},
+      "words": [
+        {"t": "volere", "b": "volere", "en": "to want", "ar": "يريد", "e": "🤲"},
+        {"t": "potere", "b": "potere", "en": "can, to be able", "ar": "يستطيع", "e": "💪"},
+        {"t": "dovere", "b": "dovere", "en": "must", "ar": "يجب", "e": "☝️"},
+        {"t": "sapere", "b": "sapere", "en": "to know", "ar": "يعرف", "e": "🧠"},
+        {"t": "avere bisogno", "b": "avere bisogno", "en": "to need", "ar": "يحتاج", "e": "🆘"},
+        {"t": "preferire", "b": "preferire", "en": "to prefer", "ar": "يفضّل", "e": "👍"},
+        {"t": "aspettare", "b": "aspettare", "en": "to wait", "ar": "ينتظر", "e": "⏳"},
+        {"t": "aiutare", "b": "aiutare", "en": "to help", "ar": "يساعد", "e": "🤝"}
+      ],
+      "phrases": [
+        {"t": "Puoi aiutarmi?", "en": "Can you help me?", "ar": "هل يمكنك مساعدتي؟"},
+        {"t": "Devo studiare.", "en": "I must study.", "ar": "يجب أن أدرس."},
+        {"t": "Non so nuotare.", "en": "I can't swim.", "ar": "لا أعرف السباحة."},
+        {"t": "Aspetta un momento, per favore.", "en": "Wait a moment, please.", "ar": "انتظر لحظة، من فضلك."}
+      ],
+      "tip": {
+        "en": "These verbs are followed by an infinitive: \"posso andare\", \"voglio mangiare\", \"so nuotare\" (I know how to swim).",
+        "ar": "هذه الأفعال يأتي بعدها فعل في صيغة المصدر: \"posso andare\"، \"voglio mangiare\"، \"so nuotare\" أي \"أعرف السباحة\"."
+      }
+    },
+    {
+      "id": "u89",
+      "emoji": "⚖️",
+      "title": {"t": "Confrontare", "en": "Comparing", "ar": "المقارنة"},
+      "words": [
+        {"t": "migliore", "b": "migliore", "en": "better", "ar": "أفضل", "e": "🔝"},
+        {"t": "peggiore", "b": "peggiore", "en": "worse", "ar": "أسوأ", "e": "👎"},
+        {"t": "maggiore", "b": "maggiore", "en": "older", "ar": "أكبر سنًّا", "e": "🧓"},
+        {"t": "minore", "b": "minore", "en": "younger", "ar": "أصغر سنًّا", "e": "🧒"},
+        {"t": "uguale", "b": "uguale", "en": "the same", "ar": "متساوٍ", "e": "⚖️"},
+        {"t": "diverso", "b": "diverso", "en": "different", "ar": "مختلف", "e": "🔀"},
+        {"t": "simile", "b": "simile", "en": "similar", "ar": "متشابه", "e": "👯"},
+        {"t": "il doppio", "b": "doppio", "en": "double", "ar": "الضِّعف", "e": "✌️"}
+      ],
+      "phrases": [
+        {"t": "Mio fratello è più grande di me.", "en": "My brother is older than me.", "ar": "أخي أكبر منّي."},
+        {"t": "Questo libro è migliore.", "en": "This book is better.", "ar": "هذا الكتاب أفضل."},
+        {"t": "Siamo diversi.", "en": "We are different.", "ar": "نحن مختلفون."},
+        {"t": "La tua bici è uguale alla mia.", "en": "Your bike is the same as mine.", "ar": "درّاجتك مثل درّاجتي."}
+      ],
+      "tip": {
+        "en": "To compare use \"più… di\": \"più alto di me\" (taller than me). \"Migliore\" means \"better\" and \"peggiore\" means \"worse\".",
+        "ar": "للمقارنة استعمل \"più… di\": \"più alto di me\" أي \"أطول منّي\". و\"migliore\" تعني \"أفضل\"، و\"peggiore\" تعني \"أسوأ\"."
+      }
+    },
+    {
+      "id": "u90",
+      "emoji": "📈",
+      "title": {"t": "Le quantità", "en": "How Much?", "ar": "الكمّيّات"},
+      "words": [
+        {"t": "molto", "b": "molto", "en": "a lot", "ar": "كثير", "e": "📈"},
+        {"t": "poco", "b": "poco", "en": "a little", "ar": "قليل", "e": "📉"},
+        {"t": "tutto", "b": "tutto", "en": "everything", "ar": "كلّ شيء", "e": "💯"},
+        {"t": "niente", "b": "niente", "en": "nothing", "ar": "لا شيء", "e": "🚫"},
+        {"t": "qualcosa", "b": "qualcosa", "en": "something", "ar": "شيء ما", "e": "❔"},
+        {"t": "abbastanza", "b": "abbastanza", "en": "enough", "ar": "كافٍ", "e": "👌"},
+        {"t": "troppo", "b": "troppo", "en": "too much", "ar": "أكثر من اللازم", "e": "🤯"},
+        {"t": "la metà", "b": "metà", "en": "half", "ar": "نصف", "e": "🌗"}
+      ],
+      "phrases": [
+        {"t": "Ho molta fame.", "en": "I'm very hungry.", "ar": "أنا جائع جدًّا."},
+        {"t": "Non voglio niente, grazie.", "en": "I don't want anything, thank you.", "ar": "لا أريد شيئًا، شكرًا."},
+        {"t": "Vuoi qualcosa da bere?", "en": "Do you want something to drink?", "ar": "هل تريد شيئًا تشربه؟"},
+        {"t": "Fa troppo caldo.", "en": "It's too hot.", "ar": "الجوّ حارّ أكثر من اللازم."}
+      ],
+      "tip": {
+        "en": "\"Molto\" agrees with a noun (\"molta fame\", \"molti libri\") but not before an adjective (\"molto bello\"). Italian uses a double negative: \"Non voglio niente\".",
+        "ar": "تتوافق \"molto\" مع الاسم (\"molta fame\"، \"molti libri\")، لكنّها لا تتغيّر قبل الصفة (\"molto bello\"). وتستعمل الإيطالية النفي المزدوج: \"Non voglio niente\"."
+      }
+    },
+    {
+      "id": "u91",
+      "emoji": "🥇",
+      "title": {"t": "Primo, secondo…", "en": "First, Second, Third", "ar": "الأعداد الترتيبيّة"},
+      "words": [
+        {"t": "primo", "b": "primo", "en": "first", "ar": "أوّل", "e": "🥇"},
+        {"t": "secondo", "b": "secondo", "en": "second", "ar": "ثانٍ", "e": "🥈"},
+        {"t": "terzo", "b": "terzo", "en": "third", "ar": "ثالث", "e": "🥉"},
+        {"t": "quarto", "b": "quarto", "en": "fourth", "ar": "رابع", "e": "4️⃣"},
+        {"t": "quinto", "b": "quinto", "en": "fifth", "ar": "خامس", "e": "5️⃣"},
+        {"t": "sesto", "b": "sesto", "en": "sixth", "ar": "سادس", "e": "6️⃣"},
+        {"t": "decimo", "b": "decimo", "en": "tenth", "ar": "عاشر", "e": "🔟"},
+        {"t": "ultimo", "b": "ultimo", "en": "last", "ar": "أخير", "e": "🔚"}
+      ],
+      "phrases": [
+        {"t": "Sono il primo.", "en": "I'm the first.", "ar": "أنا الأوّل."},
+        {"t": "Abito al secondo piano.", "en": "I live on the second floor.", "ar": "أسكن في الطابق الثاني."},
+        {"t": "È l'ultima volta.", "en": "It's the last time.", "ar": "إنّها المرّة الأخيرة."},
+        {"t": "Maggio è il quinto mese.", "en": "May is the fifth month.", "ar": "مايو هو الشهر الخامس."}
+      ],
+      "tip": {
+        "en": "Ordinals agree like adjectives: \"il primo giorno\", \"la prima volta\". After tenth, add -esimo: \"undicesimo\" (eleventh).",
+        "ar": "الأعداد الترتيبيّة تتوافق مثل الصفات: \"il primo giorno\"، \"la prima volta\". وبعد العاشر أضف -esimo: \"undicesimo\" أي \"الحادي عشر\"."
+      }
+    },
+    {
+      "id": "u92",
+      "emoji": "⏳",
+      "title": {"t": "Prima e dopo", "en": "Before & After", "ar": "قبل وبعد"},
+      "words": [
+        {"t": "ieri sera", "b": "ieri sera", "en": "last night", "ar": "الليلة الماضية", "e": "🌙"},
+        {"t": "prima", "b": "prima", "en": "before", "ar": "قبل", "e": "⏮️"},
+        {"t": "dopo", "b": "dopo", "en": "after", "ar": "بعد", "e": "⏭️"},
+        {"t": "già", "b": "già", "en": "already", "ar": "بالفعل", "e": "✅"},
+        {"t": "ancora", "b": "ancora", "en": "still, yet", "ar": "ما زال", "e": "⏳"},
+        {"t": "fra poco", "b": "fra poco", "en": "soon", "ar": "قريبًا", "e": "🔜"},
+        {"t": "mentre", "b": "mentre", "en": "while", "ar": "بينما", "e": "⌛"},
+        {"t": "all'improvviso", "b": "all'improvviso", "en": "suddenly", "ar": "فجأة", "e": "💥"}
+      ],
+      "phrases": [
+        {"t": "Prima di mangiare mi lavo le mani.", "en": "Before eating I wash my hands.", "ar": "قبل الأكل أغسل يديّ."},
+        {"t": "Hai già mangiato?", "en": "Have you eaten already?", "ar": "هل أكلتَ بالفعل؟"},
+        {"t": "Non ancora.", "en": "Not yet.", "ar": "ليس بعد."},
+        {"t": "A presto!", "en": "See you soon!", "ar": "إلى اللقاء قريبًا!"}
+      ],
+      "tip": {
+        "en": "\"Prima di\" + infinitive means \"before …ing\": \"prima di mangiare\" (before eating). \"Non ancora\" means \"not yet\".",
+        "ar": "\"prima di\" مع فعل في صيغة المصدر تعني \"قبل أن\": \"prima di mangiare\" أي \"قبل الأكل\". و\"non ancora\" تعني \"ليس بعد\"."
+      }
+    },
+    {
+      "id": "u93",
+      "emoji": "🔁",
+      "title": {"t": "Quanto spesso?", "en": "How Often", "ar": "كم مرّة؟"},
+      "words": [
+        {"t": "sempre", "b": "sempre", "en": "always", "ar": "دائمًا", "e": "♾️"},
+        {"t": "mai", "b": "mai", "en": "never", "ar": "أبدًا", "e": "🚫"},
+        {"t": "a volte", "b": "a volte", "en": "sometimes", "ar": "أحيانًا", "e": "🔀"},
+        {"t": "spesso", "b": "spesso", "en": "often", "ar": "غالبًا", "e": "🔄"},
+        {"t": "di solito", "b": "di solito", "en": "usually", "ar": "عادةً", "e": "🔁"},
+        {"t": "tutti i giorni", "b": "tutti i giorni", "en": "every day", "ar": "كلّ يوم", "e": "📅"},
+        {"t": "una volta", "b": "una volta", "en": "once", "ar": "مرّة واحدة", "e": "1️⃣"},
+        {"t": "due volte", "b": "due volte", "en": "twice", "ar": "مرّتان", "e": "2️⃣"}
+      ],
+      "phrases": [
+        {"t": "Faccio sempre colazione alle otto.", "en": "I always have breakfast at eight.", "ar": "أتناول الفطور دائمًا في الساعة الثامنة."},
+        {"t": "Non bevo mai il caffè.", "en": "I never drink coffee.", "ar": "لا أشرب القهوة أبدًا."},
+        {"t": "A volte andiamo al cinema.", "en": "Sometimes we go to the cinema.", "ar": "أحيانًا نذهب إلى السينما."},
+        {"t": "Gioco a tennis due volte alla settimana.", "en": "I play tennis twice a week.", "ar": "ألعب التنس مرّتين في الأسبوع."}
+      ],
+      "tip": {
+        "en": "\"Mai\" (never) needs \"non\" before the verb: \"Non bevo mai il caffè\" (I never drink coffee).",
+        "ar": "كلمة \"mai\" أي \"أبدًا\" تحتاج إلى \"non\" قبل الفعل: \"Non bevo mai il caffè\" أي \"لا أشرب القهوة أبدًا\"."
+      }
+    },
+    {
+      "id": "u94",
+      "emoji": "🎓",
+      "title": {"t": "La vita", "en": "Life Events", "ar": "أحداث الحياة"},
+      "words": [
+        {"t": "nascere", "b": "nascere", "en": "to be born", "ar": "يولد", "e": "👶"},
+        {"t": "crescere", "b": "crescere", "en": "to grow up", "ar": "يكبر", "e": "🌱"},
+        {"t": "sposarsi", "b": "sposarsi", "en": "to get married", "ar": "يتزوّج", "e": "💒"},
+        {"t": "traslocare", "b": "traslocare", "en": "to move house", "ar": "ينتقل إلى بيت جديد", "e": "🚚"},
+        {"t": "viaggiare", "b": "viaggiare", "en": "to travel", "ar": "يسافر", "e": "✈️"},
+        {"t": "laurearsi", "b": "laurearsi", "en": "to graduate", "ar": "يتخرّج", "e": "🎓"},
+        {"t": "andare in pensione", "b": "andare in pensione", "en": "to retire", "ar": "يتقاعد", "e": "🏖️"},
+        {"t": "conoscere", "b": "conoscere", "en": "to meet, to know", "ar": "يتعرّف إلى", "e": "🤝"}
+      ],
+      "phrases": [
+        {"t": "Sono nato nel 2010.", "en": "I was born in 2010.", "ar": "وُلدتُ سنة 2010."},
+        {"t": "I miei genitori si sono sposati a giugno.", "en": "My parents got married in June.", "ar": "تزوّج والداي في يونيو."},
+        {"t": "Ieri ho conosciuto un nuovo amico.", "en": "Yesterday I met a new friend.", "ar": "أمس تعرّفتُ إلى صديق جديد."},
+        {"t": "Mio nonno è già in pensione.", "en": "My grandfather is already retired.", "ar": "جدّي متقاعد بالفعل."}
+      ],
+      "tip": {
+        "en": "To talk about the past use the passato prossimo, \"avere\" or \"essere\" + participle: \"ho conosciuto\" (I met), \"sono nato\" (I was born).",
+        "ar": "للحديث عن الماضي استعمل الماضي القريب: \"avere\" أو \"essere\" مع اسم المفعول: \"ho conosciuto\" أي \"تعرّفتُ\"، و\"sono nato\" أي \"وُلدتُ\"."
+      }
+    },
+    {
+      "id": "u95",
+      "emoji": "📋",
+      "title": {"t": "I miei dati", "en": "Personal Details", "ar": "معلوماتي الشخصيّة"},
+      "words": [
+        {"t": "l'età", "b": "età", "en": "age", "ar": "العمر", "e": "🎂"},
+        {"t": "l'indirizzo", "b": "indirizzo", "en": "address", "ar": "العنوان", "e": "📬"},
+        {"t": "il cognome", "b": "cognome", "en": "surname", "ar": "اسم العائلة", "e": "🏷️"},
+        {"t": "la nazionalità", "b": "nazionalità", "en": "nationality", "ar": "الجنسيّة", "e": "🌐"},
+        {"t": "la firma", "b": "firma", "en": "signature", "ar": "توقيع", "e": "✍️"},
+        {"t": "il modulo", "b": "modulo", "en": "form", "ar": "استمارة", "e": "📋"},
+        {"t": "la nascita", "b": "nascita", "en": "birth", "ar": "ولادة", "e": "🍼"},
+        {"t": "l'appartamento", "b": "appartamento", "en": "flat", "ar": "شقّة", "e": "🏢"}
+      ],
+      "phrases": [
+        {"t": "Qual è il tuo cognome?", "en": "What is your surname?", "ar": "ما اسم عائلتك؟"},
+        {"t": "Quanti anni hai?", "en": "How old are you?", "ar": "كم عمرك؟"},
+        {"t": "Abito in un appartamento piccolo.", "en": "I live in a small flat.", "ar": "أسكن في شقّة صغيرة."},
+        {"t": "Firma qui, per favore.", "en": "Sign here, please.", "ar": "وقّع هنا، من فضلك."}
+      ],
+      "tip": {
+        "en": "On a form, \"nome\" is your first name and \"cognome\" is your surname. Ask age with \"avere\": \"Quanti anni hai?\".",
+        "ar": "في الاستمارة، \"nome\" هو اسمك الأوّل و\"cognome\" هو اسم العائلة. واسأل عن العمر بـ \"avere\": \"Quanti anni hai?\"."
+      }
+    },
+    {
+      "id": "u96",
+      "emoji": "🗺️",
+      "title": {"t": "Le nazionalità", "en": "Nationalities", "ar": "الجنسيّات"},
+      "words": [
+        {"t": "spagnolo", "b": "spagnolo", "en": "Spanish", "ar": "إسبانيّ", "e": "🥘"},
+        {"t": "italiano", "b": "italiano", "en": "Italian", "ar": "إيطاليّ", "e": "🍕"},
+        {"t": "francese", "b": "francese", "en": "French", "ar": "فرنسيّ", "e": "🥐"},
+        {"t": "tedesco", "b": "tedesco", "en": "German", "ar": "ألمانيّ", "e": "🥨"},
+        {"t": "inglese", "b": "inglese", "en": "English", "ar": "إنجليزيّ", "e": "💂"},
+        {"t": "giapponese", "b": "giapponese", "en": "Japanese", "ar": "يابانيّ", "e": "🍣"},
+        {"t": "messicano", "b": "messicano", "en": "Mexican", "ar": "مكسيكيّ", "e": "🌮"},
+        {"t": "cinese", "b": "cinese", "en": "Chinese", "ar": "صينيّ", "e": "🥢"}
+      ],
+      "phrases": [
+        {"t": "La mia amica è francese.", "en": "My friend is French.", "ar": "صديقتي فرنسيّة."},
+        {"t": "Parli inglese?", "en": "Do you speak English?", "ar": "هل تتكلّم الإنجليزيّة؟"},
+        {"t": "Mi piace il cibo giapponese.", "en": "I like Japanese food.", "ar": "أحبّ الطعام اليابانيّ."},
+        {"t": "Loro sono messicani.", "en": "They are Mexican.", "ar": "هم مكسيكيّون."}
+      ],
+      "tip": {
+        "en": "Nationalities are written with a small letter. Those in -o have four forms (\"italiano, italiana, italiani, italiane\"); those in -e have two (\"francese, francesi\").",
+        "ar": "تُكتب الجنسيّات بحرف صغير. المنتهية بـ -o لها أربعة أشكال (\"italiano، italiana، italiani، italiane\")، والمنتهية بـ -e لها شكلان (\"francese، francesi\")."
+      }
+    },
+    {
+      "id": "u97",
+      "emoji": "⛺",
+      "title": {"t": "In campeggio", "en": "Camping", "ar": "التخييم"},
+      "words": [
+        {"t": "la tenda", "b": "tenda", "en": "tent", "ar": "خيمة", "e": "⛺"},
+        {"t": "la torcia", "b": "torcia", "en": "torch", "ar": "مصباح يدويّ", "e": "🔦"},
+        {"t": "la bussola", "b": "bussola", "en": "compass", "ar": "بوصلة", "e": "🧭"},
+        {"t": "il falò", "b": "falò", "en": "campfire", "ar": "نار المخيّم", "e": "🔥"},
+        {"t": "il sacco a pelo", "b": "sacco a pelo", "en": "sleeping bag", "ar": "كيس نوم", "e": "🛌"},
+        {"t": "la cima", "b": "cima", "en": "summit", "ar": "قمّة", "e": "🏔️"},
+        {"t": "il lago", "b": "lago", "en": "lake", "ar": "بحيرة", "e": "🛶"},
+        {"t": "l'insetto", "b": "insetto", "en": "insect", "ar": "حشرة", "e": "🐛"}
+      ],
+      "phrases": [
+        {"t": "Dormiamo in tenda.", "en": "We sleep in a tent.", "ar": "ننام في خيمة."},
+        {"t": "Hai una torcia?", "en": "Do you have a torch?", "ar": "هل عندك مصباح يدويّ؟"},
+        {"t": "Saliamo in cima alla montagna.", "en": "We climb to the top of the mountain.", "ar": "نصعد إلى قمّة الجبل."},
+        {"t": "Cantiamo intorno al falò.", "en": "We sing around the campfire.", "ar": "نغنّي حول نار المخيّم."}
+      ],
+      "tip": {
+        "en": "\"Intorno a\" means \"around\": \"intorno al falò\". \"Vicino a\" means \"near\": \"vicino al lago\".",
+        "ar": "\"intorno a\" تعني \"حول\": \"intorno al falò\". و\"vicino a\" تعني \"قرب\": \"vicino al lago\"."
+      }
+    },
+    {
+      "id": "u98",
+      "emoji": "💭",
+      "title": {"t": "Le opinioni", "en": "Opinions", "ar": "الآراء"},
+      "words": [
+        {"t": "l'opinione", "b": "opinione", "en": "opinion", "ar": "رأي", "e": "💭"},
+        {"t": "credere", "b": "credere", "en": "to believe", "ar": "يعتقد", "e": "🤔"},
+        {"t": "d'accordo", "b": "d'accordo", "en": "agreed", "ar": "موافق", "e": "🤝"},
+        {"t": "fantastico", "b": "fantastico", "en": "great", "ar": "رائع", "e": "🤩"},
+        {"t": "orribile", "b": "orribile", "en": "horrible", "ar": "فظيع", "e": "🤮"},
+        {"t": "interessante", "b": "interessante", "en": "interesting", "ar": "ممتع", "e": "🧐"},
+        {"t": "incredibile", "b": "incredibile", "en": "incredible", "ar": "مذهل", "e": "😲"},
+        {"t": "odiare", "b": "odiare", "en": "to hate", "ar": "يكره", "e": "😤"}
+      ],
+      "phrases": [
+        {"t": "Credo di sì.", "en": "I think so.", "ar": "أظنّ ذلك."},
+        {"t": "Sono d'accordo con te.", "en": "I agree with you.", "ar": "أنا متّفق معك."},
+        {"t": "Secondo me, questo libro è fantastico.", "en": "In my opinion, this book is great.", "ar": "في رأيي، هذا الكتاب رائع."},
+        {"t": "Odio la pioggia.", "en": "I hate rain.", "ar": "أكره المطر."}
+      ],
+      "tip": {
+        "en": "Give opinions with \"secondo me…\" (in my opinion…) or \"credo che…\". \"Credo di sì\" = I think so; \"credo di no\" = I don't think so.",
+        "ar": "عبّر عن رأيك بـ \"secondo me…\" أي \"في رأيي…\" أو \"credo che…\". و\"credo di sì\" تعني \"أظنّ ذلك\"، و\"credo di no\" تعني \"لا أظنّ ذلك\"."
+      }
+    },
+    {
+      "id": "u99",
+      "emoji": "🎯",
+      "title": {"t": "Progetti e sogni", "en": "Plans & Dreams", "ar": "الخطط والأحلام"},
+      "words": [
+        {"t": "il programma", "b": "programma", "en": "plan", "ar": "خطّة", "e": "📝"},
+        {"t": "l'appuntamento", "b": "appuntamento", "en": "appointment", "ar": "موعد", "e": "📍"},
+        {"t": "l'idea", "b": "idea", "en": "idea", "ar": "فكرة", "e": "💡"},
+        {"t": "l'obiettivo", "b": "obiettivo", "en": "goal", "ar": "غاية", "e": "🎯"},
+        {"t": "il desiderio", "b": "desiderio", "en": "wish", "ar": "أمنية", "e": "🌠"},
+        {"t": "l'invito", "b": "invito", "en": "invitation", "ar": "دعوة", "e": "💌"},
+        {"t": "il progetto", "b": "progetto", "en": "project", "ar": "مشروع", "e": "📐"},
+        {"t": "il sogno", "b": "sogno", "en": "dream", "ar": "حلم", "e": "💭"}
+      ],
+      "phrases": [
+        {"t": "Che programmi hai per l'estate?", "en": "What are your plans for the summer?", "ar": "ما خططك للصيف؟"},
+        {"t": "Imparerò a nuotare.", "en": "I'm going to learn to swim.", "ar": "سأتعلّم السباحة."},
+        {"t": "Che bella idea!", "en": "What a good idea!", "ar": "يا لها من فكرة جيّدة!"},
+        {"t": "Il mio sogno è viaggiare per il mondo.", "en": "My dream is to travel the world.", "ar": "حلمي أن أسافر حول العالم."}
+      ],
+      "tip": {
+        "en": "For the future, -are verbs end in -erò: \"imparare → imparerò\" (I will learn), \"viaggiare → viaggerò\". In speech the present also works: \"domani parto\".",
+        "ar": "للمستقبل تنتهي أفعال -are بـ -erò: \"imparare ← imparerò\" أي \"سأتعلّم\"، و\"viaggiare ← viaggerò\". وفي الكلام يصلح المضارع أيضًا: \"domani parto\"."
+      }
+    },
+    {
+      "id": "u100",
+      "emoji": "🌟",
+      "title": {"t": "Bravo!", "en": "Well Done!", "ar": "أحسنت!"},
+      "words": [
+        {"t": "il successo", "b": "successo", "en": "success", "ar": "نجاح", "e": "🌟"},
+        {"t": "il diploma", "b": "diploma", "en": "diploma", "ar": "شهادة", "e": "📜"},
+        {"t": "il premio", "b": "premio", "en": "prize", "ar": "جائزة", "e": "🎖️"},
+        {"t": "orgoglioso", "b": "orgoglioso", "en": "proud", "ar": "فخور", "e": "😎"},
+        {"t": "lo sforzo", "b": "sforzo", "en": "effort", "ar": "جهد", "e": "💪"},
+        {"t": "la pratica", "b": "pratica", "en": "practice", "ar": "ممارسة", "e": "🔄"},
+        {"t": "il livello", "b": "livello", "en": "level", "ar": "مستوى", "e": "📊"},
+        {"t": "il progresso", "b": "progresso", "en": "progress", "ar": "تقدّم", "e": "📈"}
+      ],
+      "phrases": [
+        {"t": "Complimenti! Hai finito il corso.", "en": "Congratulations! You have finished the course.", "ar": "تهانينا! لقد أنهيتَ الدورة."},
+        {"t": "Sono molto orgoglioso di te.", "en": "I'm very proud of you.", "ar": "أنا فخور بك جدًّا."},
+        {"t": "La pratica è la chiave del successo.", "en": "Practice is the key to success.", "ar": "الممارسة مفتاح النجاح."},
+        {"t": "Continua così!", "en": "Keep it up!", "ar": "استمرّ هكذا!"}
+      ],
+      "tip": {
+        "en": "\"Hai finito\" (you have finished) uses \"avere\" + participle. Keep practising every day: \"continua così!\"",
+        "ar": "\"hai finito\" أي \"لقد أنهيتَ\" تتكوّن من \"avere\" مع اسم المفعول. واصل التدرّب كلّ يوم: \"continua così!\""
       }
     }
   ]
