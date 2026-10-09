@@ -42,6 +42,10 @@ fun CourseScreen(viewModel: BlasterViewModel) {
     val stars by viewModel.courseStars.collectAsStateWithLifecycle()
     val data = content ?: return LoadingContent(language == HelperLanguage.ARABIC)
     var openUnit by rememberSaveable { mutableStateOf<String?>(null) }
+    val requested by viewModel.openCourseUnit.collectAsStateWithLifecycle()
+    LaunchedEffect(requested) {
+        requested?.let { openUnit = it; viewModel.consumeOpenCourseUnit() }
+    }
     val unit = data.course.firstOrNull { it.id == openUnit }
     BackHandler(enabled = unit != null) { openUnit = null }
     if (unit == null) {
@@ -96,7 +100,7 @@ private fun CoursePath(course: List<CourseUnit>, stars: Map<String, Int>, langua
                         ) { Text(if (unlocked) unit.emoji else "🔒", fontSize = 28.sp) }
                         Spacer(Modifier.width(12.dp))
                         Column(Modifier.weight(1f)) {
-                            Text(language.pick("الوحدة ${i + 1}", "Unit ${i + 1}"), color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            Text(language.pick("المستوى ${i + 1}", "Level ${i + 1}"), color = TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                             Text(unit.title, color = TextPrimary, fontSize = 18.sp, fontWeight = FontWeight.ExtraBold)
                             Text(unit.helperTitle(language), color = TextSecondary, fontSize = 13.sp)
                         }
@@ -133,8 +137,11 @@ private fun unitSteps(unit: CourseUnit, random: Random): List<UnitStep> = buildL
     unit.words.forEach { add(UnitStep.Learn(it)) }
     if (unit.phrases.isNotEmpty()) add(UnitStep.Phrases)
     add(UnitStep.Tip)
-    unit.words.shuffled(random).chunked(4).forEach { add(UnitStep.Match(it)) }
-    unit.words.shuffled(random).take(4).forEach { w ->
+    // Four words (picked at random) are matched to their pictures, the other four are heard and
+    // picked, and then all eight come back in the crossword.
+    val mixed = unit.words.shuffled(random)
+    add(UnitStep.Match(mixed.take(4)))
+    mixed.drop(4).forEach { w ->
         add(UnitStep.Listen(w, (unit.words.filter { it != w }.shuffled(random).take(3) + w).shuffled(random)))
     }
     add(UnitStep.Cross)
@@ -162,7 +169,7 @@ private fun UnitLesson(unit: CourseUnit, number: Int, viewModel: BlasterViewMode
     Column(Modifier.fillMaxSize().padding(horizontal = 14.dp, vertical = 8.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             TextButton(onClick = onExit) { Text("✕", color = TextSecondary, fontSize = 18.sp) }
-            Text("${unit.emoji} ${language.pick("الوحدة", "Unit")} $number · ${unit.title}", color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp, maxLines = 1, modifier = Modifier.weight(1f))
+            Text("${unit.emoji} ${language.pick("المستوى", "Level")} $number · ${unit.title}", color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp, maxLines = 1, modifier = Modifier.weight(1f))
         }
         ProgressBar(index / (steps.size - 1).toFloat(), color = SolarAmber, height = 8.dp)
         Spacer(Modifier.height(10.dp))

@@ -14,7 +14,14 @@ import java.io.File
 import java.time.LocalDate
 
 /** The three steps of the daily path on the home screen, in the order they are suggested. */
-enum class PathStep { WORDS, GRAMMAR, STORY }
+enum class PathStep {
+    LESSON, WORDS, GRAMMAR, STORY;
+
+    companion object {
+        /** Today's practice on Home: a course lesson, words, then grammar (the adventure has its own button). */
+        val TODAY = listOf(LESSON, WORDS, GRAMMAR)
+    }
+}
 
 /** Daily reminder preferences. */
 data class ReminderSettings(val enabled: Boolean = false, val hour: Int = 19)

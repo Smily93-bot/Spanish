@@ -309,17 +309,27 @@ class BlasterViewModel(
         soundEngine.click()
     }
 
+    /** Opens the welcome tour again (the ❔ button on Home). */
+    fun showTourAgain() { _showTour.value = true }
+
     fun dismissTour() {
         prefs.edit().putBoolean(KEY_TOUR_SEEN, true).apply()
         _showTour.value = false
     }
 
     /** The next step of today's path, or null when all three are done. */
-    fun nextStep(done: Set<PathStep>): PathStep? = PathStep.entries.firstOrNull { it !in done }
+    fun nextStep(done: Set<PathStep>): PathStep? = PathStep.TODAY.firstOrNull { it !in done }
 
     /** Opens a path step from the home screen. Word lessons return home when they end. */
     fun startFromHome(step: PathStep) {
         when (step) {
+            PathStep.LESSON -> {
+                val content = _content.value
+                if (content != null && content.course.isNotEmpty()) {
+                    _openCourseUnit.value = content.course[com.example.ui.screens.nextCourseUnit(content.course, courseStars.value)].id
+                }
+                navigateTo(Screen.Course)
+            }
             PathStep.WORDS -> {
                 navigateTo(Screen.WordGalaxy)
                 galaxyFromHome = true
@@ -449,10 +459,16 @@ class BlasterViewModel(
 
     val courseStars: StateFlow<Map<String, Int>> = engagement.courseStars
 
+    private val _openCourseUnit = MutableStateFlow<String?>(null)
+    /** A unit to open straight away (from Today's practice); the course screen takes it once. */
+    val openCourseUnit: StateFlow<String?> = _openCourseUnit.asStateFlow()
+    fun consumeOpenCourseUnit() { _openCourseUnit.value = null }
+
     /** A finished unit: stars for the path and XP toward today's goal. */
     fun finishCourseUnit(unitId: String, stars: Int) = viewModelScope.launch {
         soundEngine.fanfare()
         engagement.saveCourseStars(unitId, stars)
+        engagement.completeStep(PathStep.LESSON)
         earnXp(10 + 5 * stars)
     }
 

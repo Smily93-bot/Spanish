@@ -26,11 +26,14 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.data.model.GrammarExample
+import com.example.data.model.GrammarPattern
 import com.example.data.model.GrammarQuestion
 import com.example.data.model.GrammarTopic
 import com.example.data.model.HelperLanguage
 import com.example.data.model.pick
 import com.example.ui.components.AudioButton
+import com.example.ui.components.bidiSafe
 import com.example.ui.components.LoadingContent
 import com.example.ui.components.ProgressBar
 import com.example.ui.theme.*
@@ -142,9 +145,34 @@ private fun TopicMap(topics: List<GrammarTopic>, viewModel: BlasterViewModel, la
 
 // ---------------------------------------------------------------------------------------------- Round
 
+/** A grammar round in small bites: a short start card, then one piece of the rule, two questions, the next piece… */
+private sealed interface LabStep {
+    data object Start : LabStep
+    data class Piece(val pattern: GrammarPattern?, val example: GrammarExample?, val tip: String?) : LabStep
+    data class Ask(val q: Int) : LabStep
+}
+
+private fun labSteps(topic: GrammarTopic, questions: Int, language: HelperLanguage): List<LabStep> = buildList {
+    add(LabStep.Start)
+    val patterns = topic.patterns.filter { it.formula.isNotBlank() }
+    val pieces = buildList {
+        patterns.forEachIndexed { i, p -> add(LabStep.Piece(p, topic.examples.getOrNull(i), null)) }
+        if (topic.tip(language).isNotBlank()) add(LabStep.Piece(null, topic.examples.getOrNull(patterns.size), topic.tip(language)))
+        if (isEmpty()) add(LabStep.Piece(null, topic.examples.firstOrNull(), null))
+    }
+    // Spread the questions after the pieces: every piece is followed by its share of questions.
+    var q = 0
+    pieces.forEachIndexed { i, piece ->
+        add(piece)
+        val until = if (i == pieces.lastIndex) questions else minOf(questions, (questions * (i + 1)) / pieces.size)
+        while (q < until) add(LabStep.Ask(q++))
+    }
+}
+
 @Composable
 private fun RoundView(round: GrammarRound, viewModel: BlasterViewModel, language: HelperLanguage) {
-    var index by remember { mutableIntStateOf(-1) }       // -1 = rule card
+    val steps = remember(round) { labSteps(round.topic, round.questions.size, language) }
+    var index by remember { mutableIntStateOf(0) }
     var correct by remember { mutableIntStateOf(0) }
     var combo by remember { mutableIntStateOf(0) }
     val total = round.questions.size
@@ -154,77 +182,102 @@ private fun RoundView(round: GrammarRound, viewModel: BlasterViewModel, language
             IconButton(onClick = { viewModel.quitGrammarRound() }) {
                 Icon(Icons.Default.Close, contentDescription = language.pick("خروج", "Quit"), tint = TextSecondary)
             }
-            val progress by animateFloatAsState((index + 1).coerceAtLeast(0) / (total + 1f), label = "progress")
+            val progress by animateFloatAsState(index / steps.size.toFloat(), label = "progress")
             ProgressBar(progress = progress, color = NebulaPurple, modifier = Modifier.weight(1f))
             Spacer(Modifier.width(10.dp))
             Text(if (combo >= 2) "🔥 x$combo" else "🕵️", color = SolarAmber, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp)
         }
         Spacer(Modifier.height(10.dp))
-        if (index < 0) {
-            RuleCard(round.topic, viewModel, language) { index = 0 }
-        } else {
-            key(index) {
-                QuestionCard(round.questions[index], index, total, viewModel, language) { ok ->
+        key(index) {
+            when (val step = steps[index]) {
+                LabStep.Start -> StartCard(round.topic, viewModel, language) { index++ }
+                is LabStep.Piece -> PieceCard(round.topic, step, viewModel, language) { index++ }
+                is LabStep.Ask -> QuestionCard(round.questions[step.q], step.q, total, viewModel, language) { ok ->
                     if (ok) { correct++; combo++ } else combo = 0
-                    if (index + 1 < total) index++ else viewModel.finishGrammarRound(correct)
+                    if (index + 1 < steps.size) index++ else viewModel.finishGrammarRound(correct)
                 }
             }
         }
     }
 }
 
+/** Just the name of the rule and one line about it, then START. */
 @Composable
-private fun RuleCard(topic: GrammarTopic, viewModel: BlasterViewModel, language: HelperLanguage, onStart: () -> Unit) {
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        NiloSays(
-            line = NiloLine(tl("La regla de hoy:"), "قاعدة اليوم:", "Today's rule:"),
-            language = language,
-            onSpeak = { viewModel.speakSpanish("${tl("La regla de hoy:")} ${topic.titleEs}") },
-            size = 48.dp
-        )
+private fun StartCard(topic: GrammarTopic, viewModel: BlasterViewModel, language: HelperLanguage, onStart: () -> Unit) {
+    Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)) {
         Box(
             Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(22.dp))
-                .background(Brush.linearGradient(listOf(SpaceNavy, Color(0xFF15367A))))
-                .padding(18.dp)
+                .clip(RoundedCornerShape(24.dp))
+                .background(Brush.linearGradient(listOf(SpaceNavy, Color(0xFF2A1F6B))))
+                .padding(22.dp)
         ) {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(topic.level, color = DiamondCyan, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                Text(topic.titleEs, color = StarWhite, fontSize = 24.sp, fontWeight = FontWeight.ExtraBold)
-                Text(topic.title(language), color = SolarGold, fontSize = 15.sp, fontWeight = FontWeight.Bold)
-                Text(topic.intro(language), color = StarWhite.copy(alpha = 0.9f), fontSize = 14.sp)
-            }
-        }
-        topic.patterns.filter { it.formula.isNotBlank() }.forEach { p ->
-            Surface(shape = RoundedCornerShape(14.dp), color = AdventureSurface, border = BorderStroke(1.dp, AdventureCardBorder), modifier = Modifier.fillMaxWidth()) {
-                Column(Modifier.padding(12.dp)) {
-                    if (p.label.isNotBlank()) Text(p.label, color = NebulaPurple, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp)
-                    Text(p.formula, color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                    if (p.note(language).isNotBlank()) Text(p.note(language), color = TextSecondary, fontSize = 12.sp)
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text("🕵️ " + topic.level, color = DiamondCyan, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(topic.titleEs, color = StarWhite, fontSize = 26.sp, fontWeight = FontWeight.ExtraBold, modifier = Modifier.weight(1f))
+                    AudioButton(onClick = { viewModel.speakSpanish(topic.titleEs) }, size = 36.dp)
                 }
-            }
-        }
-        topic.examples.take(3).forEach { e ->
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) {
-                    Text(e.spanish, color = ExplorerBlue, fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                    if (e.translation(language).isNotBlank()) Text(e.translation(language), color = TextSecondary, fontSize = 12.sp, modifier = Modifier.fillMaxWidth())
-                }
-                AudioButton(onClick = { viewModel.speakSpanish(e.spanish) }, size = 34.dp)
-            }
-        }
-        if (topic.tip(language).isNotBlank()) {
-            Surface(shape = RoundedCornerShape(14.dp), color = SolarGold.copy(alpha = 0.15f), modifier = Modifier.fillMaxWidth()) {
-                Text("🧠 " + topic.tip(language), color = TextPrimary, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(12.dp))
+                Text(topic.title(language), color = SolarGold, fontSize = 17.sp, fontWeight = FontWeight.Bold)
+                Text(
+                    language.pick("خطوات صغيرة: جزء من القاعدة، ثم سؤالان عليه.", "Small steps: one piece of the rule, then two questions on it."),
+                    color = StarWhite.copy(alpha = 0.85f), fontSize = 14.sp
+                )
             }
         }
         Button(
             onClick = onStart,
+            colors = ButtonDefaults.buttonColors(containerColor = SolarAmber),
+            shape = RoundedCornerShape(18.dp),
+            modifier = Modifier.fillMaxWidth().height(60.dp)
+        ) { Text(language.pick("ابدأ ▶", "START ▶"), fontWeight = FontWeight.ExtraBold, fontSize = 20.sp) }
+    }
+}
+
+/** One small piece of the rule: a pattern (or the tip) with one example to hear. */
+@Composable
+private fun PieceCard(topic: GrammarTopic, piece: LabStep.Piece, viewModel: BlasterViewModel, language: HelperLanguage, onNext: () -> Unit) {
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        Text(
+            if (piece.tip != null) language.pick("🧠 تذكّر", "🧠 Remember") else language.pick("📘 القاعدة", "📘 The rule"),
+            color = NebulaPurple, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp
+        )
+        piece.pattern?.let { p ->
+            Surface(shape = RoundedCornerShape(20.dp), color = SpaceNavy, modifier = Modifier.fillMaxWidth()) {
+                Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    if (p.label.isNotBlank()) Text(p.label, color = DiamondCyan, fontWeight = FontWeight.ExtraBold, fontSize = 14.sp)
+                    Text(p.formula, color = StarWhite, fontWeight = FontWeight.ExtraBold, fontSize = 21.sp, lineHeight = 28.sp)
+                    if (p.note(language).isNotBlank()) {
+                        Text(if (language == HelperLanguage.ARABIC) bidiSafe(p.note(language)) else p.note(language), color = SolarGold, fontSize = 15.sp, lineHeight = 22.sp)
+                    }
+                }
+            }
+        }
+        piece.tip?.let {
+            Surface(shape = RoundedCornerShape(20.dp), color = SolarGold.copy(alpha = 0.18f), modifier = Modifier.fillMaxWidth()) {
+                Text(if (language == HelperLanguage.ARABIC) bidiSafe(it) else it, color = TextPrimary, fontSize = 17.sp, lineHeight = 26.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(18.dp))
+            }
+        }
+        if (piece.pattern == null && piece.tip == null && topic.intro(language).isNotBlank()) {
+            Text(if (language == HelperLanguage.ARABIC) bidiSafe(topic.intro(language)) else topic.intro(language), color = TextPrimary, fontSize = 17.sp, lineHeight = 26.sp)
+        }
+        piece.example?.let { e ->
+            Text(language.pick("💬 مثال", "💬 Example"), color = TextSecondary, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text(e.spanish, color = ExplorerBlue, fontWeight = FontWeight.Bold, fontSize = 19.sp)
+                    if (e.translation(language).isNotBlank()) Text(e.translation(language), color = TextSecondary, fontSize = 14.sp, modifier = Modifier.fillMaxWidth())
+                }
+                AudioButton(onClick = { viewModel.speakSpanish(e.spanish) }, size = 40.dp)
+            }
+        }
+        Spacer(Modifier.height(4.dp))
+        Button(
+            onClick = onNext,
             colors = ButtonDefaults.buttonColors(containerColor = NebulaPurple),
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier.fillMaxWidth().height(56.dp)
-        ) { Text(language.pick("فهمت! لنتدرّب ▶", "Got it! Let's practise ▶"), fontWeight = FontWeight.ExtraBold, fontSize = 16.sp) }
+        ) { Text(language.pick("فهمت! جرّب ▶", "Got it! Try it ▶"), fontWeight = FontWeight.ExtraBold, fontSize = 16.sp) }
     }
 }
 

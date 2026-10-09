@@ -209,7 +209,6 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
     var adDiamonds by remember { mutableIntStateOf(0) }
     var outOfDiamonds by remember { mutableStateOf(false) }
     var adMisses by remember { mutableIntStateOf(0) }
-    var showStory by remember { mutableStateOf(false) }
     var showTip by remember { mutableStateOf(false) }
     // Every chapter starts with its lesson and words, before the ship.
     var briefed by remember { mutableStateOf(false) }
@@ -392,36 +391,28 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
     }
 
     Column(Modifier.fillMaxSize().background(AdventureBg)) {
-        // Header: chapter, the lesson and story buttons, and the diamonds still held.
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)) {
-            Text("${tablet.level} · ${tablet.title(language)}", color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp, maxLines = 1, modifier = Modifier.weight(1f))
-            TextButton(onClick = { briefed = false }, contentPadding = PaddingValues(horizontal = 6.dp)) {
-                Text(language.pick("📘 الدرس", "📘 Lesson"), color = ExplorerBlue, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-            }
-            TextButton(onClick = { showStory = true }, contentPadding = PaddingValues(horizontal = 6.dp)) {
-                Text(language.pick("📖 القصة", "📖 Story"), color = ExplorerBlue, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-            }
-            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(end = 6.dp)) {
-                Text("💎 $diamonds", color = SolarAmber, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
-                if (clock - lostAt < 1.5f) Text("−1", color = MeteorRed, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
-            }
-        }
-
-        val station = openStation
-        if (!briefed) {
-            Box(Modifier.weight(1f).fillMaxWidth()) {
-                MissionBriefing(tablet, chapterNumber, level, data, viewModel, language, onStart = { briefed = true })
-            }
-        } else if (station == null) {
+        // Header, kept small: rooms done, the secret sentence, diamonds and ❔ (how to play / what's new).
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(start = 10.dp, end = 4.dp, top = 2.dp, bottom = 2.dp)) {
             GoalStrip(
-                tablet = tablet,
                 language = language,
                 progress = state.solved,
                 secret = secretWords,
                 secretOrder = secretOrder,
                 newPiece = solvedAt.values.any { clock - it < 4f },
-                onSpeak = { viewModel.speakSpanish(it) }
+                onSpeak = { viewModel.speakSpanish(it) },
+                modifier = Modifier.weight(1f)
             )
+            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(horizontal = 6.dp)) {
+                Text("💎 $diamonds", color = SolarAmber, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
+                if (clock - lostAt < 1.5f) Text("−1", color = MeteorRed, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
+            }
+            Surface(onClick = { briefed = false }, shape = CircleShape, color = SpaceNavy, modifier = Modifier.size(36.dp)) {
+                Box(contentAlignment = Alignment.Center) { Text("❔", fontSize = 18.sp) }
+            }
+        }
+
+        val station = openStation
+        if (station == null) {
             Box(Modifier.weight(1f).fillMaxWidth()) {
                 // Clipped so the zoomed-in ship never draws over the goal text above it.
                 Canvas(Modifier.fillMaxSize().clipToBounds()) {
@@ -521,6 +512,10 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
         }
     }
 
+    if (!briefed) {
+        MissionBriefing(tablet, chapterNumber, level, language, onStart = { briefed = true })
+    }
+
     if (showTip) {
         AlertDialog(
             onDismissRequest = { showTip = false },
@@ -580,23 +575,11 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
         )
     }
 
-    if (showStory) {
-        AlertDialog(
-            onDismissRequest = { showStory = false },
-            containerColor = AdventureBg,
-            confirmButton = { TextButton(onClick = { showStory = false }) { Text(language.pick("إغلاق", "Close")) } },
-            text = {
-                Column(Modifier.verticalScroll(rememberScrollState())) {
-                    StoryCard(language.pick("📡 القصة", tl("📡 La historia")), tablet.story, tablet.storyAr, viewModel, language)
-                }
-            }
-        )
-    }
 }
 
 private fun lerpCell(from: Cell, to: Cell, t: Float) = Offset(from.x + (to.x - from.x) * t, from.y + (to.y - from.y) * t)
 
-/** ▲ ◀ ▼ ▶ in the middle (hold to keep walking), undo on the left, tip and restart on the right. */
+/** ▲ ◀ ▼ ▶ on the left (hold to keep walking); tip, undo and restart on the right. */
 @Composable
 private fun ShipControls(canUndo: Boolean, onHold: (Cell?) -> Unit, onUndo: () -> Unit, onRestart: () -> Unit, onTip: () -> Unit) {
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
@@ -1002,31 +985,28 @@ private fun DrawScope.drawBubble(textMeasurer: TextMeasurer, text: String, cente
 // --------------------------------------------------------------------------- Panels
 
 /** Small strip above the deck: the chapter goal, rooms done and the secret message. */
+/** Rooms done and the secret sentence, revealed a few words per room. */
 @Composable
 private fun GoalStrip(
-    tablet: ReadingTablet,
     language: HelperLanguage,
     progress: Int,
     secret: List<String>,
     secretOrder: List<Int>,
     newPiece: Boolean,
-    onSpeak: (String) -> Unit
+    onSpeak: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val total = Station.entries.size
-    // Words of the secret sentence revealed so far, spread over the seven rooms.
     val shown = secretOrder.take((secret.size * progress + total - 1) / total).toSet()
-    Column(Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 4.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("🎯 " + tablet.expeditionGoal(language), color = TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.Bold, maxLines = 2, modifier = Modifier.weight(1f))
-            Text("🚪 $progress/$total", color = SolarAmber, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp)
-        }
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                "🔐 " + secret.mapIndexed { i, w -> if (i in shown) w else "▁".repeat(w.trim('.', ',', '¡', '!', '¿', '?').length.coerceIn(2, 8)) }.joinToString(" "),
-                color = if (newPiece) SuccessGreen else NebulaPurple, fontSize = 15.sp, fontWeight = FontWeight.Bold, lineHeight = 21.sp, modifier = Modifier.weight(1f)
-            )
-            if (progress >= total) AudioButton(onClick = { onSpeak(secret.joinToString(" ")) }, size = 32.dp)
-        }
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier) {
+        Text("🚪 $progress/$total", color = SolarAmber, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp)
+        Spacer(Modifier.width(8.dp))
+        Text(
+            "🔐 " + secret.mapIndexed { i, w -> if (i in shown) w else "▁".repeat(w.trim('.', ',', '¡', '!', '¿', '?').length.coerceIn(2, 6)) }.joinToString(" "),
+            color = if (newPiece) SuccessGreen else NebulaPurple, fontSize = 14.sp, fontWeight = FontWeight.Bold, lineHeight = 19.sp, maxLines = 2,
+            modifier = Modifier.weight(1f)
+        )
+        if (progress >= total) AudioButton(onClick = { onSpeak(secret.joinToString(" ")) }, size = 30.dp)
     }
 }
 
@@ -1043,10 +1023,21 @@ private sealed interface Step {
     data object Table : Step
     data object Search : Step
     data object Order : Step
+    /** Matching pairs (from Practice): four words of this chapter and their pictures. */
+    data class Match(val words: List<CourseWord>) : Step
     data class Note(val emoji: String, val text: String) : Step
 }
 
 private fun storySentences(text: String) = text.split(Regex("(?<=[.!?])\\s+")).filter { it.isNotBlank() }
+
+/** Four course words for the radio room's matching game: words from this chapter first, then early course words. */
+private fun storyMatch(tablet: ReadingTablet, data: SpanishContent): List<CourseWord>? {
+    val text = "${tablet.story} ${tablet.ending}".lowercase()
+    val all = data.course.flatMap { it.words }.distinctBy { it.emoji }
+    val inStory = all.filter { w -> Regex("\\b${Regex.escape(w.bare.lowercase())}\\b").containsMatchIn(text) }
+    val picked = (inStory.shuffled() + data.course.take(3).flatMap { it.words }.shuffled()).distinctBy { it.emoji }.take(4)
+    return picked.takeIf { it.size == 4 }
+}
 
 /** Each room plays differently: reading, writing, searching, the grammar table, ordering, jumping and falling words. */
 private fun buildSteps(
@@ -1061,7 +1052,7 @@ private fun buildSteps(
     return when (station) {
         Station.STORY -> storySentences(tablet.story).let { s ->
             s.mapIndexed { i, line -> Step.Sentence(line, i + 1, s.size, tablet.storyLines.getOrNull(i)?.meaning(language)) }
-        }
+        } + listOfNotNull(storyMatch(tablet, data)?.let { Step.Match(it) })
         Station.OPENING -> tablet.opening.mapIndexed { i, f -> Step.Write("opening-$i", f) }
         Station.SEARCH -> if (scene == null || searchTargets.isEmpty()) listOf(Step.Note("🔍", "")) else listOf(Step.Search)
         Station.CONSOLE -> listOf(Step.Lesson, Step.Table)
@@ -1101,6 +1092,7 @@ private fun MissionPanel(
         Step.Table -> tableCells.all { (r, c) -> "table-$r-$c" in results }
         Step.Search -> searchTargets.all { "search-${it.id}" in results }
         Step.Order -> "order" in results
+        is Step.Match -> "match" in results
         else -> true
     }
     val last = index == steps.lastIndex
@@ -1121,21 +1113,15 @@ private fun MissionPanel(
                     modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
                 )
             }
-            Text(station.label(language), color = TextSecondary, fontSize = 12.sp, maxLines = 1, modifier = Modifier.weight(1f).padding(start = 8.dp))
-            steps.indices.forEach { i ->
-                Box(
-                    Modifier
-                        .padding(horizontal = 2.dp)
-                        .size(if (i == index) 10.dp else 7.dp)
-                        .clip(CircleShape)
-                        .background(if (i <= index) accent else AdventureCardBorder)
-                )
-            }
+            Spacer(Modifier.weight(1f))
+            if (steps.size > 1) Text("${index + 1} / ${steps.size}", color = TextSecondary, fontSize = 13.sp, fontWeight = FontWeight.Bold)
             TextButton(onClick = onClose) { Text("✕", color = TextSecondary, fontSize = 18.sp) }
         }
         // Instructions: translated in the first levels; later in the target language (words already learnt),
         // with every word tappable and the translation one tap away.
-        if (level <= 3) {
+        if (index > 0) {
+            // The instruction is shown on the room's first card only.
+        } else if (level <= 3) {
             Text("👉 " + station.how(language), color = TextPrimary, fontSize = 13.sp, lineHeight = 18.sp, modifier = Modifier.padding(bottom = 6.dp))
         } else {
             var translate by remember(station) { mutableStateOf(false) }
@@ -1162,6 +1148,10 @@ private fun MissionPanel(
                         Step.Lesson -> LessonCard(tablet, viewModel, language)
                         Step.Table -> GrammarTableQuiz(tablet.table, tableCells, results, viewModel, language)
                         Step.Search -> if (scene != null) HiddenObjectSearch(scene, searchTargets, results, viewModel, language)
+                        is Step.Match -> {
+                            val onMistake = LocalOnMistake.current
+                            MatchPairs(step.words, viewModel, language, onMistake) { results["match"] = true }
+                        }
                         Step.Order -> OrderPuzzle(tablet.order, tablet.orderTranslation(language), results, viewModel, language)
                         is Step.Note -> if (step.text.isNotBlank()) AdventureCard(borderColor = accent) {
                             Text(step.emoji, fontSize = 30.sp)
@@ -1248,138 +1238,54 @@ private fun TappableSentence(text: String, data: SpanishContent, viewModel: Blas
 }
 
 /**
- * Shown before Lía boards the ship: what this chapter teaches (in Arabic or English), its new
- * words with their meanings, and how the map works. It can be opened again from the header.
+ * A pop-up when the chapter starts (and from ❔): the goal, what's new on this ship and how to play.
+ * The grammar is taught later, in small pieces, inside the engine room.
  */
 @Composable
 private fun MissionBriefing(
     tablet: ReadingTablet,
     level: Int,
     ship: ShipLevel,
-    data: SpanishContent,
-    viewModel: BlasterViewModel,
     language: HelperLanguage,
     onStart: () -> Unit
 ) {
-    // The chapter's words that are in the dictionary, in story order.
-    val words = remember(tablet.id) {
-        "${tablet.story} ${tablet.ending}".split(" ")
-            .map { it.trim('.', ',', '¡', '!', '¿', '?', ':', ';', '"').lowercase() }
-            // Skip names and tiny function words; keep the words worth learning.
-            .filter { it.length > 2 && it !in setOf("lía", "nilo", "los", "las", "una", "uno", "del", "con", "por", "gli", "che", "per", "una", "dei", "nel", "sul") }
-            .distinct()
-            .mapNotNull { w -> data.glossary(w)?.let { w to it } }
-            .distinctBy { it.second.spanish }
-            .take(12)
-    }
-    val examples = remember(tablet.id) { storySentences(tablet.lesson.example) }
-    val scroll = rememberScrollState()
-    Column(Modifier.fillMaxSize().background(AdventureBg)) {
-        Box(Modifier.weight(1f).fillMaxWidth()) {
-            Column(
-                Modifier.fillMaxSize().verticalScroll(scroll).padding(horizontal = 14.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                Text("🚀 ${language.pick("المستوى", tl("Nivel"))} $level · ${tablet.level}", color = SolarAmber, fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
-                Text("🎯 " + bidiSafe(tablet.goal(language)), color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 15.sp)
-
-                // 1. The rule, explained in the helper language.
-                AdventureCard(borderColor = ExplorerBlue) {
-                    Text(language.pick("📘 ماذا ستتعلمين", "📘 What you'll learn"), color = ExplorerBlue, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp)
-                    Text(language.pick(tablet.lesson.titleAr, tablet.lesson.title), color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp)
-                    Spacer(Modifier.height(4.dp))
-                    Text(language.pick(bidiSafe(tablet.lesson.arabic), tablet.lesson.english), color = TextPrimary, fontSize = 15.sp, lineHeight = 23.sp)
-                    // The forms to learn, as a clear table (tap a form to hear it).
-                    if (tablet.table.rows.isNotEmpty()) {
-                        Spacer(Modifier.height(8.dp))
-                        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-                            Column(
-                                Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(ExplorerBlue.copy(alpha = 0.06f))
-                                    .padding(8.dp)
-                            ) {
-                                Row {
-                                    tablet.table.headers.forEach { h ->
-                                        Text(h, color = ExplorerBlue, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp, modifier = Modifier.weight(1f))
-                                    }
-                                }
-                                tablet.table.rows.forEach { row ->
-                                    Row(Modifier.padding(vertical = 3.dp)) {
-                                        row.forEachIndexed { c, cell ->
-                                            Text(
-                                                cell,
-                                                color = if (c == 0) TextSecondary else TextPrimary,
-                                                fontWeight = if (c == 0) FontWeight.Normal else FontWeight.ExtraBold,
-                                                fontSize = 15.sp,
-                                                modifier = Modifier.weight(1f).clickable { viewModel.speakSpanish(cell) }
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    if (examples.isNotEmpty()) {
-                        Spacer(Modifier.height(8.dp))
-                        Text(language.pick("💬 أمثلة — اضغطي على أي كلمة", "💬 Examples — tap any word"), color = NebulaPurple, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
-                        examples.forEach { sentence ->
-                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 2.dp)) {
-                                Box(Modifier.weight(1f)) { TappableSentence(sentence, data, viewModel, language, fontSize = 16) }
-                                AudioButton(onClick = { viewModel.speakSpanish(sentence) }, size = 32.dp)
-                            }
-                        }
-                    }
-                }
-
-                // 2. The words of this chapter.
-                if (words.isNotEmpty()) {
-                    AdventureCard(borderColor = SuccessGreen) {
-                        Text(language.pick("🆕 كلمات هذه المهمة", "🆕 Words in this mission"), color = SuccessGreen, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp)
-                        Spacer(Modifier.height(4.dp))
-                        words.forEach { (form, entry) ->
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.fillMaxWidth().clickable { viewModel.speakSpanish(form) }.padding(vertical = 3.dp)
-                            ) {
-                                Text("🔊 $form", color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 15.sp, modifier = Modifier.weight(1f))
-                                Text(entry.shortMeaning(language), color = TextSecondary, fontSize = 14.sp, modifier = Modifier.weight(1f))
-                            }
-                        }
-                    }
-                }
-
-                // 3. What's new on this ship (one new idea per level).
+    AlertDialog(
+        onDismissRequest = onStart,
+        containerColor = SpaceNavy,
+        shape = RoundedCornerShape(24.dp),
+        title = {
+            Column {
+                Text("🚀 ${language.pick("المستوى", tl("Nivel"))} $level", color = SolarGold, fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
+                Text(tablet.title(language), color = StarWhite, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+            }
+        },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text("🎯 " + bidiSafe(tablet.goal(language)), color = StarWhite, fontWeight = FontWeight.Bold, fontSize = 15.sp, lineHeight = 21.sp)
                 if (ship.newEn.isNotBlank()) {
-                    AdventureCard(borderColor = NebulaPurple) {
-                        Text(language.pick("🆕 جديد في هذا المستوى", "🆕 New in this level"), color = NebulaPurple, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp)
-                        Text(language.pick(bidiSafe(ship.newAr), ship.newEn), color = TextPrimary, fontSize = 15.sp, lineHeight = 22.sp)
+                    Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(NebulaPurple.copy(alpha = 0.35f)).padding(12.dp)) {
+                        Text(language.pick("🆕 جديد في هذا المستوى", "🆕 New in this level"), color = SolarGold, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp)
+                        Text(language.pick(bidiSafe(ship.newAr), ship.newEn), color = StarWhite, fontSize = 15.sp, lineHeight = 22.sp)
                     }
                 }
-
-                // 4. How the ship works.
-                AdventureCard(borderColor = SolarGold) {
-                    Text(language.pick("🎮 كيف تلعبين", "🎮 How to play"), color = SolarAmber, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp)
+                Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Color.White.copy(alpha = 0.08f)).padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(language.pick("🎮 كيف تلعبين", "🎮 How to play"), color = SolarGold, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp)
                     listOf(
-                        language.pick("1. حرّكي ليا بالأسهم ▲ ◀ ▼ ▶. لا يوجد وقت: الروبوتات تتحرك فقط عندما تتحركين.", "1. Move Lía with the arrows ▲ ◀ ▼ ▶. No timer: robots only move when you move."),
-                        language.pick("2. قفي على دائرة الغرفة المضيئة لتبدأ لعبتها.", "2. Step on the glowing room's circle to start its game."),
-                        language.pick("3. كل غرفة تنجحين فيها تعطيك مفتاحًا ملوّنًا يفتح الباب الذي بلونه.", "3. Every room you finish gives a coloured key for the door of the same colour."),
-                        language.pick("4. بعد الغرفة الأخيرة اخرجي من الباب 🚪.", "4. After the last room, leave through the door 🚪."),
-                        language.pick("↶ تراجعي خطوة · ↺ عودي إلى آخر غرفة · 💡 تلميح", "↶ undo a step · ↺ back to the last room · 💡 tip"),
-                        language.pick("💎 الإجابة الخاطئة أو الروبوت يكلّفانك ماسة.", "💎 A wrong answer or a robot costs a diamond.")
-                    ).forEach { Text(it, color = TextPrimary, fontSize = 14.sp, lineHeight = 20.sp) }
+                        language.pick("◀ ▲ ▶ حرّكي ليا. لا يوجد وقت.", "◀ ▲ ▶ move Lía. There's no timer."),
+                        language.pick("⭕ قفي على الغرفة المضيئة لتلعبي لعبتها.", "⭕ Step on the glowing room to play its game."),
+                        language.pick("🔑 كل غرفة تعطيك مفتاحًا لباب بلونه.", "🔑 Each room gives a key for the door of its colour."),
+                        language.pick("🚪 بعد الغرفة الأخيرة اخرجي من الباب.", "🚪 After the last room, leave through the door."),
+                        language.pick("↶ تراجع · ↺ آخر غرفة · 💡 تلميح · ❔ هذه النافذة", "↶ undo · ↺ last room · 💡 tip · ❔ this window")
+                    ).forEach { Text(it, color = StarWhite, fontSize = 14.sp, lineHeight = 20.sp) }
                 }
             }
-            ScrollMoreHint(scroll, language, AdventureBg)
+        },
+        confirmButton = {
+            Button(onClick = onStart, colors = ButtonDefaults.buttonColors(containerColor = SuccessGreen), shape = RoundedCornerShape(14.dp)) {
+                Text(language.pick("🚀 هيا!", "🚀 Let's go!"), fontWeight = FontWeight.ExtraBold)
+            }
         }
-        BlasterCyberButton(
-            text = language.pick("🚀 ابدئي المهمة", "🚀 Start the mission"),
-            onClick = onStart,
-            color = SuccessGreen,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 8.dp)
-        )
-    }
+    )
 }
 
 /** One story sentence in Lía's speech bubble, read aloud. */
@@ -1398,26 +1304,25 @@ private fun SentenceCard(step: Step.Sentence, data: SpanishContent, viewModel: B
             modifier = Modifier.weight(1f)
         ) {
             Column(Modifier.padding(16.dp)) {
-                TappableSentence(step.text, data, viewModel, language, fontSize = 20, showTapHint = true)
+                TappableSentence(step.text, data, viewModel, language, fontSize = 22, showTapHint = step.number == 1)
                 Spacer(Modifier.height(10.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("${step.number} / ${step.total}", color = TextSecondary, fontSize = 12.sp, modifier = Modifier.weight(1f))
+                // 🔊 hear it again · 🌐 this sentence's translation (not the whole story).
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     AudioButton(onClick = { viewModel.speakSpanish(step.text) }, size = 40.dp)
+                    if (!step.translation.isNullOrBlank()) {
+                        Surface(
+                            onClick = { showTranslation = !showTranslation },
+                            shape = CircleShape,
+                            color = if (showTranslation) ExplorerBlue else ExplorerBlue.copy(alpha = 0.12f),
+                            modifier = Modifier.size(40.dp)
+                        ) { Box(contentAlignment = Alignment.Center) { Text("🌐", fontSize = 20.sp) } }
+                    }
+                }
+                if (showTranslation && !step.translation.isNullOrBlank()) {
+                    Spacer(Modifier.height(8.dp))
+                    Text(step.translation, color = TextPrimary, fontSize = 17.sp, lineHeight = 25.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.fillMaxWidth())
                 }
             }
-        }
-    }
-    // Translation of this sentence only (not the whole story).
-    if (!step.translation.isNullOrBlank()) {
-        TextButton(onClick = { showTranslation = !showTranslation }) {
-            Text(
-                if (showTranslation) language.pick("إخفاء الترجمة", "Hide translation")
-                else language.pick("🌐 ترجمة هذه الجملة", "🌐 Translate this sentence"),
-                color = ExplorerBlue, fontWeight = FontWeight.Bold
-            )
-        }
-        if (showTranslation) {
-            Text(step.translation, color = TextPrimary, fontSize = 17.sp, lineHeight = 25.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.fillMaxWidth())
         }
     }
 }

@@ -9,6 +9,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Surface
@@ -60,6 +61,8 @@ fun CommandBridgeScreen(viewModel: BlasterViewModel) {
     val chapter = data.tablets.firstOrNull { it.id !in completedIds }
     val grammarStars by viewModel.grammarStars.collectAsStateWithLifecycle()
     val nextTopic = remember(data, grammarStars) { viewModel.nextGrammarTopic() }
+    val courseStars by viewModel.courseStars.collectAsStateWithLifecycle()
+    val lessonUnit = data.course.getOrNull(nextCourseUnit(data.course, courseStars))
 
     Column(
         modifier = Modifier
@@ -68,12 +71,12 @@ fun CommandBridgeScreen(viewModel: BlasterViewModel) {
             .padding(horizontal = 20.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        // Lía and what she says
+        // Lía and what she says, and ❔ to read the welcome tour again.
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(
                 painter = painterResource(if (mood == LiaMood.SAD) R.drawable.lia_sad else R.drawable.lia_happy),
                 contentDescription = "Lía",
-                modifier = Modifier.size(84.dp)
+                modifier = Modifier.size(76.dp)
             )
             Spacer(Modifier.width(8.dp))
             Surface(
@@ -84,10 +87,9 @@ fun CommandBridgeScreen(viewModel: BlasterViewModel) {
             ) {
                 Text(
                     when {
-                        next == null -> language.pick("أنجزتِ كل شيء اليوم! 🎉", "You finished today's path! 🎉")
-                        mood == LiaMood.SAD -> language.pick("اشتقتُ إليكِ! لنبدأ من جديد.", "I missed you! Let's start again.")
-                        done.isEmpty() -> language.pick("هل أنتِ مستعدة؟ اضغطي على زر ابدئي.", "Ready? Tap START.")
-                        else -> language.pick("أحسنتِ! لنكمل.", "Nice work! Let's keep going.")
+                        mood == LiaMood.SAD -> language.pick("اشتقتُ إليك! لنبدأ من جديد.", "I missed you! Let's start again.")
+                        next == null -> language.pick("أنهيت تمارين اليوم! 🎉 هيا إلى المغامرة.", "Today's practice is done! 🎉 On to the adventure.")
+                        else -> language.pick("أهلًا يا بطل! من أين نبدأ؟", "Hi! Where shall we start?")
                     },
                     color = TextPrimary,
                     fontSize = 16.sp,
@@ -95,41 +97,38 @@ fun CommandBridgeScreen(viewModel: BlasterViewModel) {
                     modifier = Modifier.padding(12.dp)
                 )
             }
-        }
-
-        if (showTour) WelcomeTour(language) { viewModel.dismissTour() }
-
-        // The beginner course comes first: it teaches the words the games and the adventure use.
-        val courseStars by viewModel.courseStars.collectAsStateWithLifecycle()
-        if (data.course.isNotEmpty()) {
-            val unitIndex = nextCourseUnit(data.course, courseStars)
-            val unit = data.course[unitIndex]
-            val allDone = data.course.all { (courseStars[it.id] ?: 0) > 0 }
+            Spacer(Modifier.width(6.dp))
             Surface(
-                onClick = { viewModel.navigateTo(Screen.Course) },
-                shape = RoundedCornerShape(22.dp),
-                color = SuccessGreen.copy(alpha = 0.12f),
-                border = BorderStroke(2.dp, SuccessGreen),
-                modifier = Modifier.fillMaxWidth()
+                onClick = { viewModel.showTourAgain() },
+                shape = CircleShape,
+                color = SpaceNavy,
+                modifier = Modifier.size(40.dp)
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(14.dp)) {
-                    Text(if (allDone) "🎓" else unit.emoji, fontSize = 34.sp)
-                    Spacer(Modifier.width(12.dp))
-                    Column(Modifier.weight(1f)) {
-                        Text(
-                            if (allDone) language.pick("📚 أنهيتِ الدورة! راجعي متى شئتِ", "📚 Course finished! Review any time")
-                            else language.pick("📚 الدورة · الوحدة ${unitIndex + 1}", "📚 Course · Unit ${unitIndex + 1}"),
-                            color = SuccessGreen, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp
-                        )
-                        if (!allDone) {
-                            Text(unit.title, color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
-                            Text(unit.helperTitle(language), color = TextSecondary, fontSize = 13.sp)
-                        }
-                    }
-                    Text("▶", color = SuccessGreen, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold)
-                }
+                Box(contentAlignment = Alignment.Center) { Text("❔", fontSize = 20.sp) }
             }
         }
+
+        // 1. The main game: Lía's adventure.
+        HomeChoice(
+            emoji = "🚀",
+            title = language.pick("مغامرة ليا", "Lía's adventure"),
+            subtitle = chapter?.let { "${it.level} · ${it.title(language)}" } ?: language.pick("أعد أي فصل", "Replay any chapter"),
+            action = language.pick("العب ▶", "PLAY ▶"),
+            colors = listOf(SpaceDeep, Color(0xFF2A1F6B)),
+            accent = SolarGold
+        ) { viewModel.startFromHome(PathStep.STORY) }
+
+        // 2. Today's practice: lesson, words, grammar.
+        val todayDone = PathStep.TODAY.count { it in done }
+        HomeChoice(
+            emoji = "📅",
+            title = language.pick("تمارين اليوم", "Today's practice"),
+            subtitle = if (next == null) language.pick("أنهيتها كلها! العب ما تشاء", "All done! Play anything you like")
+            else "$todayDone/${PathStep.TODAY.size} · " + stepTitle(next, language),
+            action = language.pick("ابدأ ▶", "START ▶"),
+            colors = listOf(SolarAmber, Color(0xFFF59E2B)),
+            accent = Color.White
+        ) { if (next == null) viewModel.navigateTo(Screen.Practice) else viewModel.startFromHome(next) }
 
         // Today's goal
         val xp = streak.xpOn(today)
@@ -150,44 +149,19 @@ fun CommandBridgeScreen(viewModel: BlasterViewModel) {
             ProgressBar(progress = xp / streak.dailyGoal.toFloat(), color = SolarAmber, height = 12.dp)
         }
 
-        // The one big button
-        val startStep = next ?: PathStep.WORDS
-        Surface(
-            onClick = { if (next == null) viewModel.navigateTo(Screen.Practice) else viewModel.startFromHome(startStep) },
-            shape = RoundedCornerShape(24.dp),
-            color = Color.Transparent,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Box(
-                Modifier
-                    .background(Brush.horizontalGradient(listOf(SolarAmber, Color(0xFFF59E2B))))
-                    .padding(vertical = 16.dp, horizontal = 20.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        if (next == null) language.pick("العبي أكثر ▶", "PLAY MORE ▶") else language.pick("ابدئي ▶", "START ▶"),
-                        color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.ExtraBold
-                    )
-                    Text(
-                        if (next == null) language.pick("اختاري أي لعبة", "Pick any game") else stepTitle(startStep, language),
-                        color = Color.White.copy(alpha = 0.9f), fontSize = 14.sp, fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-        }
-
-        // Today's path
+        // Today's path: the three practice steps.
         Text(language.pick("مسار اليوم", "Today's path"), color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp)
-        PathStep.entries.forEachIndexed { i, step ->
+        PathStep.TODAY.forEachIndexed { i, step ->
             PathRow(
                 number = i + 1,
                 title = stepTitle(step, language),
                 subtitle = when (step) {
+                    PathStep.LESSON -> lessonUnit?.let { "${language.pick("المستوى", "Level")} ${data.course.indexOf(it) + 1} · ${it.title} · ${it.helperTitle(language)}" }
+                        ?: language.pick("٨ كلمات بالصور والألعاب", "8 words with pictures and games")
                     PathStep.WORDS -> language.pick("5 كلمات جديدة أو مراجعة سريعة", "5 new words or a quick review")
-                    PathStep.STORY -> chapter?.let { it.title(language) } ?: language.pick("أعيدي أي فصل", "Replay any chapter")
                     PathStep.GRAMMAR -> nextTopic?.title(language)
-                        ?: language.pick("قاعدة واحدة وسبب كل إجابة", "One rule and the reason behind each answer")
+                        ?: language.pick("قاعدة واحدة خطوة بخطوة", "One rule, step by step")
+                    PathStep.STORY -> chapter?.title(language).orEmpty()
                 },
                 emoji = stepEmoji(step),
                 done = step in done,
@@ -196,15 +170,38 @@ fun CommandBridgeScreen(viewModel: BlasterViewModel) {
         }
         Spacer(Modifier.height(4.dp))
     }
+
+    if (showTour) WelcomeTour(language) { viewModel.dismissTour() }
+}
+
+/** One of the two big choices on Home. */
+@Composable
+private fun HomeChoice(emoji: String, title: String, subtitle: String, action: String, colors: List<Color>, accent: Color, onClick: () -> Unit) {
+    Surface(onClick = onClick, shape = RoundedCornerShape(24.dp), color = Color.Transparent, modifier = Modifier.fillMaxWidth()) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.background(Brush.horizontalGradient(colors)).padding(horizontal = 18.dp, vertical = 18.dp)
+        ) {
+            Text(emoji, fontSize = 40.sp)
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Text(title, color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold)
+                Text(subtitle, color = Color.White.copy(alpha = 0.85f), fontSize = 13.sp, fontWeight = FontWeight.Bold, maxLines = 2)
+            }
+            Text(action, color = accent, fontSize = 17.sp, fontWeight = FontWeight.ExtraBold)
+        }
+    }
 }
 
 fun stepTitle(step: PathStep, language: HelperLanguage) = when (step) {
-    PathStep.WORDS -> language.pick("تعلّمي كلمات", "Learn words")
+    PathStep.LESSON -> language.pick("درس اليوم", "Today's lesson")
+    PathStep.WORDS -> language.pick("تعلّم كلمات", "Learn words")
     PathStep.STORY -> language.pick("مغامرة ليا", "Lía's adventure")
     PathStep.GRAMMAR -> language.pick("القواعد: لماذا؟", "Grammar: why?")
 }
 
 private fun stepEmoji(step: PathStep) = when (step) {
+    PathStep.LESSON -> "📚"
     PathStep.WORDS -> "🌌"
     PathStep.STORY -> "🗺️"
     PathStep.GRAMMAR -> "🕵️"
@@ -247,37 +244,37 @@ private fun PathRow(
     }
 }
 
-/** One-time card for new players: what each part of the app is for. */
+/** Welcome tour: a pop-up the first time, and again from the ❔ button on Home. */
 @Composable
 private fun WelcomeTour(language: HelperLanguage, onDismiss: () -> Unit) {
-    Surface(
-        shape = RoundedCornerShape(20.dp),
-        color = NebulaPurple.copy(alpha = 0.08f),
-        border = BorderStroke(1.5.dp, NebulaPurple.copy(alpha = 0.5f)),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(language.pick("👋 أهلًا بكِ! هذا ما في التطبيق:", "👋 Welcome! Here's what's inside:"), color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp)
-            TourLine("▶", language.pick("زر ابدئي يختار لكِ درس اليوم خطوة بخطوة.", "START picks today's lesson for you, step by step."))
-            TourLine("🌌", language.pick(tl("الكلمات: تعلّمي أهم 5000 كلمة إسبانية."), tl("Words: learn the 5000 most-used Spanish words.")))
-            TourLine("🕵️", language.pick("القواعد: افهمي لماذا تكون الإجابة صحيحة.", "Grammar: understand why each answer is right."))
-            TourLine("🗺️", language.pick("المغامرة: امشي مع ليا ونيلو وأنجزي المهمات.", "Adventure: walk with Lía and Nilo and finish missions."))
-            TourLine("🎮", language.pick("تمارين في الأسفل: كل الألعاب في مكان واحد.", "Practice (bottom bar): every game in one place."))
-            TourLine("👤", language.pick("أنا في الأسفل: تقدّمك وجوائزك والإعدادات.", "Me: your progress, trophies and settings."))
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = SpaceNavy,
+        shape = RoundedCornerShape(24.dp),
+        title = { Text(language.pick("👋 أهلًا بك! هذا ما في التطبيق", "👋 Welcome! Here's what's inside"), color = SolarGold, fontWeight = FontWeight.ExtraBold, fontSize = 19.sp) },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                TourLine("🚀", language.pick("مغامرة ليا: اللعبة الأساسية. امشِ في السفينة وحلّ الألغاز وتعلّم.", "Lía's adventure: the main game. Walk the ship, solve puzzles, learn."))
+                TourLine("📅", language.pick("تمارين اليوم: درس، ثم كلمات، ثم قاعدة.", "Today's practice: a lesson, then words, then a rule."))
+                TourLine("🎮", language.pick("تمارين (في الأسفل): كل الألعاب في مكان واحد.", "Practice (bottom bar): every game in one place."))
+                TourLine("👤", language.pick("أنا (في الأسفل): تقدّمك وجوائزك والإعدادات.", "Me (bottom bar): your progress, trophies and settings."))
+                TourLine("❔", language.pick("اضغط ❔ في الأعلى لتقرأ هذا مرة أخرى.", "Tap ❔ at the top to read this again."))
+            }
+        },
+        confirmButton = {
             Button(
                 onClick = onDismiss,
-                colors = ButtonDefaults.buttonColors(containerColor = NebulaPurple),
-                shape = RoundedCornerShape(14.dp),
-                modifier = Modifier.fillMaxWidth()
+                colors = ButtonDefaults.buttonColors(containerColor = SolarAmber),
+                shape = RoundedCornerShape(14.dp)
             ) { Text(language.pick("فهمت!", "Got it!"), fontWeight = FontWeight.ExtraBold) }
         }
-    }
+    )
 }
 
 @Composable
 private fun TourLine(emoji: String, text: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(emoji, fontSize = 20.sp, modifier = Modifier.width(34.dp))
-        Text(text, color = TextPrimary, fontSize = 14.sp, modifier = Modifier.weight(1f))
+        Text(text, color = StarWhite, fontSize = 15.sp, lineHeight = 21.sp, modifier = Modifier.weight(1f))
     }
 }
