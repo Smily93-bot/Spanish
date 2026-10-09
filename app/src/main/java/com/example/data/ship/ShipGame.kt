@@ -278,6 +278,36 @@ object ShipRules {
         return ShipStep(ns, event, gotKey, pushed, switched, teleported, gotDiamond, picked, openedDoor)
     }
 
+    /**
+     * Can Lía still reach the next learning room (or the exit) from [s]? A breadth-first search over
+     * her moves; used to notice a dead end (e.g. a key spent on the wrong door) and offer a restart.
+     * Returns true when the search gets too big to be sure.
+     */
+    fun canProgress(level: ShipLevel, s: ShipState, wanted: Int, limit: Int = 60_000): Boolean {
+        val start = s.copy(facing = RIGHT)
+        val seen = HashSet<ShipState>()
+        seen += start
+        val queue = ArrayDeque(listOf(start))
+        while (queue.isNotEmpty()) {
+            val cur = queue.removeFirst()
+            for (d in listOf(UP, DOWN, LEFT, RIGHT)) {
+                val r = step(level, cur, d, wanted)
+                when (r.event) {
+                    is ShipEvent.RoomOpen, ShipEvent.Win -> return true
+                    is ShipEvent.Blocked, ShipEvent.Hit -> continue
+                    else -> {
+                        val next = r.state.copy(facing = RIGHT)
+                        if (seen.add(next)) {
+                            if (seen.size > limit) return true
+                            queue.addLast(next)
+                        }
+                    }
+                }
+            }
+        }
+        return false
+    }
+
     /** A learning room's game was won: count it and hand over its reward key. */
     fun solveRoom(level: ShipLevel, s: ShipState, room: Int): ShipState {
         if (room != s.solved) return s

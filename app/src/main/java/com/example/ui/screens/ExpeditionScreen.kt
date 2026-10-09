@@ -2,7 +2,10 @@ package com.example.ui.screens
 
 import com.example.flavor.tl
 import androidx.compose.foundation.BorderStroke
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.Animatable
@@ -173,7 +176,7 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
     // Fetch quest: a thing for each fetch spot (from units with things you can carry); one is wanted.
     val things = remember(tablet.id) {
         val carryable = data.course.filter { it.id in setOf("u6", "u7", "u8", "u10", "u12") }.flatMap { it.words }
-        carryable.ifEmpty { data.courseWords }.distinctBy { it.emoji }.shuffled().take(level.fetchSpots.size)
+        carryable.ifEmpty { data.courseWords }.filter { it.emoji !in setOf("🔑", "🗝️", "🚪") }.distinctBy { it.emoji }.shuffled().take(level.fetchSpots.size)
     }
     val wanted = remember(tablet.id) { if (things.isEmpty()) 0 else things.indices.random() }
 
@@ -217,6 +220,9 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
     var briefed by remember { mutableStateOf(false) }
     // How to play is shown on the first level, and whenever ❔ is pressed.
     var briefFromHelp by remember { mutableStateOf(false) }
+    // A dead end (e.g. a key used on the wrong door): offer to go back to the last room.
+    var stuck by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
     val results = remember { mutableStateMapOf<String, Boolean>() }
     var openStation by remember { mutableStateOf<Int?>(null) }
     var finished by remember { mutableStateOf(false) }
@@ -334,6 +340,14 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
                 when {
                     result.gotKey != null || result.openedDoor || result.teleported || result.switched -> viewModel.soundEngine.powerUp()
                     result.gotDiamond || result.pushed || result.pickedThing -> viewModel.soundEngine.click()
+                }
+                // After a key is used or a battery pushed, check in the background that the way on is still open.
+                if (result.openedDoor || result.pushed || result.switched) {
+                    val snapshot = state
+                    scope.launch {
+                        val ok = withContext(Dispatchers.Default) { ShipRules.canProgress(level, snapshot, wanted) }
+                        if (!ok && state == snapshot) stuck = true
+                    }
                 }
                 result.pickedThing.takeIf { it }?.let {
                     things.getOrNull(state.carry)?.let { t -> say(NiloLine("🙌 ${t.word}", "", "")) }
@@ -519,6 +533,30 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
 
     if (!briefed) {
         MissionBriefing(tablet, chapterNumber, level, language, showHowTo = chapterNumber == 1 || briefFromHelp, onStart = { briefed = true; briefFromHelp = false })
+    }
+
+    if (stuck) {
+        AlertDialog(
+            onDismissRequest = { stuck = false },
+            containerColor = SpaceNavy,
+            shape = RoundedCornerShape(24.dp),
+            title = { Text(language.pick("🚧 طريق مسدود", "🚧 Dead end"), color = SolarGold, fontWeight = FontWeight.ExtraBold) },
+            text = {
+                Text(
+                    language.pick(
+                        "لم يعد هناك طريق إلى الغرفة التالية (ربما فتحتِ الباب الخطأ). عودي إلى آخر غرفة وجرّبي طريقًا آخر.",
+                        "There's no way to the next room any more (maybe the wrong door was opened). Go back to the last room and try another way."
+                    ),
+                    color = StarWhite, fontSize = 16.sp, lineHeight = 23.sp
+                )
+            },
+            confirmButton = {
+                Button(onClick = { stuck = false; backToCheckpoint() }, colors = ButtonDefaults.buttonColors(containerColor = MeteorRed), shape = RoundedCornerShape(14.dp)) {
+                    Text(language.pick("↺ العودة إلى آخر غرفة", "↺ Back to the last room"), fontWeight = FontWeight.ExtraBold)
+                }
+            },
+            dismissButton = { TextButton(onClick = { stuck = false }) { Text(language.pick("↶ تراجع خطوة", "↶ Undo a step"), color = StarWhite) } }
+        )
     }
 
     if (showTip) {

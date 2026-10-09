@@ -26,6 +26,16 @@ class ShipLevelsTest {
     }
 
     @Test
+    fun wrongDoorIsADeadEnd() {
+        // Level 4: the red key from the radio room used on the far red door leaves no way on.
+        val level = levels[3]
+        var s = ShipRules.solveRoom(level, ShipRules.start(level).copy(pos = level.pads[0]), 0)
+        assertTrue(ShipRules.canProgress(level, s, 0))
+        s = s.copy(keys = listOf(0, 0, 0, 0))
+        assertTrue(!ShipRules.canProgress(level, s, 0))
+    }
+
+    @Test
     fun everyLevelIsSolvableInTheApp() {
         assertTrue(levels.size >= 12)
         levels.forEachIndexed { i, level ->
@@ -41,6 +51,10 @@ class ShipLevelsTest {
                 for (m in level.solution) {
                     val step = ShipRules.step(level, s, dir(m), wanted)
                     if (step.event is ShipEvent.Hit || step.event is ShipEvent.Blocked) { ok = false; break }
+                    // The dead-end check must never fire on the real solution.
+                    if ((step.openedDoor || step.pushed || step.switched) && step.event !is ShipEvent.RoomOpen && step.event !is ShipEvent.Win) {
+                        assertTrue("level ${i + 1}: dead end reported on the solution", ShipRules.canProgress(level, step.state, wanted))
+                    }
                     s = step.state
                     val e = step.event
                     if (e is ShipEvent.RoomOpen) s = ShipRules.solveRoom(level, s, e.room)
