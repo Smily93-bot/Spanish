@@ -49,7 +49,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -1012,7 +1015,10 @@ private fun GoalStrip(
 
 /** One screen of a room's game: rooms are played one card at a time. */
 private sealed interface Step {
-    data class Sentence(val text: String, val number: Int, val total: Int, val translation: String?) : Step
+    /** One more story sentence; the ones before it stay above, like a chat. */
+    data class Sentence(val text: String, val number: Int, val total: Int, val translation: String?, val before: List<String> = emptyList()) : Step
+    /** The chapter's grammar in a small piece: the rule, its forms, and where they are in the story. */
+    data class Rule(val short: Boolean) : Step
     /** Typed answer. */
     data class Write(val key: String, val field: TabletField) : Step
     /** Word Jump: Lía jumps onto the right word. */
@@ -1051,16 +1057,16 @@ private fun buildSteps(
     val choices = data.answerChoices
     return when (station) {
         Station.STORY -> storySentences(tablet.story).let { s ->
-            s.mapIndexed { i, line -> Step.Sentence(line, i + 1, s.size, tablet.storyLines.getOrNull(i)?.meaning(language)) }
-        } + listOfNotNull(storyMatch(tablet, data)?.let { Step.Match(it) })
-        Station.OPENING -> tablet.opening.mapIndexed { i, f -> Step.Write("opening-$i", f) }
+            s.mapIndexed { i, line -> Step.Sentence(line, i + 1, s.size, tablet.storyLines.getOrNull(i)?.meaning(language), s.take(i)) }
+        } + Step.Rule(short = false) + listOfNotNull(storyMatch(tablet, data)?.let { Step.Match(it) })
+        Station.OPENING -> listOf(Step.Rule(short = true)) + tablet.opening.mapIndexed { i, f -> Step.Write("opening-$i", f) }
         Station.SEARCH -> if (scene == null || searchTargets.isEmpty()) listOf(Step.Note("🔍", "")) else listOf(Step.Search)
         Station.CONSOLE -> listOf(Step.Lesson, Step.Table)
         Station.ORDER -> listOf(Step.Order)
         Station.MISSION -> listOf(Step.Note("🛰️", language.pick(tablet.missionAr, tablet.mission))) +
             tablet.fields.mapIndexed { i, f -> Step.Choice("fields-$i", f.label, f.answers, language.pick(bidiSafe(f.hintAr), f.hint), choices.options(f.answers, tablet)) }
         Station.PORTAL -> storySentences(tablet.ending).let { s ->
-            s.mapIndexed { i, line -> Step.Sentence(line, i + 1, s.size, tablet.endingLines.getOrNull(i)?.meaning(language)) }
+            s.mapIndexed { i, line -> Step.Sentence(line, i + 1, s.size, tablet.endingLines.getOrNull(i)?.meaning(language), s.take(i)) }
         } + tablet.gate.mapIndexed { i, f ->
             Step.Falling("gate-$i", f.label, f.answers, language.pick(bidiSafe(f.hintAr), f.hint), choices.options(f.answers, tablet))
         } + Step.Note("🏁", tablet.expeditionPayoff(language) + "\n" + language.pick("المكافأة: ", tl("Recompensa: ")) + tablet.reward(language))
@@ -1142,6 +1148,7 @@ private fun MissionPanel(
                 } else Column(Modifier.fillMaxSize().verticalScroll(scroll), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     when (step) {
                         is Step.Sentence -> SentenceCard(step, data, viewModel, language)
+                        is Step.Rule -> RuleCard(tablet, step.short, viewModel, language)
                         is Step.Write -> QuestionCard(step.field, step.key, results, viewModel, language)
                         is Step.Choice -> ChoiceCard(step, results, viewModel, language)
                         is Step.Falling -> FallingWordsCard(step, results, viewModel, language)
@@ -1159,6 +1166,7 @@ private fun MissionPanel(
                         }
                     }
                 }
+                if (step is Step.Sentence) LaunchedEffect(scroll.maxValue) { scroll.animateScrollTo(scroll.maxValue) }
                 if (step !is Step.Choice) ScrollMoreHint(scroll, language, AdventureBg)
             }
         }
@@ -1288,11 +1296,91 @@ private fun MissionBriefing(
     )
 }
 
+/**
+ * The chapter's rule in one small card: what it is, its forms (tap to hear), and the story
+ * sentences that use them, with the form highlighted. The short version opens the next room as a reminder.
+ */
+@Composable
+private fun RuleCard(tablet: ReadingTablet, short: Boolean, viewModel: BlasterViewModel, language: HelperLanguage) {
+    val forms = remember(tablet.id) {
+        tablet.table.rows.flatMap { it.drop(1) }.flatMap { it.split("/") }.map { it.trim() }.filter { it.isNotBlank() }.distinct()
+    }
+    val inStory = remember(tablet.id) {
+        storySentences(tablet.story).mapNotNull { line ->
+            val words = line.split(" ")
+            val hit = words.indexOfFirst { w -> w.trim('.', ',', '¡', '!', '¿', '?').lowercase() in forms.map { it.lowercase() } }
+            if (hit >= 0) line to hit else null
+        }.take(if (short) 1 else 3)
+    }
+    AdventureCard(borderColor = ExplorerBlue) {
+        Text(if (short) language.pick("📘 تذكّري القاعدة", "📘 Remember the rule") else language.pick("📘 قاعدة هذا الفصل", "📘 This chapter's rule"),
+            color = ExplorerBlue, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp)
+        Text(language.pick(tablet.lesson.titleAr, tablet.lesson.title), color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 19.sp)
+        if (!short) {
+            Spacer(Modifier.height(4.dp))
+            Text(language.pick(bidiSafe(tablet.lesson.arabic), tablet.lesson.english), color = TextPrimary, fontSize = 16.sp, lineHeight = 24.sp)
+        }
+    }
+    // The forms as pairs: who → form.
+    if (tablet.table.rows.isNotEmpty()) {
+        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                tablet.table.rows.forEach { row ->
+                    val form = row.drop(1).joinToString(" · ")
+                    Surface(
+                        onClick = { viewModel.speakSpanish(row.joinToString(" ")) },
+                        shape = RoundedCornerShape(14.dp),
+                        color = ExplorerBlue.copy(alpha = 0.10f),
+                        border = BorderStroke(1.dp, ExplorerBlue.copy(alpha = 0.4f))
+                    ) {
+                        Row(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Text(row.first(), color = TextSecondary, fontSize = 14.sp)
+                            Text(" → ", color = TextSecondary, fontSize = 14.sp)
+                            Text(form, color = ExplorerBlue, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    // Where the rule was in the story.
+    if (inStory.isNotEmpty()) {
+        Text(language.pick("🔎 في القصة:", "🔎 In the story:"), color = NebulaPurple, fontWeight = FontWeight.ExtraBold, fontSize = 14.sp)
+        inStory.forEach { (line, hit) ->
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    buildAnnotatedString {
+                        line.split(" ").forEachIndexed { i, w ->
+                            if (i > 0) append(" ")
+                            if (i == hit) withStyle(SpanStyle(color = SuccessGreen, fontWeight = FontWeight.ExtraBold, background = SuccessGreen.copy(alpha = 0.15f))) { append(w) }
+                            else append(w)
+                        }
+                    },
+                    color = TextPrimary, fontSize = 18.sp, lineHeight = 26.sp, modifier = Modifier.weight(1f)
+                )
+                AudioButton(onClick = { viewModel.speakSpanish(line) }, size = 34.dp)
+            }
+        }
+    }
+}
+
 /** One story sentence in Lía's speech bubble, read aloud. */
 @Composable
 private fun SentenceCard(step: Step.Sentence, data: SpanishContent, viewModel: BlasterViewModel, language: HelperLanguage) {
     var showTranslation by remember { mutableStateOf(false) }
     LaunchedEffect(step.text) { viewModel.speakSpanish(step.text) }
+    // The sentences already heard stay above the new one (tap one to hear it again).
+    step.before.forEach { line ->
+        Surface(
+            onClick = { viewModel.speakSpanish(line) },
+            shape = RoundedCornerShape(topStart = 4.dp, topEnd = 18.dp, bottomEnd = 18.dp, bottomStart = 18.dp),
+            color = AdventureSurface.copy(alpha = 0.7f),
+            border = BorderStroke(1.dp, AdventureCardBorder),
+            modifier = Modifier.fillMaxWidth().padding(start = 78.dp)
+        ) {
+            Text(line, color = TextSecondary, fontSize = 16.sp, lineHeight = 22.sp, modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp))
+        }
+    }
     Row(verticalAlignment = Alignment.Top) {
         Image(painterResource(R.drawable.lia_happy), contentDescription = "Lía", modifier = Modifier.size(70.dp))
         Spacer(Modifier.width(8.dp))
