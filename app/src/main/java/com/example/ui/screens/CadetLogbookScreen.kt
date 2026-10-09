@@ -81,7 +81,7 @@ fun CadetLogbookScreen(viewModel: BlasterViewModel) {
                 if (filtered.isEmpty()) {
                     item {
                         Text(
-                            language.pick("العبي أي لعبة لتبدأ الكلمات بالظهور هنا.", "Play any game and the words you meet will appear here."),
+                            language.pick("العب أي لعبة لتبدأ الكلمات بالظهور هنا.", "Play any game and the words you meet will appear here."),
                             color = TextSecondary, fontSize = 13.sp
                         )
                     }
@@ -163,7 +163,7 @@ private fun SearchField(query: String, onChange: (String) -> Unit, language: Hel
         value = query,
         onValueChange = onChange,
         singleLine = true,
-        placeholder = { Text(language.pick(tl("ابحثي بالإسبانية أو العربية…"), tl("Search in Spanish or English…"))) },
+        placeholder = { Text(language.pick(tl("ابحث بالإسبانية أو العربية…"), tl("Search in Spanish or English…"))) },
         shape = RoundedCornerShape(14.dp),
         modifier = Modifier.fillMaxWidth()
     )

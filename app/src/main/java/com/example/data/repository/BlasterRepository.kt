@@ -241,20 +241,20 @@ class BlasterRepository(private val dao: AppDao) {
 
         /** Arabic descriptions for [MILESTONES] (the stored description is English). */
         val MILESTONE_DESCRIPTIONS_AR = mapOf(
-            "games_1" to "العبي أول جولة في الألعاب",
-            "games_10" to "العبي 10 جولات",
-            "games_50" to "العبي 50 جولة",
-            "score_500" to "اجمعي 500 نقطة في جولة واحدة",
-            "score_2000" to "اجمعي 2000 نقطة في جولة واحدة",
-            "tablets_1" to "أكملي أول بعثة مع ليا",
-            "tablets_6" to "أكملي 6 بعثات",
-            "tablets_12" to "أكملي البعثات الاثنتي عشرة",
-            "words_25" to "أتقني 25 كلمة",
-            "words_100" to "أتقني 100 كلمة",
-            "words_300" to "أتقني 300 كلمة",
-            "level_5" to "بلغي المستوى 5",
-            "level_10" to "بلغي المستوى 10",
-            "ship_3" to "رقّي سفينتك إلى الفئة 3"
+            "games_1" to "العب أول جولة في الألعاب",
+            "games_10" to "العب 10 جولات",
+            "games_50" to "العب 50 جولة",
+            "score_500" to "اجمع 500 نقطة في جولة واحدة",
+            "score_2000" to "اجمع 2000 نقطة في جولة واحدة",
+            "tablets_1" to "أكمل أول بعثة مع ليا",
+            "tablets_6" to "أكمل 6 بعثات",
+            "tablets_12" to "أكمل البعثات الاثنتي عشرة",
+            "words_25" to "أتقن 25 كلمة",
+            "words_100" to "أتقن 100 كلمة",
+            "words_300" to "أتقن 300 كلمة",
+            "level_5" to "ابلغ المستوى 5",
+            "level_10" to "ابلغ المستوى 10",
+            "ship_3" to "رقِّ سفينتك إلى الفئة 3"
         )
 
         fun xpForLevel(level: Int) = 300 + (level - 1) * 150

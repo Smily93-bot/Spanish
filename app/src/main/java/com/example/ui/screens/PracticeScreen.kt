@@ -36,17 +36,17 @@ private data class PracticeTile(
 )
 
 private val TILES = listOf(
-    PracticeTile("📚", "الدورة", "Course", "تعلّمي من الصفر", "Learn from zero", SuccessGreen) { it.navigateTo(Screen.Course) },
-    PracticeTile("🔗", "التوصيل", "Matching", "صِلي الكلمة بصورتها", "Match words to pictures", ExplorerBlue) { it.navigateTo(Screen.MatchGame) },
+    PracticeTile("📚", "الدورة", "Course", "تعلّم من الصفر", "Learn from zero", SuccessGreen) { it.navigateTo(Screen.Course) },
+    PracticeTile("🔗", "التوصيل", "Matching", "صِل الكلمة بصورتها", "Match words to pictures", ExplorerBlue) { it.navigateTo(Screen.MatchGame) },
     PracticeTile("🔠", "الكلمات المتقاطعة", "Crossword", "الصورة هي التلميح", "Pictures are the clues", NebulaPurple) { it.navigateTo(Screen.Crossword) },
-    PracticeTile("😋", "الملتهم", "Word Munchers", "كُلي الكلمات المناسبة فقط", "Eat only the words that fit", SuccessGreen) { it.navigateTo(Screen.Munchers) },
+    PracticeTile("😋", "الملتهم", "Word Munchers", "كُل الكلمات المناسبة فقط", "Eat only the words that fit", SuccessGreen) { it.navigateTo(Screen.Munchers) },
     PracticeTile("🌌", "الكلمات", "Words", "أهم 5000 كلمة", "Top 5000 words", DiamondCyan) { it.navigateTo(Screen.WordGalaxy) },
-    PracticeTile("🕵️", "القواعد: لماذا؟", "Grammar: why?", "افهمي سبب كل إجابة", "The reason behind answers", NebulaPurple) { it.navigateTo(Screen.GrammarLab) },
+    PracticeTile("🕵️", "القواعد: لماذا؟", "Grammar: why?", "افهم سبب كل إجابة", "The reason behind answers", NebulaPurple) { it.navigateTo(Screen.GrammarLab) },
     PracticeTile("🗺️", "المغامرة", "Adventure", "قصة ليا ومهماتها", "Lía's story missions", SolarAmber) { it.navigateTo(Screen.AdventureMap) },
-    PracticeTile("☄️", "النيازك", "Meteors", "اختاري المعنى بسرعة", "Pick the meaning fast", MeteorRed) { it.navigateTo(Screen.MeteorBlaster) },
-    PracticeTile("🐸", "القفز", "Word Jump", "اقفزي على الكلمة الصحيحة", "Jump on the right word", SolarGold) { it.navigateTo(Screen.WordJump) },
-    PracticeTile("🔀", "الجمل", "Sentences", "رتّبي الكلمات", "Put words in order", ExplorerBlue) { it.navigateTo(Screen.GrammarReactor) },
-    PracticeTile("✏️", "الفراغات", "Fill the gap", "أكملي الجملة", "Complete the sentence", SuccessGreen) { it.navigateTo(Screen.QuantumCloze) }
+    PracticeTile("☄️", "النيازك", "Meteors", "اختر المعنى بسرعة", "Pick the meaning fast", MeteorRed) { it.navigateTo(Screen.MeteorBlaster) },
+    PracticeTile("🐸", "القفز", "Word Jump", "اقفز على الكلمة الصحيحة", "Jump on the right word", SolarGold) { it.navigateTo(Screen.WordJump) },
+    PracticeTile("🔀", "الجمل", "Sentences", "رتّب الكلمات", "Put words in order", ExplorerBlue) { it.navigateTo(Screen.GrammarReactor) },
+    PracticeTile("✏️", "الفراغات", "Fill the gap", "أكمل الجملة", "Complete the sentence", SuccessGreen) { it.navigateTo(Screen.QuantumCloze) }
 )
 
 /** All ways to practise, as big tiles with one short line each. */
@@ -60,7 +60,7 @@ fun PracticeScreen(viewModel: BlasterViewModel) {
             .padding(horizontal = 20.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        Text(language.pick("ماذا تريدين أن تلعبي؟", "What do you want to play?"), color = TextPrimary, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold)
+        Text(language.pick("ماذا تريد أن تلعب؟", "What do you want to play?"), color = TextPrimary, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold)
         TILES.chunked(2).forEach { row ->
             Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
                 row.forEach { tile -> TileCard(tile, language, Modifier.weight(1f)) { tile.open(viewModel) } }

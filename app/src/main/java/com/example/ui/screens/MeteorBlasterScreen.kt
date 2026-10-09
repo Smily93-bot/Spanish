@@ -92,7 +92,7 @@ private fun ModeSelect(viewModel: BlasterViewModel, language: HelperLanguage) {
             Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(language.pick("☄️ مدفع النيازك ☄️", "☄️ METEOR BLASTER ☄️"), color = SolarGold, fontWeight = FontWeight.ExtraBold, fontSize = 22.sp)
                 Text(
-                    language.pick("اضغطي على النيزك الذي يحمل الإجابة الصحيحة قبل أن يصطدم بسفينتك!", "Tap the meteor with the right answer before it hits your ship!"),
+                    language.pick("اضغط على النيزك الذي يحمل الإجابة الصحيحة قبل أن يصطدم بسفينتك!", "Tap the meteor with the right answer before it hits your ship!"),
                     color = StarWhite, fontSize = 12.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(horizontal = 20.dp)
                 )
                 Spacer(Modifier.height(6.dp))
@@ -100,8 +100,8 @@ private fun ModeSelect(viewModel: BlasterViewModel, language: HelperLanguage) {
             }
         }
         ModeCard("🔤", BlasterMode.TRANSLATION, language.pick(tl("كلمة إسبانية ← معناها"), tl("Spanish word → its meaning")), ExplorerBlue, viewModel, language)
-        ModeCard("🔁", BlasterMode.SYNONYM, language.pick(tl("اختاري الكلمة الإسبانية المرادفة"), tl("Pick the Spanish synonym")), NebulaPurple, viewModel, language)
-        ModeCard("⚖️", BlasterMode.ANTONYM, language.pick(tl("اختاري الكلمة الإسبانية المضادة"), tl("Pick the Spanish opposite")), SolarAmber, viewModel, language)
+        ModeCard("🔁", BlasterMode.SYNONYM, language.pick(tl("اختر الكلمة الإسبانية المرادفة"), tl("Pick the Spanish synonym")), NebulaPurple, viewModel, language)
+        ModeCard("⚖️", BlasterMode.ANTONYM, language.pick(tl("اختر الكلمة الإسبانية المضادة"), tl("Pick the Spanish opposite")), SolarAmber, viewModel, language)
         OutlinedButton(
             onClick = { viewModel.fetchLocalHighScores("ALL") },
             shape = RoundedCornerShape(14.dp),
@@ -307,7 +307,7 @@ private fun GameOverPanel(state: MeteorGameState, viewModel: BlasterViewModel, l
             if (reward.leveledUp) Text(language.pick("🚀 المستوى ${reward.newLevel}!", tl("🚀 ¡Nivel %d!").format(reward.newLevel)), color = DiamondCyan, fontWeight = FontWeight.Bold)
             reward.unlockedMilestones.forEach { Text("🎖️ ${it.title} (+${it.rewardCredits} ⭐)", color = SuccessGreen, fontWeight = FontWeight.Bold) }
         }
-        BlasterCyberButton(language.pick("العبي مجددًا", tl("JUGAR OTRA VEZ")), { viewModel.startMeteorGame(state.mode) }, Modifier.fillMaxWidth(), SolarAmber)
+        BlasterCyberButton(language.pick("العب مجددًا", tl("JUGAR OTRA VEZ")), { viewModel.startMeteorGame(state.mode) }, Modifier.fillMaxWidth(), SolarAmber)
         BlasterCyberButton(language.pick("🏆 لوحة الشرف", tl("🏆 Récords")), { viewModel.fetchLocalHighScores(state.mode.name) }, Modifier.fillMaxWidth(), NebulaPurple)
         OutlinedButton(
             onClick = { viewModel.exitMeteorGame() },

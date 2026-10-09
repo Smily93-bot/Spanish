@@ -67,7 +67,7 @@ fun GrammarReactorScreen(viewModel: BlasterViewModel) {
         LevelPicker(
             title = tl("⚛️ Reactor Gramatical"),
             subtitle = language.pick(
-                "رتّبي أجزاء الجملة لتشغيل المفاعل. كل جملة صحيحة من المحاولة الأولى تمنحك طاقة إضافية.",
+                "رتّب أجزاء الجملة لتشغيل المفاعل. كل جملة صحيحة من المحاولة الأولى تمنحك طاقة إضافية.",
                 "Put the sentence fragments in order to power the reactor. First-try answers charge it faster."
             ),
             color = NebulaPurple,
@@ -105,7 +105,7 @@ fun LevelPicker(title: String, subtitle: String, color: Color, language: HelperL
             Spacer(Modifier.height(6.dp))
             Text(subtitle, color = StarWhite.copy(alpha = 0.85f), fontSize = 13.sp)
         }
-        SectionHeader(language.pick("اختاري المستوى", tl("Elige tu nivel")))
+        SectionHeader(language.pick("اختر المستوى", tl("Elige tu nivel")))
         CefrLevel.entries.chunked(2).forEach { pair ->
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 pair.forEach { lvl ->
@@ -171,7 +171,7 @@ private fun ReactorRun(
         if (streak >= 2) Text("🔥 x$streak", color = SolarAmber, fontWeight = FontWeight.Bold)
 
         AdventureCard(borderColor = NebulaPurple.copy(alpha = 0.5f)) {
-            Text(language.pick(tl("ابني هذه الجملة بالإسبانية:"), tl("Build this sentence in Spanish:")), color = TextSecondary, fontSize = 12.sp)
+            Text(language.pick(tl("ابنِ هذه الجملة بالإسبانية:"), tl("Build this sentence in Spanish:")), color = TextSecondary, fontSize = 12.sp)
             Text(sentence.translation, color = TextPrimary, fontSize = 17.sp, fontWeight = FontWeight.Bold)
         }
 
@@ -202,7 +202,7 @@ private fun ReactorRun(
         }
 
         if (!solved && placed.size == sentence.words.size) {
-            BlasterCyberButton(language.pick("شغّلي المفاعل", tl("Activar reactor")), {
+            BlasterCyberButton(language.pick("شغّل المفاعل", tl("Activar reactor")), {
                 if (placed.map { it.value } == sentence.words) {
                     solved = true
                     val firstTry = mistakes == 0
@@ -231,7 +231,7 @@ private fun ReactorRun(
                 placed.addAll(sentence.words.withIndex())
                 solved = true
                 streak = 0
-            }, modifier = Modifier.fillMaxWidth()) { Text(language.pick("أظهري الحل", tl("Ver la solución")), color = TextSecondary) }
+            }, modifier = Modifier.fillMaxWidth()) { Text(language.pick("أظهر الحل", tl("Ver la solución")), color = TextSecondary) }
         }
 
         if (solved) {

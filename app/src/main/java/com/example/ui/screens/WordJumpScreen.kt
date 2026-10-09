@@ -47,7 +47,7 @@ fun WordJumpScreen(viewModel: BlasterViewModel) {
         key(run) { JumpRun(data, viewModel, language) { lost = it } }
     }
     reward?.let {
-        val title = if (lost) language.pick("💔 انتهت القلوب، حاولي مرة أخرى", "💔 Out of hearts, try again") else language.pick("🐸 قفزة رائعة!", "🐸 " + tl("¡Gran salto!"))
+        val title = if (lost) language.pick("💔 انتهت القلوب، حاول مرة أخرى", "💔 Out of hearts, try again") else language.pick("🐸 قفزة رائعة!", "🐸 " + tl("¡Gran salto!"))
         RewardDialog(it, language == HelperLanguage.ARABIC, title) {
             viewModel.dismissPracticeReward()
             run = 0
@@ -66,7 +66,7 @@ private fun JumpStart(language: HelperLanguage, onStart: () -> Unit) {
         Text("Word Jump", color = TextPrimary, fontSize = 30.sp, fontWeight = FontWeight.ExtraBold)
         Text(
             language.pick(
-                "اضغطي على الكلمة الصحيحة لتقفز ليا إليها.\n10 جولات و3 قلوب.",
+                "اضغط على الكلمة الصحيحة لتقفز ليا إليها.\n10 جولات و3 قلوب.",
                 "Tap the right word and Lía jumps onto it.\n10 rounds, 3 hearts."
             ),
             color = TextSecondary, fontSize = 16.sp, textAlign = TextAlign.Center
@@ -76,7 +76,7 @@ private fun JumpStart(language: HelperLanguage, onStart: () -> Unit) {
             colors = ButtonDefaults.buttonColors(containerColor = SolarAmber),
             shape = RoundedCornerShape(20.dp),
             modifier = Modifier.fillMaxWidth().height(60.dp)
-        ) { Text(language.pick("ابدئي ▶", "START ▶"), fontSize = 20.sp, fontWeight = FontWeight.ExtraBold) }
+        ) { Text(language.pick("ابدأ ▶", "START ▶"), fontSize = 20.sp, fontWeight = FontWeight.ExtraBold) }
     }
 }
 
@@ -125,8 +125,8 @@ private fun JumpRun(data: SpanishContent, viewModel: BlasterViewModel, language:
                 Text(
                     when (mode) {
                         BlasterMode.TRANSLATION -> language.pick("ما معنى", "What does it mean?")
-                        BlasterMode.SYNONYM -> language.pick("اقفزي على المرادف", "Jump on the synonym")
-                        BlasterMode.ANTONYM -> language.pick("اقفزي على العكس", "Jump on the opposite")
+                        BlasterMode.SYNONYM -> language.pick("اقفز على المرادف", "Jump on the synonym")
+                        BlasterMode.ANTONYM -> language.pick("اقفز على العكس", "Jump on the opposite")
                     },
                     color = TextSecondary, fontSize = 14.sp, fontWeight = FontWeight.Bold
                 )

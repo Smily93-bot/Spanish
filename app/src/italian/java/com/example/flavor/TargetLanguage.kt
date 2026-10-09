@@ -106,23 +106,23 @@ private val ITALIAN = mapOf(
     "مستكشف الإسبانية" to "مستكشف الإيطالية",
     "¡Hola! Bienvenida a Spanish Blaster." to "Ciao! Benvenuta in Italian Blaster.",
     "Build this sentence in Spanish:" to "Build this sentence in Italian:",
-    "ابني هذه الجملة بالإسبانية:" to "ابني هذه الجملة بالإيطالية:",
+    "ابنِ هذه الجملة بالإسبانية:" to "ابنِ هذه الجملة بالإيطالية:",
     "Escribe en español" to "Scrivi in italiano",
     "اكتبي الإجابة بالإسبانية" to "اكتبي الإجابة بالإيطالية",
     "No Spanish voice installed on this device." to "No Italian voice installed on this device.",
     "لا يوجد صوت إسباني مثبت على الجهاز." to "لا يوجد صوت إيطالي مثبت على الجهاز.",
     "Search in Spanish or English…" to "Search in Italian or English…",
-    "ابحثي بالإسبانية أو العربية…" to "ابحثي بالإيطالية أو العربية…",
+    "ابحث بالإسبانية أو العربية…" to "ابحث بالإيطالية أو العربية…",
     "Spanish word → its meaning" to "Italian word → its meaning",
     "كلمة إسبانية ← معناها" to "كلمة إيطالية ← معناها",
     "Pick the Spanish synonym" to "Pick the Italian synonym",
-    "اختاري الكلمة الإسبانية المرادفة" to "اختاري الكلمة الإيطالية المرادفة",
+    "اختر الكلمة الإسبانية المرادفة" to "اختر الكلمة الإيطالية المرادفة",
     "Pick the Spanish opposite" to "Pick the Italian opposite",
-    "اختاري الكلمة الإسبانية المضادة" to "اختاري الكلمة الإيطالية المضادة",
+    "اختر الكلمة الإسبانية المضادة" to "اختر الكلمة الإيطالية المضادة",
     "🔈 No Spanish voice found. Install one in Settings → Text-to-speech → Install voice data → Español." to
         "🔈 No Italian voice found. Install one in Settings → Text-to-speech → Install voice data → Italiano.",
-    "🔈 لا يوجد صوت إسباني على جهازك. ثبّتيه من: الإعدادات ← تحويل النص إلى كلام ← تثبيت بيانات الصوت ← Español." to
-        "🔈 لا يوجد صوت إيطالي على جهازك. ثبّتيه من: الإعدادات ← تحويل النص إلى كلام ← تثبيت بيانات الصوت ← Italiano.",
+    "🔈 لا يوجد صوت إسباني على جهازك. ثبّته من: الإعدادات ← تحويل النص إلى كلام ← تثبيت بيانات الصوت ← Español." to
+        "🔈 لا يوجد صوت إيطالي على جهازك. ثبّته من: الإعدادات ← تحويل النص إلى كلام ← تثبيت بيانات الصوت ← Italiano.",
 
     // Game modes, ranks, ships
     "Significado" to "Significato",
@@ -283,11 +283,11 @@ private val ITALIAN = mapOf(
     "مرحبًا! أنا ليا. سنتعلم الإسبانية معًا.\nHi! I'm Lía. Let's learn Spanish together." to
         "مرحبًا! أنا ليا. سنتعلم الإيطالية معًا.\nHi! I'm Lía. Let's learn Italian together.",
     "Words: learn the 5000 most-used Spanish words." to "Words: learn the 5000 most-used Italian words.",
-    "الكلمات: تعلّمي أهم 5000 كلمة إسبانية." to "الكلمات: تعلّمي أهم 5000 كلمة إيطالية.",
+    "الكلمات: تعلّم أهم 5000 كلمة إسبانية." to "الكلمات: تعلّم أهم 5000 كلمة إيطالية.",
     "📱 Add the widget: long-press your home screen → Widgets → Spanish Blaster." to
         "📱 Add the widget: long-press your home screen → Widgets → Italian Blaster.",
-    "📱 أضيفي الأداة إلى الشاشة الرئيسية: اضغطي مطولًا على الشاشة ← الأدوات ← Spanish Blaster." to
-        "📱 أضيفي الأداة إلى الشاشة الرئيسية: اضغطي مطولًا على الشاشة ← الأدوات ← Italian Blaster.",
+    "📱 أضف الأداة إلى الشاشة الرئيسية: اضغط مطولًا على الشاشة ← الأدوات ← Spanish Blaster." to
+        "📱 أضف الأداة إلى الشاشة الرئيسية: اضغط مطولًا على الشاشة ← الأدوات ← Italian Blaster.",
     "📡 La historia" to "📡 La storia",
 
     // Nilo, Lía's co-pilot

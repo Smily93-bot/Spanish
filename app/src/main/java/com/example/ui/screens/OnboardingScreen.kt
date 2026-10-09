@@ -59,7 +59,7 @@ fun OnboardingScreen(viewModel: BlasterViewModel) {
                     color = StarWhite, fontSize = 16.sp, textAlign = TextAlign.Center
                 )
                 Spacer(Modifier.height(10.dp))
-                Text("اختاري لغتك · Choose your language", color = StarWhite.copy(alpha = 0.8f), fontSize = 14.sp)
+                Text("اختر لغتك · Choose your language", color = StarWhite.copy(alpha = 0.8f), fontSize = 14.sp)
                 BigChoice("العربية", "") { viewModel.setHelperLanguage(HelperLanguage.ARABIC); step = 1 }
                 BigChoice("English", "") { viewModel.setHelperLanguage(HelperLanguage.ENGLISH); step = 1 }
             } else {
@@ -77,7 +77,7 @@ fun OnboardingScreen(viewModel: BlasterViewModel) {
                 BigChoice(language.pick("15 دقيقة", "15 minutes"), language.pick("جاد", "Serious")) { viewModel.finishOnboarding(100) }
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    language.pick("بعدها ستظهر لكِ الصفحة الرئيسية.", "Then you'll see your home screen."),
+                    language.pick("بعدها ستظهر لك الصفحة الرئيسية.", "Then you'll see your home screen."),
                     color = StarWhite.copy(alpha = 0.8f), fontSize = 14.sp, textAlign = TextAlign.Center
                 )
             }

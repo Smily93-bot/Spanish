@@ -180,7 +180,7 @@ fun RewardDialog(reward: RewardResult, isArabic: Boolean, title: String, onDismi
                 }
                 if (reward.leveledUp) {
                     Text(
-                        if (isArabic) "🚀 ارتقيتِ إلى المستوى ${reward.newLevel}! (+50 ⭐)" else tl("🚀 ¡Subiste al nivel %d! (+50 ⭐)").format(reward.newLevel),
+                        if (isArabic) "🚀 ارتقيت إلى المستوى ${reward.newLevel}! (+50 ⭐)" else tl("🚀 ¡Subiste al nivel %d! (+50 ⭐)").format(reward.newLevel),
                         color = ExplorerBlue, fontWeight = FontWeight.Bold
                     )
                 }

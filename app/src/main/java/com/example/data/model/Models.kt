@@ -259,10 +259,10 @@ data class GrammarTopic(
 /** Explorer ranks unlocked by player level. */
 enum class Rank(val minLevel: Int, val spanish: String, val english: String, val arabic: String, val emoji: String) {
     CADET(1, tl("Cadete"), "Cadet", "طالب طيران", "👩‍🚀"),
-    EXPLORER(3, tl("Exploradora"), "Explorer", "مستكشفة", "🛰️"),
-    PILOT(6, tl("Piloto"), "Pilot", "طيّارة", "🚀"),
-    CAPTAIN(10, tl("Capitana"), "Captain", "قبطانة", "🌟"),
-    COMMANDER(15, tl("Comandante"), "Commander", "قائدة", "🌍"),
+    EXPLORER(3, tl("Exploradora"), "Explorer", "مستكشف", "🛰️"),
+    PILOT(6, tl("Piloto"), "Pilot", "طيّار", "🚀"),
+    CAPTAIN(10, tl("Capitana"), "Captain", "قبطان", "🌟"),
+    COMMANDER(15, tl("Comandante"), "Commander", "قائد", "🌍"),
     ADMIRAL(22, tl("Almirante galáctica"), "Galactic Admiral", "أميرال المجرة", "👑");
 
     fun label(language: HelperLanguage) = language.pick(arabic, english)

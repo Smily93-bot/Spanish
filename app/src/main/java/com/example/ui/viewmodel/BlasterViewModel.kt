@@ -667,8 +667,8 @@ class BlasterViewModel(
         val duration = (9000 - state.wordsBlasted * 180).coerceAtLeast(3800)
         val prompt = when (state.mode) {
             BlasterMode.TRANSLATION -> _helperLanguage.value.pick("ما معنى هذه الكلمة؟", "What does this mean?")
-            BlasterMode.SYNONYM -> _helperLanguage.value.pick("اختاري المرادف", "Blast the synonym")
-            BlasterMode.ANTONYM -> _helperLanguage.value.pick("اختاري الضد", "Blast the opposite")
+            BlasterMode.SYNONYM -> _helperLanguage.value.pick("اختر المرادف", "Blast the synonym")
+            BlasterMode.ANTONYM -> _helperLanguage.value.pick("اختر الضد", "Blast the opposite")
         }
         _meteorState.value = state.copy(
             currentWord = word,

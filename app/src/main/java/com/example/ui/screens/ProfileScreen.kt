@@ -94,12 +94,12 @@ fun ProfileScreen(viewModel: BlasterViewModel) {
                 steps = 7
             )
             OutlinedButton(onClick = { viewModel.speakSpanish(tl("¡Hola! Bienvenida a Spanish Blaster.")) }) {
-                Text(language.pick("جرّبي الصوت", "Test the voice"))
+                Text(language.pick("جرّب الصوت", "Test the voice"))
             }
             if (viewModel.speechEngine.spanishVoiceMissing) {
                 Text(
                     language.pick(
-                        tl("🔈 لا يوجد صوت إسباني على جهازك. ثبّتيه من: الإعدادات ← تحويل النص إلى كلام ← تثبيت بيانات الصوت ← Español."),
+                        tl("🔈 لا يوجد صوت إسباني على جهازك. ثبّته من: الإعدادات ← تحويل النص إلى كلام ← تثبيت بيانات الصوت ← Español."),
                         tl("🔈 No Spanish voice found. Install one in Settings → Text-to-speech → Install voice data → Español.")
                     ),
                     color = MeteorRed, fontSize = 12.sp
@@ -130,7 +130,7 @@ fun ProfileScreen(viewModel: BlasterViewModel) {
                     Button(
                         onClick = { confirmReset = false; viewModel.resetProgress() },
                         colors = ButtonDefaults.buttonColors(containerColor = MeteorRed)
-                    ) { Text(language.pick("نعم، ابدئي من جديد", "Yes, reset"), fontWeight = FontWeight.Bold) }
+                    ) { Text(language.pick("نعم، ابدأ من جديد", "Yes, reset"), fontWeight = FontWeight.Bold) }
                 },
                 dismissButton = { TextButton(onClick = { confirmReset = false }) { Text(language.pick("إلغاء", "Cancel")) } }
             )

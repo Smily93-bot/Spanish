@@ -45,7 +45,7 @@ fun QuantumClozeScreen(viewModel: BlasterViewModel) {
         LevelPicker(
             title = tl("🌀 Cloze Cuántico"),
             subtitle = language.pick(
-                "اختاري الكلمة التي تكمل الجملة قبل أن ينهار الحقل الكمي. الجمل مأخوذة من قائمة أكثر 5000 كلمة استخدامًا.",
+                "اختر الكلمة التي تكمل الجملة قبل أن ينهار الحقل الكمي. الجمل مأخوذة من قائمة أكثر 5000 كلمة استخدامًا.",
                 "Pick the word that completes the sentence before the quantum field collapses. Sentences come from the 5000 most frequent words."
             ),
             color = ExplorerBlue,
@@ -161,7 +161,7 @@ private fun ClozeRun(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
                         Text(
-                            if (picked == question.answer) language.pick("✅ أحسنتِ!", tl("✅ ¡Correcto!"))
+                            if (picked == question.answer) language.pick("✅ أحسنت!", tl("✅ ¡Correcto!"))
                             else if (picked == "") language.pick("⏱️ انتهى الوقت", tl("⏱️ ¡Tiempo!"))
                             else language.pick("❌ الإجابة الصحيحة: ", tl("❌ Respuesta: ")) + question.answer,
                             color = TextPrimary, fontWeight = FontWeight.Bold

@@ -61,14 +61,14 @@ fun MunchersScreen(viewModel: BlasterViewModel) {
     val data = content ?: return LoadingContent(language == HelperLanguage.ARABIC)
     val open = data.course.take(nextCourseUnit(data.course, stars) + 1).ifEmpty { data.course }
     if (open.size < 2) {
-        Text(language.pick("ابدئي الدورة أولًا لتفتحي الكلمات.", "Start the course first to unlock words."), color = TextSecondary, modifier = Modifier.padding(24.dp))
+        Text(language.pick("ابدأ الدورة أولًا لتفتح الكلمات.", "Start the course first to unlock words."), color = TextSecondary, modifier = Modifier.padding(24.dp))
         return
     }
     var game by remember { mutableIntStateOf(0) }
     var lost by remember { mutableStateOf(false) }
     key(game) { MunchGame(open, viewModel, language) { lost = it } }
     reward?.let {
-        val title = if (lost) language.pick("💔 انتهت القلوب، حاولي مرة أخرى", "💔 Out of hearts, try again") else language.pick("😋 وجبة رائعة!", "😋 Great munching!")
+        val title = if (lost) language.pick("💔 انتهت القلوب، حاول مرة أخرى", "💔 Out of hearts, try again") else language.pick("😋 وجبة رائعة!", "😋 Great munching!")
         RewardDialog(it, language == HelperLanguage.ARABIC, title) {
             viewModel.dismissPracticeReward()
             game++
@@ -189,7 +189,7 @@ private fun MunchGame(open: List<CourseUnit>, viewModel: BlasterViewModel, langu
             Text(board.unit.emoji, fontSize = 34.sp)
             Spacer(Modifier.width(10.dp))
             Column(Modifier.weight(1f)) {
-                Text(language.pick("كُلي فقط كلمات:", "Eat only words about:"), color = StarWhite.copy(alpha = 0.7f), fontSize = 12.sp, maxLines = 1)
+                Text(language.pick("كُل فقط كلمات:", "Eat only words about:"), color = StarWhite.copy(alpha = 0.7f), fontSize = 12.sp, maxLines = 1)
                 Text("${board.unit.title} · ${board.unit.helperTitle(language)}", color = StarWhite, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp)
             }
             flash?.let { Text(it, fontSize = 20.sp) }

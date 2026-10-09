@@ -52,7 +52,7 @@ object Reminders {
         val title = when {
             sad && arabic -> "😢 ليا حزينة، تفتقدك!"
             sad -> "😢 Lía is sad, she misses you!"
-            live > 0 && arabic -> "🔥 حافظي على سلسلة $live يوم!"
+            live > 0 && arabic -> "🔥 حافظ على سلسلة $live يوم!"
             live > 0 -> "🔥 Keep your $live-day streak alive!"
             arabic -> "🚀 ليا ونيلو بانتظارك"
             else -> "🚀 Lía and Nilo are waiting"
@@ -60,7 +60,7 @@ object Reminders {
         val body = when {
             due > 0 && arabic -> "لديك $due كلمة للمراجعة. بضع دقائق تكفي."
             due > 0 -> "You have $due words to review. A few minutes is enough."
-            arabic -> "تعلّمي 5 كلمات جديدة اليوم مع نيلو."
+            arabic -> "تعلّم 5 كلمات جديدة اليوم مع نيلو."
             else -> "Learn 5 new words with Nilo today."
         }
         val manager = context.getSystemService(NotificationManager::class.java) ?: return

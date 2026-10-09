@@ -93,13 +93,13 @@ fun StreakCard(viewModel: BlasterViewModel, language: HelperLanguage) {
                 )
                 Text(
                     when {
-                        done -> language.pick("أنجزتِ هدف اليوم! عودي غدًا 💪", "Goal done today! Come back tomorrow 💪")
+                        done -> language.pick("أنجزت هدف اليوم! عُد غدًا 💪", "Goal done today! Come back tomorrow 💪")
                         streak.liaMood(today) == LiaMood.SAD -> language.pick(
-                            "ليا حزينة، غبتِ ${streak.daysAway(today)} أيام. أكملي هدف اليوم لتفرح من جديد!",
+                            "ليا حزينة، غبت ${streak.daysAway(today)} أيام. أكمل هدف اليوم لتفرح من جديد!",
                             "Lía is sad, you were away ${streak.daysAway(today)} days. Hit today's goal to cheer her up!"
                         )
-                        live > 0 -> language.pick("أكملي هدف اليوم حتى لا تنطفئ الشعلة", "Hit today's goal to keep the flame alive")
-                        else -> language.pick("أكملي هدف اليوم لتبدئي سلسلة", "Hit today's goal to start a streak")
+                        live > 0 -> language.pick("أكمل هدف اليوم حتى لا تنطفئ الشعلة", "Hit today's goal to keep the flame alive")
+                        else -> language.pick("أكمل هدف اليوم لتبدأ سلسلة", "Hit today's goal to start a streak")
                     },
                     color = TextSecondary, fontSize = 12.sp
                 )
@@ -141,7 +141,7 @@ fun StreakSettings(viewModel: BlasterViewModel, language: HelperLanguage) {
             Column(Modifier.weight(1f)) {
                 Text(language.pick("تذكير يومي", "Daily reminder"), color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 13.sp)
                 Text(
-                    language.pick("نذكّرك فقط إذا لم تنجزي هدفك", "Only if you haven't reached your goal"),
+                    language.pick("نذكّرك فقط إذا لم تنجز هدفك", "Only if you haven't reached your goal"),
                     color = TextSecondary, fontSize = 11.sp
                 )
             }
@@ -166,14 +166,14 @@ fun StreakSettings(viewModel: BlasterViewModel, language: HelperLanguage) {
         }
         Text(
             language.pick(
-                "❄️ تجميد السلسلة يحميها إذا فاتك يوم. تحصلين على واحد كل 7 أيام.",
+                "❄️ تجميد السلسلة يحميها إذا فاتك يوم. تحصل على واحد كل 7 أيام.",
                 "❄️ A streak freeze saves you if you miss a day. Earn one every 7 days."
             ),
             color = TextSecondary, fontSize = 11.sp
         )
         Text(
             language.pick(
-                tl("📱 أضيفي الأداة إلى الشاشة الرئيسية: اضغطي مطولًا على الشاشة ← الأدوات ← Spanish Blaster."),
+                tl("📱 أضف الأداة إلى الشاشة الرئيسية: اضغط مطولًا على الشاشة ← الأدوات ← Spanish Blaster."),
                 tl("📱 Add the widget: long-press your home screen → Widgets → Spanish Blaster.")
             ),
             color = TextSecondary, fontSize = 11.sp
@@ -251,7 +251,7 @@ fun StreakCelebration(viewModel: BlasterViewModel, language: HelperLanguage) {
                 )
                 Spacer(Modifier.height(6.dp))
                 Text(
-                    language.pick("أنجزتِ هدف اليوم. نراك غدًا!", "Daily goal reached. See you tomorrow!"),
+                    language.pick("أنجزت هدف اليوم. نراك غدًا!", "Daily goal reached. See you tomorrow!"),
                     color = TextPrimary, textAlign = TextAlign.Center
                 )
                 if (e.milestone != null) {
@@ -264,7 +264,7 @@ fun StreakCelebration(viewModel: BlasterViewModel, language: HelperLanguage) {
                 if (e.earnedFreeze) {
                     Spacer(Modifier.height(6.dp))
                     Text(
-                        language.pick("❄️ ربحتِ تجميدًا للسلسلة!", "❄️ You earned a streak freeze!"),
+                        language.pick("❄️ ربحت تجميدًا للسلسلة!", "❄️ You earned a streak freeze!"),
                         color = DiamondCyan, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center
                     )
                 }

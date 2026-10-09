@@ -95,7 +95,7 @@ private fun TopicMap(topics: List<GrammarTopic>, viewModel: BlasterViewModel, la
                 Text(tl("🕵️ ¿Por qué?"), color = SolarGold, fontSize = 26.sp, fontWeight = FontWeight.ExtraBold)
                 Text(
                     language.pick(
-                        "نيلو المحقق يشرح لكِ سبب كل إجابة: قاعدة واحدة، ثم 6 أسئلة سريعة.",
+                        "نيلو المحقق يشرح لك سبب كل إجابة: قاعدة واحدة، ثم 6 أسئلة سريعة.",
                         "Detective Nilo shows you the reason behind every answer: one rule, then 6 quick questions."
                     ),
                     color = StarWhite, fontSize = 14.sp
@@ -114,7 +114,7 @@ private fun TopicMap(topics: List<GrammarTopic>, viewModel: BlasterViewModel, la
                 modifier = Modifier.fillMaxWidth().height(64.dp)
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(language.pick("ابدئي ▶", "START ▶"), fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
+                    Text(language.pick("ابدأ ▶", "START ▶"), fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
                     Text("${next.titleEs} · ${next.title(language)}", fontSize = 12.sp, maxLines = 1)
                 }
             }
@@ -312,7 +312,7 @@ private fun QuestionCard(
 
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(
-            language.pick("السؤال ${index + 1} من $total · أكملي الجملة", "Question ${index + 1} of $total · Complete the sentence"),
+            language.pick("السؤال ${index + 1} من $total · أكمل الجملة", "Question ${index + 1} of $total · Complete the sentence"),
             color = TextSecondary, fontSize = 13.sp, fontWeight = FontWeight.Bold
         )
         Surface(shape = RoundedCornerShape(20.dp), color = AdventureSurface, border = BorderStroke(1.5.dp, AdventureCardBorder), modifier = Modifier.fillMaxWidth()) {
@@ -414,8 +414,8 @@ private fun ResultView(result: GrammarResult, viewModel: BlasterViewModel, langu
         )
         NiloSays(
             line = when (result.stars) {
-                3 -> NiloLine(tl("¡Caso resuelto! Eres una detective."), "حُلّت القضية! أنتِ محققة بارعة.", "Case solved! You're a real detective.")
-                2 -> NiloLine(tl("¡Muy bien! Casi perfecto."), "أحسنتِ! شبه مثالي.", "Very good! Almost perfect.")
+                3 -> NiloLine(tl("¡Caso resuelto! Eres una detective."), "حُلّت القضية! أنتَ محقق بارع.", "Case solved! You're a real detective.")
+                2 -> NiloLine(tl("¡Muy bien! Casi perfecto."), "أحسنت! شبه مثالي.", "Very good! Almost perfect.")
                 else -> NiloLine(tl("Repasamos la regla y lo intentamos otra vez."), "لنراجع القاعدة ونحاول مرة أخرى.", "Let's review the rule and try again.")
             },
             language = language,
@@ -436,7 +436,7 @@ private fun ResultView(result: GrammarResult, viewModel: BlasterViewModel, langu
                 onClick = { viewModel.startGrammarRound(result.topic) },
                 shape = RoundedCornerShape(16.dp),
                 modifier = Modifier.fillMaxWidth().height(50.dp)
-            ) { Text(language.pick("أعيدي المحاولة", "Try again"), fontWeight = FontWeight.Bold) }
+            ) { Text(language.pick("أعد المحاولة", "Try again"), fontWeight = FontWeight.Bold) }
         }
     }
 }

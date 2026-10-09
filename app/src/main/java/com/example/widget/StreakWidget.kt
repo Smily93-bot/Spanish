@@ -63,7 +63,7 @@ class StreakWidget : AppWidgetProvider() {
                 setTextViewText(
                     R.id.widget_goal,
                     when (mood) {
-                        LiaMood.HAPPY -> t("✅ أنجزتِ هدف اليوم! ليا سعيدة", "✅ Goal done! Lía is happy")
+                        LiaMood.HAPPY -> t("✅ أنجزت هدف اليوم! ليا سعيدة", "✅ Goal done! Lía is happy")
                         LiaMood.SAD -> t("😢 ليا حزينة… $away أيام بلا دراسة", "😢 Lía misses you… $away days away")
                         LiaMood.WAITING -> t("الهدف: $xp / $goal نقطة", "Goal: $xp / $goal XP")
                     }
@@ -73,7 +73,7 @@ class StreakWidget : AppWidgetProvider() {
                     R.id.widget_due,
                     when {
                         due > 0 -> t("📚 $due كلمة للمراجعة", "📚 $due words to review")
-                        EngagementStore.learnedCount(prefs) == 0 -> t("🌌 ابدئي مجرة الكلمات", "🌌 Start the Word Galaxy")
+                        EngagementStore.learnedCount(prefs) == 0 -> t("🌌 ابدأ مجرة الكلمات", "🌌 Start the Word Galaxy")
                         else -> t("✨ لا مراجعات الآن", "✨ No reviews due")
                     }
                 )

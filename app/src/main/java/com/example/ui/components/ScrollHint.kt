@@ -88,7 +88,7 @@ fun BoxScope.ScrollMoreHint(scroll: ScrollState, language: HelperLanguage, fadeC
                     .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
                 Text(
-                    language.pick("⬇ مرّري للأسفل لرؤية المزيد", "⬇ Scroll down to see more"),
+                    language.pick("⬇ مرّر للأسفل لرؤية المزيد", "⬇ Scroll down to see more"),
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
                     fontSize = 13.sp

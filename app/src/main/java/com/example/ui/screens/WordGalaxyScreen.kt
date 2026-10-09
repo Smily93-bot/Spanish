@@ -103,7 +103,7 @@ private fun GalaxyMap(viewModel: BlasterViewModel, language: HelperLanguage) {
                     ProgressBar(progress = learned / Galaxy.WORDS.toFloat(), color = SolarGold)
                     Text(
                         language.pick(
-                            "تعلّمتِ $learned · حفظتِ $memorized · من 5000",
+                            "تعلّمت $learned · حفظت $memorized · من 5000",
                             "$learned learned · $memorized memorized · of 5000"
                         ),
                         color = StarWhite.copy(alpha = 0.8f), fontSize = 12.sp
@@ -136,7 +136,7 @@ private fun GalaxyMap(viewModel: BlasterViewModel, language: HelperLanguage) {
 
         item {
             NiloSays(
-                line = if (due > 0) NiloLine(tl("¡Repasa primero, así no olvidas!"), "راجعي أولًا حتى لا تنسي!", "Review first so you don't forget!")
+                line = if (due > 0) NiloLine(tl("¡Repasa primero, así no olvidas!"), "راجع أولًا حتى لا تنسى!", "Review first so you don't forget!")
                 else NiloLine(tl("Cada día, cinco palabras nuevas."), "كل يوم، خمس كلمات جديدة.", "Five new words every day."),
                 language = language,
                 onSpeak = { viewModel.speakSpanish(if (due > 0) tl("¡Repasa primero, así no olvidas!") else tl("Cada día, cinco palabras nuevas.")) },
@@ -179,7 +179,7 @@ private fun DailyGoalLine(xp: Int, goal: Int, streak: Int, language: HelperLangu
         Text(if (xp >= goal) "🔥" else "🕯️", fontSize = 18.sp)
         Spacer(Modifier.width(6.dp))
         Text(
-            if (xp >= goal) language.pick("أنجزتِ هدف اليوم · سلسلة $streak يوم", "Daily goal done · $streak-day streak")
+            if (xp >= goal) language.pick("أنجزت هدف اليوم · سلسلة $streak يوم", "Daily goal done · $streak-day streak")
             else language.pick("هدف اليوم: $xp / $goal نقطة", "Today's goal: $xp / $goal XP"),
             color = SolarGold, fontSize = 13.sp, fontWeight = FontWeight.Bold
         )
@@ -302,7 +302,7 @@ private fun ConstellationDialog(
                 Text("✦ ${Galaxy.name(index)}", fontWeight = FontWeight.ExtraBold, color = TextPrimary)
                 Text(
                     language.pick(
-                        "الكلمات ${Galaxy.ranksOf(index).first}–${Galaxy.ranksOf(index).last} · تعلّمتِ ${Galaxy.introducedIn(index, cards)}",
+                        "الكلمات ${Galaxy.ranksOf(index).first}–${Galaxy.ranksOf(index).last} · تعلّمت ${Galaxy.introducedIn(index, cards)}",
                         "Words ${Galaxy.ranksOf(index).first}–${Galaxy.ranksOf(index).last} · ${Galaxy.introducedIn(index, cards)} learned"
                     ),
                     fontSize = 12.sp, color = TextSecondary
@@ -313,7 +313,7 @@ private fun ConstellationDialog(
             if (!unlocked) {
                 Text(
                     language.pick(
-                        "🔒 تعلّمي 40 كلمة من الكوكبة السابقة لفتح هذه.",
+                        "🔒 تعلّم 40 كلمة من الكوكبة السابقة لفتح هذه.",
                         "🔒 Learn 40 words of the previous constellation to open this one."
                     ),
                     color = TextPrimary
@@ -350,7 +350,7 @@ private fun ConstellationDialog(
                 Button(
                     onClick = { onDismiss(); viewModel.startGalaxyLesson(index) },
                     colors = ButtonDefaults.buttonColors(containerColor = SolarAmber)
-                ) { Text(language.pick("تعلّمي 5 كلمات", "Learn 5 words"), fontWeight = FontWeight.Bold) }
+                ) { Text(language.pick("تعلّم 5 كلمات", "Learn 5 words"), fontWeight = FontWeight.Bold) }
             }
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text(language.pick("إغلاق", "Close")) } }
@@ -477,7 +477,7 @@ private fun IntroCard(
             modifier = Modifier.fillMaxWidth().height(54.dp)
         ) {
             Text(
-                if (number == total) language.pick("ابدئي التحدي ☄️", "Start the challenge ☄️") else language.pick("التالي", "Next"),
+                if (number == total) language.pick("ابدأ التحدي ☄️", "Start the challenge ☄️") else language.pick("التالي", "Next"),
                 fontWeight = FontWeight.ExtraBold, fontSize = 16.sp
             )
         }
@@ -531,8 +531,8 @@ private fun QuestionView(
             when (question.type) {
                 GalaxyExercise.MEANING -> language.pick("ما معنى هذه الكلمة؟", "What does this word mean?")
                 GalaxyExercise.REVERSE -> language.pick(tl("كيف نقول هذا بالإسبانية؟"), tl("How do you say this in Spanish?"))
-                GalaxyExercise.LISTEN -> language.pick("استمعي واختاري الكلمة", "Listen and pick the word")
-                GalaxyExercise.SPELL -> language.pick("اكتبي الكلمة بالحروف", "Spell the word")
+                GalaxyExercise.LISTEN -> language.pick("استمع واختر الكلمة", "Listen and pick the word")
+                GalaxyExercise.SPELL -> language.pick("اكتب الكلمة بالحروف", "Spell the word")
             },
             color = TextSecondary, fontSize = 14.sp, fontWeight = FontWeight.Bold
         )
@@ -686,7 +686,7 @@ private fun Feedback(
     viewModel: BlasterViewModel,
     onContinue: () -> Unit
 ) {
-    val miss = NiloLine(tl("¡Casi! Lo repetimos luego."), "كدتِ! سنعيدها بعد قليل.", "Almost! We'll try it again soon.")
+    val miss = NiloLine(tl("¡Casi! Lo repetimos luego."), "كدت! سنعيدها بعد قليل.", "Almost! We'll try it again soon.")
     Surface(
         shape = RoundedCornerShape(18.dp),
         color = if (correct) SuccessGreen.copy(alpha = 0.12f) else MeteorRed.copy(alpha = 0.10f),
@@ -727,7 +727,7 @@ private fun GalaxySummaryView(summary: GalaxySummary, language: HelperLanguage, 
         Text("🌟", fontSize = 64.sp)
         Text(
             if (summary.isLesson) language.pick("كلمات جديدة في مجرتك!", "New stars in your galaxy!")
-            else language.pick("أنهيتِ المراجعة!", "Review complete!"),
+            else language.pick("أنهيت المراجعة!", "Review complete!"),
             color = TextPrimary, fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, textAlign = TextAlign.Center
         )
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -737,13 +737,13 @@ private fun GalaxySummaryView(summary: GalaxySummary, language: HelperLanguage, 
         }
         if (summary.newlyMemorized > 0) {
             Text(
-                language.pick("🧠 حفظتِ ${summary.newlyMemorized} كلمة بشكل دائم!", "🧠 ${summary.newlyMemorized} words now memorized!"),
+                language.pick("🧠 حفظت ${summary.newlyMemorized} كلمة بشكل دائم!", "🧠 ${summary.newlyMemorized} words now memorized!"),
                 color = NebulaPurple, fontWeight = FontWeight.Bold
             )
         }
         Text(
             language.pick(
-                "ستعود الكلمات للمراجعة في الوقت المناسب قبل أن تنسيها.",
+                "ستعود الكلمات للمراجعة في الوقت المناسب قبل أن تنساها.",
                 "Words come back for review right before you would forget them."
             ),
             color = TextSecondary, fontSize = 13.sp, textAlign = TextAlign.Center

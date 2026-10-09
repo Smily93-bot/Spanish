@@ -71,7 +71,7 @@ private fun CoursePath(course: List<CourseUnit>, stars: Map<String, Int>, langua
         Text(language.pick("📚 الدورة: من الصفر", "📚 Course: from zero"), color = TextPrimary, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold)
         Text(
             language.pick(
-                "كل وحدة تعلّمك ٨ كلمات بالصور والصوت، ثم تلعبين بها. بعدها تصبح مغامرة ليا أسهل!",
+                "كل وحدة تعلّمك ٨ كلمات بالصور والصوت، ثم تلعب بها. بعدها تصبح مغامرة ليا أسهل!",
                 "Each unit teaches 8 words with pictures and sound, then you play with them. After that, Lía's adventure gets easier!"
             ),
             color = TextSecondary, fontSize = 14.sp, lineHeight = 20.sp
@@ -219,7 +219,7 @@ private fun LearnCard(word: CourseWord, viewModel: BlasterViewModel, language: H
 @Composable
 private fun PhrasesCard(unit: CourseUnit, viewModel: BlasterViewModel, language: HelperLanguage) {
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Text(language.pick("💬 جمل قصيرة — اضغطي لتسمعي", "💬 Short sentences — tap to listen"), color = NebulaPurple, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp)
+        Text(language.pick("💬 جمل قصيرة — اضغط لتسمع", "💬 Short sentences — tap to listen"), color = NebulaPurple, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp)
         unit.phrases.forEach { p ->
             AdventureCard(borderColor = NebulaPurple, onClick = { viewModel.speakSpanish(p.text) }) {
                 Text("🔊 " + p.text, color = TextPrimary, fontSize = 19.sp, fontWeight = FontWeight.Bold)
@@ -247,10 +247,10 @@ private fun UnitDone(unit: CourseUnit, stars: Int, language: HelperLanguage) {
     Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
         Text("⭐".repeat(stars), fontSize = 48.sp)
         Spacer(Modifier.height(8.dp))
-        Text(language.pick("أنهيتِ الوحدة!", "Unit complete!"), color = SuccessGreen, fontWeight = FontWeight.ExtraBold, fontSize = 26.sp)
+        Text(language.pick("أنهيت الوحدة!", "Unit complete!"), color = SuccessGreen, fontWeight = FontWeight.ExtraBold, fontSize = 26.sp)
         Text(unit.words.joinToString("  ") { it.emoji }, fontSize = 26.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(top = 10.dp))
         Text(
-            language.pick("تعرفين الآن ${unit.words.size} كلمات جديدة.", "You now know ${unit.words.size} new words."),
+            language.pick("تعرف الآن ${unit.words.size} كلمات جديدة.", "You now know ${unit.words.size} new words."),
             color = TextSecondary, fontSize = 15.sp, modifier = Modifier.padding(top = 6.dp)
         )
     }
@@ -288,7 +288,7 @@ fun MatchPairs(words: List<CourseWord>, viewModel: BlasterViewModel, language: H
     }
 
     Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Text(language.pick("🔗 صِلي كل كلمة بصورتها", "🔗 Match each word to its picture"), color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
+        Text(language.pick("🔗 صِل كل كلمة بصورتها", "🔗 Match each word to its picture"), color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 words.forEach { w ->
@@ -342,7 +342,7 @@ private fun ListenPick(word: CourseWord, options: List<CourseWord>, viewModel: B
     val wrong = remember(word) { mutableStateListOf<CourseWord>() }
     LaunchedEffect(word) { viewModel.speakSpanish(word.word) }
     Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        Text(language.pick("👂 استمعي واختاري الصورة", "👂 Listen and pick the picture"), color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
+        Text(language.pick("👂 استمع واختر الصورة", "👂 Listen and pick the picture"), color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
         AudioButton(onClick = { viewModel.speakSpanish(word.word) }, size = 72.dp)
         if (picked == word) Text(word.word, color = SuccessGreen, fontSize = 26.sp, fontWeight = FontWeight.ExtraBold)
         options.chunked(2).forEach { pair ->
@@ -530,7 +530,7 @@ fun QuickWordGameScreen(viewModel: BlasterViewModel, crossword: Boolean) {
     var mistakes by remember { mutableIntStateOf(0) }
     val open = data.course.take(nextCourseUnit(data.course, stars) + 1).flatMap { it.words }
     if (open.size < 4) {
-        Text(language.pick("ابدئي الدورة أولًا لتفتحي الكلمات.", "Start the course first to unlock words."), color = TextSecondary, modifier = Modifier.padding(24.dp))
+        Text(language.pick("ابدأ الدورة أولًا لتفتح الكلمات.", "Start the course first to unlock words."), color = TextSecondary, modifier = Modifier.padding(24.dp))
         return
     }
     val words = remember(round) { open.shuffled().take(if (crossword) 8 else 4) }
@@ -543,7 +543,7 @@ fun QuickWordGameScreen(viewModel: BlasterViewModel, crossword: Boolean) {
         }
         if (finished) {
             Text(
-                language.pick("🎉 أحسنتِ!", "🎉 Well done!") + if (mistakes == 0) " ⭐⭐⭐" else "",
+                language.pick("🎉 أحسنت!", "🎉 Well done!") + if (mistakes == 0) " ⭐⭐⭐" else "",
                 color = SuccessGreen, fontWeight = FontWeight.ExtraBold, fontSize = 20.sp
             )
             BlasterCyberButton(
