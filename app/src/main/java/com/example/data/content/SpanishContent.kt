@@ -334,7 +334,20 @@ class SpanishContent(
                         titleAr = lesson.optString("titleAr", lesson.optString("title")),
                         english = lesson.optString("en"),
                         arabic = lesson.optString("ar"),
-                        example = lesson.optString("example")
+                        example = lesson.optString("example"),
+                        points = lesson.optJSONArray("points")?.let { arr ->
+                            (0 until arr.length()).map { i ->
+                                val p = arr.getJSONObject(i)
+                                LessonPoint(
+                                    english = p.optString("en"),
+                                    arabic = p.optString("ar"),
+                                    example = p.optString("example"),
+                                    exEn = p.optString("exEn"),
+                                    exAr = p.optString("exAr"),
+                                    key = p.optString("key")
+                                )
+                            }
+                        }.orEmpty()
                     ),
                     table = GrammarTable(
                         headers = table.getJSONArray("headers").strings(),

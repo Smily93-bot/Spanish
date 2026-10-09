@@ -215,6 +215,8 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
     var showTip by remember { mutableStateOf(false) }
     // Every chapter starts with its lesson and words, before the ship.
     var briefed by remember { mutableStateOf(false) }
+    // How to play is shown on the first level, and whenever ❔ is pressed.
+    var briefFromHelp by remember { mutableStateOf(false) }
     val results = remember { mutableStateMapOf<String, Boolean>() }
     var openStation by remember { mutableStateOf<Int?>(null) }
     var finished by remember { mutableStateOf(false) }
@@ -409,7 +411,7 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
                 Text("💎 $diamonds", color = SolarAmber, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
                 if (clock - lostAt < 1.5f) Text("−1", color = MeteorRed, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
             }
-            Surface(onClick = { briefed = false }, shape = CircleShape, color = SpaceNavy, modifier = Modifier.size(36.dp)) {
+            Surface(onClick = { briefFromHelp = true; briefed = false }, shape = CircleShape, color = SpaceNavy, modifier = Modifier.size(36.dp)) {
                 Box(contentAlignment = Alignment.Center) { Text("❔", fontSize = 18.sp) }
             }
         }
@@ -516,7 +518,7 @@ fun ExpeditionScreen(tablet: ReadingTablet, data: SpanishContent, viewModel: Bla
     }
 
     if (!briefed) {
-        MissionBriefing(tablet, chapterNumber, level, language, onStart = { briefed = true })
+        MissionBriefing(tablet, chapterNumber, level, language, showHowTo = chapterNumber == 1 || briefFromHelp, onStart = { briefed = true; briefFromHelp = false })
     }
 
     if (showTip) {
@@ -1018,7 +1020,7 @@ private sealed interface Step {
     /** One more story sentence; the ones before it stay above, like a chat. */
     data class Sentence(val text: String, val number: Int, val total: Int, val translation: String?, val before: List<String> = emptyList()) : Step
     /** The chapter's grammar in a small piece: the rule, its forms, and where they are in the story. */
-    data class Rule(val short: Boolean) : Step
+    data class Rule(val short: Boolean, val point: Int? = null, val last: Boolean = true) : Step
     /** Typed answer. */
     data class Write(val key: String, val field: TabletField) : Step
     /** Word Jump: Lía jumps onto the right word. */
@@ -1035,6 +1037,12 @@ private sealed interface Step {
 }
 
 private fun storySentences(text: String) = text.split(Regex("(?<=[.!?])\\s+")).filter { it.isNotBlank() }
+
+/** The rule in chunks: one card per teaching point (the last one also shows the forms). */
+private fun ruleSteps(tablet: ReadingTablet): List<Step> {
+    val n = tablet.lesson.points.size
+    return if (n == 0) listOf(Step.Rule(short = false)) else List(n) { Step.Rule(short = false, point = it, last = it == n - 1) }
+}
 
 /** Four course words for the radio room's matching game: words from this chapter first, then early course words. */
 private fun storyMatch(tablet: ReadingTablet, data: SpanishContent): List<CourseWord>? {
@@ -1058,7 +1066,7 @@ private fun buildSteps(
     return when (station) {
         Station.STORY -> storySentences(tablet.story).let { s ->
             s.mapIndexed { i, line -> Step.Sentence(line, i + 1, s.size, tablet.storyLines.getOrNull(i)?.meaning(language), s.take(i)) }
-        } + Step.Rule(short = false) + listOfNotNull(storyMatch(tablet, data)?.let { Step.Match(it) })
+        } + ruleSteps(tablet) + listOfNotNull(storyMatch(tablet, data)?.let { Step.Match(it) })
         Station.OPENING -> listOf(Step.Rule(short = true)) + tablet.opening.mapIndexed { i, f -> Step.Write("opening-$i", f) }
         Station.SEARCH -> if (scene == null || searchTargets.isEmpty()) listOf(Step.Note("🔍", "")) else listOf(Step.Search)
         Station.CONSOLE -> listOf(Step.Lesson, Step.Table)
@@ -1148,7 +1156,7 @@ private fun MissionPanel(
                 } else Column(Modifier.fillMaxSize().verticalScroll(scroll), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     when (step) {
                         is Step.Sentence -> SentenceCard(step, data, viewModel, language)
-                        is Step.Rule -> RuleCard(tablet, step.short, viewModel, language)
+                        is Step.Rule -> if (step.point != null) RulePointCard(tablet, step.point, step.last, viewModel, language) else RuleCard(tablet, step.short, viewModel, language)
                         is Step.Write -> QuestionCard(step.field, step.key, results, viewModel, language)
                         is Step.Choice -> ChoiceCard(step, results, viewModel, language)
                         is Step.Falling -> FallingWordsCard(step, results, viewModel, language)
@@ -1255,6 +1263,7 @@ private fun MissionBriefing(
     level: Int,
     ship: ShipLevel,
     language: HelperLanguage,
+    showHowTo: Boolean,
     onStart: () -> Unit
 ) {
     AlertDialog(
@@ -1276,7 +1285,7 @@ private fun MissionBriefing(
                         Text(language.pick(bidiSafe(ship.newAr), ship.newEn), color = StarWhite, fontSize = 15.sp, lineHeight = 22.sp)
                     }
                 }
-                Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Color.White.copy(alpha = 0.08f)).padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                if (showHowTo) Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Color.White.copy(alpha = 0.08f)).padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(language.pick("🎮 كيف تلعبين", "🎮 How to play"), color = SolarGold, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp)
                     listOf(
                         language.pick("◀ ▲ ▶ حرّكي ليا. لا يوجد وقت.", "◀ ▲ ▶ move Lía. There's no timer."),
@@ -1294,6 +1303,67 @@ private fun MissionBriefing(
             }
         }
     )
+}
+
+/** One teaching point of the chapter's rule: a short explanation and one example with the key form highlighted. */
+@Composable
+private fun RulePointCard(tablet: ReadingTablet, index: Int, last: Boolean, viewModel: BlasterViewModel, language: HelperLanguage) {
+    val point = tablet.lesson.points[index]
+    val total = tablet.lesson.points.size
+    LaunchedEffect(point.example) { viewModel.speakSpanish(point.example) }
+    AdventureCard(borderColor = ExplorerBlue) {
+        Text("📘 " + language.pick(bidiSafe(tablet.lesson.titleAr), tablet.lesson.title) + "  ·  ${index + 1}/$total",
+            color = ExplorerBlue, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp)
+        Spacer(Modifier.height(6.dp))
+        Text(if (language == HelperLanguage.ARABIC) bidiSafe(point.text(language)) else point.text(language),
+            color = TextPrimary, fontSize = 18.sp, lineHeight = 27.sp, fontWeight = FontWeight.SemiBold)
+    }
+    if (point.example.isNotBlank()) {
+        Surface(shape = RoundedCornerShape(18.dp), color = SpaceNavy, modifier = Modifier.fillMaxWidth()) {
+            Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    val at = if (point.key.isBlank()) -1 else point.example.indexOf(point.key)
+                    Text(
+                        buildAnnotatedString {
+                            if (at < 0) append(point.example) else {
+                                append(point.example.substring(0, at))
+                                withStyle(SpanStyle(color = SolarGold, fontWeight = FontWeight.ExtraBold, background = SolarGold.copy(alpha = 0.18f))) { append(point.key) }
+                                append(point.example.substring(at + point.key.length))
+                            }
+                        },
+                        color = StarWhite, fontSize = 22.sp, lineHeight = 30.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f)
+                    )
+                    AudioButton(onClick = { viewModel.speakSpanish(point.example) }, size = 40.dp)
+                }
+                if (point.exampleMeaning(language).isNotBlank()) {
+                    Text(point.exampleMeaning(language), color = StarWhite.copy(alpha = 0.75f), fontSize = 15.sp)
+                }
+            }
+        }
+    }
+    if (last && tablet.table.rows.isNotEmpty()) FormChips(tablet, viewModel)
+}
+
+/** The rule's forms as tappable pairs: who → form. */
+@Composable
+private fun FormChips(tablet: ReadingTablet, viewModel: BlasterViewModel) {
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+            tablet.table.rows.forEach { row ->
+                Surface(
+                    onClick = { viewModel.speakSpanish(row.joinToString(" ")) },
+                    shape = RoundedCornerShape(14.dp),
+                    color = ExplorerBlue.copy(alpha = 0.10f),
+                    border = BorderStroke(1.dp, ExplorerBlue.copy(alpha = 0.4f))
+                ) {
+                    Row(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Text(row.first() + " → ", color = TextSecondary, fontSize = 14.sp)
+                        Text(row.drop(1).joinToString(" · "), color = ExplorerBlue, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
+                    }
+                }
+            }
+        }
+    }
 }
 
 /**
@@ -1315,34 +1385,13 @@ private fun RuleCard(tablet: ReadingTablet, short: Boolean, viewModel: BlasterVi
     AdventureCard(borderColor = ExplorerBlue) {
         Text(if (short) language.pick("📘 تذكّري القاعدة", "📘 Remember the rule") else language.pick("📘 قاعدة هذا الفصل", "📘 This chapter's rule"),
             color = ExplorerBlue, fontWeight = FontWeight.ExtraBold, fontSize = 13.sp)
-        Text(language.pick(tablet.lesson.titleAr, tablet.lesson.title), color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 19.sp)
+        Text(language.pick(bidiSafe(tablet.lesson.titleAr), tablet.lesson.title), color = TextPrimary, fontWeight = FontWeight.ExtraBold, fontSize = 19.sp)
         if (!short) {
             Spacer(Modifier.height(4.dp))
             Text(language.pick(bidiSafe(tablet.lesson.arabic), tablet.lesson.english), color = TextPrimary, fontSize = 16.sp, lineHeight = 24.sp)
         }
     }
-    // The forms as pairs: who → form.
-    if (tablet.table.rows.isNotEmpty()) {
-        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                tablet.table.rows.forEach { row ->
-                    val form = row.drop(1).joinToString(" · ")
-                    Surface(
-                        onClick = { viewModel.speakSpanish(row.joinToString(" ")) },
-                        shape = RoundedCornerShape(14.dp),
-                        color = ExplorerBlue.copy(alpha = 0.10f),
-                        border = BorderStroke(1.dp, ExplorerBlue.copy(alpha = 0.4f))
-                    ) {
-                        Row(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Text(row.first(), color = TextSecondary, fontSize = 14.sp)
-                            Text(" → ", color = TextSecondary, fontSize = 14.sp)
-                            Text(form, color = ExplorerBlue, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp)
-                        }
-                    }
-                }
-            }
-        }
-    }
+    if (tablet.table.rows.isNotEmpty()) FormChips(tablet, viewModel)
     // Where the rule was in the story.
     if (inStory.isNotEmpty()) {
         Text(language.pick("🔎 في القصة:", "🔎 In the story:"), color = NebulaPurple, fontWeight = FontWeight.ExtraBold, fontSize = 14.sp)

@@ -100,7 +100,21 @@ data class LineTranslation(val english: String, val arabic: String) {
     fun meaning(language: HelperLanguage) = language.pick(arabic, english)
 }
 
-data class TabletLesson(val title: String, val titleAr: String, val english: String, val arabic: String, val example: String)
+data class TabletLesson(
+    val title: String,
+    val titleAr: String,
+    val english: String,
+    val arabic: String,
+    val example: String,
+    /** The rule taught in small steps (one idea each), with an example per step. */
+    val points: List<LessonPoint> = emptyList()
+)
+
+/** One small step of a chapter's rule; [key] is the form to highlight inside [example]. */
+data class LessonPoint(val english: String, val arabic: String, val example: String, val exEn: String, val exAr: String, val key: String) {
+    fun text(language: HelperLanguage) = language.pick(arabic, english)
+    fun exampleMeaning(language: HelperLanguage) = language.pick(exAr, exEn)
+}
 
 /** A tappable object in a hidden-object scene. Boxes are (x, y, width, height) as fractions of the image. */
 data class HiddenObject(
