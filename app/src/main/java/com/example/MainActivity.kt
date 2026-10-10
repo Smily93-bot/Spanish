@@ -136,7 +136,7 @@ fun MainAppContent(viewModel: BlasterViewModel) {
         },
         bottomBar = {
             // Games with on-screen controls hide the tabs so Home isn't pressed by accident (the back arrow stays).
-            if (currentScreen !in setOf(Screen.WordJump, Screen.MeteorBlaster, Screen.TabletCodex, Screen.Munchers)) NavigationBar(
+            if (currentScreen !in setOf(Screen.WordJump, Screen.MeteorBlaster, Screen.TabletCodex, Screen.Munchers, Screen.GrammarLab)) NavigationBar(
                 containerColor = AdventureSurface,
                 tonalElevation = 2.dp
             ) {

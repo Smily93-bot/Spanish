@@ -310,7 +310,7 @@ private fun QuestionCard(
     val answered = picked != null
     val ok = picked == q.answer
 
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
             language.pick("السؤال ${index + 1} من $total · أكمل الجملة", "Question ${index + 1} of $total · Complete the sentence"),
             color = TextSecondary, fontSize = 13.sp, fontWeight = FontWeight.Bold
@@ -319,10 +319,11 @@ private fun QuestionCard(
             Text(
                 sentence(q, if (answered) q.correct else null, if (answered) SuccessGreen else NebulaPurple),
                 color = TextPrimary,
-                fontSize = 22.sp,
+                fontSize = 20.sp,
+                lineHeight = 27.sp,
                 fontWeight = FontWeight.SemiBold,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 22.dp).fillMaxWidth()
+                modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp).fillMaxWidth()
             )
         }
         q.options.forEachIndexed { i, option ->
@@ -349,7 +350,7 @@ private fun QuestionCard(
                 border = BorderStroke(2.dp, border),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(option, color = TextPrimary, fontSize = 18.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, modifier = Modifier.padding(14.dp))
+                Text(option, color = TextPrimary, fontSize = 17.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center, modifier = Modifier.padding(horizontal = 12.dp, vertical = 9.dp))
             }
         }
         if (answered) {
@@ -359,31 +360,31 @@ private fun QuestionCard(
                 border = BorderStroke(1.5.dp, if (ok) SuccessGreen else MeteorRed),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(
-                        if (ok) language.pick("✅ صحيح!", "✅ Correct!") else language.pick("❌ ليس تمامًا", "❌ Not quite"),
-                        color = if (ok) SuccessGreen else MeteorRed, fontWeight = FontWeight.ExtraBold, fontSize = 17.sp
-                    )
+                Column(Modifier.padding(horizontal = 12.dp, vertical = 10.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    // Verdict, the sentence's meaning and 🔊 on one line (the sentence itself is filled in above).
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
-                            Text(q.filled(), color = TextPrimary, fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                            if (q.translation(language).isNotBlank()) Text(q.translation(language), color = TextSecondary, fontSize = 13.sp, modifier = Modifier.fillMaxWidth())
+                            Text(
+                                if (ok) language.pick("✅ صحيح!", "✅ Correct!") else language.pick("❌ ليس تمامًا", "❌ Not quite"),
+                                color = if (ok) SuccessGreen else MeteorRed, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp
+                            )
+                            if (q.translation(language).isNotBlank()) Text(q.translation(language), color = TextSecondary, fontSize = 14.sp, modifier = Modifier.fillMaxWidth())
                         }
                         AudioButton(onClick = { viewModel.speakSpanish(q.filled()) }, size = 34.dp)
                     }
                     if (q.why(language).isNotBlank()) {
                         Surface(shape = RoundedCornerShape(12.dp), color = NebulaPurple.copy(alpha = 0.10f), modifier = Modifier.fillMaxWidth()) {
-                            Column(Modifier.padding(12.dp)) {
-                                Text(language.pick("🕵️ لماذا؟", "🕵️ Why?"), color = NebulaPurple, fontWeight = FontWeight.ExtraBold, fontSize = 14.sp)
-                                Text(q.why(language), color = TextPrimary, fontSize = 15.sp)
-                            }
+                            Text(
+                                language.pick("🕵️ لماذا؟ ", "🕵️ Why? ") + q.why(language),
+                                color = TextPrimary, fontSize = 14.sp, lineHeight = 20.sp, modifier = Modifier.padding(10.dp)
+                            )
                         }
                     }
                     Button(
                         onClick = { onNext(ok) },
                         colors = ButtonDefaults.buttonColors(containerColor = if (ok) SuccessGreen else NebulaPurple),
                         shape = RoundedCornerShape(14.dp),
-                        modifier = Modifier.fillMaxWidth().height(50.dp)
+                        modifier = Modifier.fillMaxWidth().height(46.dp)
                     ) {
                         Text(
                             if (index + 1 < total) language.pick("التالي", "Next") else language.pick("النتيجة", "See result"),
